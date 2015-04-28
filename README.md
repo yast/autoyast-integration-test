@@ -15,23 +15,30 @@ Features
 Installation
 ------------
 
-  1. Install packages 'mkdud' and 'mksusecd' from OBS
+  1. Install packages 'mkdud' and 'mksusecd' from OBS.
 
-  2. configure `sudo` in order to run the `mksusecd`, `systemctl start libvirtd` and `zypper in` command as root
+  2. Configure `sudo` in order to run the `mksusecd`, `systemctl start
+     libvirtd` and `zypper in` commands as root.
 
-  3. generate a ssh-key (e.g. with ssh-keygen) if you do not have one
+  3. Generate a ssh-key (e.g. with ssh-keygen) if you do not have one.
 
-  4. install and start `virt-manager`
+  4. Configure default network for libvirt:
 
-  5. [configure default network](https://tails.boum.org/doc/advanced_topics/virtualization/virt-manager/index.de.html#index3h1) in `virt-manager`
+    $ virsh net-start default
+    $ virsh net-autostart default # if you want the default network to be started automatically.
 
-  6. install [pennyworth](https://github.com/SUSE/pennyworth#installation)
+  5. Install [pennyworth](https://github.com/SUSE/pennyworth#installation). If you’re running Tumbleweed,
+     you must install the `net-tools-deprecated` package.
 
-  7. clone autoyast_test repository and install needed GEMs
+  6. Clone autoyast_test repository and install needed GEMs
 
         $ git clone https://github.com/schubi2/autoyast_test
         $ cd autoyast_test
         $ bundle install
+
+  7. Only in Tumbleweed, update the vagrant-libvirt plugin:
+
+        $ NOKOGIRI_USE_SYSTEM_LIBRARIES=true vagrant plugin install vagrant-libvirt
 
 
 
