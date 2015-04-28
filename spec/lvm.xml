@@ -1,0 +1,146 @@
+<?xml version="1.0"?>
+<!DOCTYPE profile>
+<profile xmlns="http://www.suse.com/1.0/yast2ns" xmlns:config="http://www.suse.com/1.0/configns">
+
+  <general>
+    <mode>
+      <confirm config:type="boolean">false</confirm>
+    </mode>
+  </general>
+  <scripts>
+    <post-scripts config:type="list">
+      <script>
+        <filename>yast_clone.sh</filename>
+        <interpreter>shell</interpreter>
+        <location/>
+        <feedback config:type="boolean">false</feedback>
+        <source><![CDATA[#!/bin/sh
+mv /var/run/zypp.pid /var/run/zypp.sav
+yast clone_system
+mv /var/run/zypp.sav /var/run/zypp.pid
+        ]]></source>
+      </script>
+    </post-scripts>
+    <init-scripts config:type="list">
+      <script>
+        <chrooted config:type="boolean">true</chrooted>
+        <interpreter>shell</interpreter>
+        <source><![CDATA[
+  chkconfig sshd on
+  rcsshd start
+]]></source>
+      </script>
+    </init-scripts>
+  </scripts>
+  <networking>
+      <keep_install_network config:type="boolean">true</keep_install_network>
+  </networking>
+  <report>
+    <errors>
+      <log config:type="boolean">true</log>
+      <show config:type="boolean">true</show>
+      <timeout config:type="integer">0</timeout>
+    </errors>
+    <messages>
+      <log config:type="boolean">true</log>
+      <show config:type="boolean">true</show>
+      <timeout config:type="integer">0</timeout>
+    </messages>
+    <warnings>
+      <log config:type="boolean">true</log>
+      <show config:type="boolean">true</show>
+      <timeout config:type="integer">0</timeout>
+    </warnings>
+    <yesno_messages>
+      <log config:type="boolean">true</log>
+      <show config:type="boolean">true</show>
+      <timeout config:type="integer">0</timeout>
+    </yesno_messages>
+  </report>
+
+    <partitioning config:type="list">
+      <drive>
+        <partitions config:type="list">
+          <partition>
+            <partition_nr config:type="integer">1</partition_nr>
+            <lvm_group>system</lvm_group>
+            <partition_type>primary</partition_type>
+            <size>5G</size>
+          </partition>
+          <partition>
+            <partition_nr config:type="integer">2</partition_nr>
+            <lvm_group>system</lvm_group>
+            <partition_type>primary</partition_type>
+            <size>max</size>
+          </partition>
+        </partitions>
+        <use>all</use>
+      </drive>
+      <drive>
+        <device>/dev/system</device>
+        <initialize config:type="boolean">true</initialize>
+        <is_lvm_vg config:type="boolean">true</is_lvm_vg>
+        <partitions config:type="list">
+          <partition>
+            <lv_name>root_lv</lv_name>
+            <mount>/</mount>
+            <size>3G</size>
+          </partition>
+          <partition>
+            <lv_name>opt_lv</lv_name>
+            <mount>/opt</mount>
+            <size>max</size>
+          </partition>
+          <partition>
+            <filesystem config:type="symbol">swap</filesystem>
+            <lv_name>swap_lv</lv_name>
+            <mount>swap</mount>
+            <size>auto</size>
+          </partition>
+        </partitions>
+        <pesize>4M</pesize>
+        <use>all</use>
+      </drive>
+    </partitioning>
+
+  <software>
+    <patterns config:type="list">
+      <pattern>Minimal</pattern>
+      <pattern>base</pattern>
+    </patterns>
+    <packages config:type="list">
+      <package>mc</package>
+    </packages>
+    <remove-packages config:type="list">
+      <package>zsh</package>
+    </remove-packages>
+  </software>
+
+  <language>
+    <language>de_DE</language>
+    <languages>de_DE</languages>
+  </language>
+
+  <users config:type="list">
+    <user>
+      <encrypted config:type="boolean">false</encrypted>
+      <fullname>vagrant</fullname>
+      <gid>100</gid>
+      <home>/home/vagrant</home>
+      <shell>/bin/bash</shell>
+      <uid>1000</uid>
+      <user_password>vagrant</user_password>
+      <username>vagrant</username>
+    </user>
+    <user>
+      <encrypted config:type="boolean">false</encrypted>
+      <fullname>root</fullname>
+      <gid>0</gid>
+      <home>/root</home>
+      <shell>/bin/bash</shell>
+      <uid>0</uid>
+      <user_password>vagrant</user_password>
+      <username>root</username>
+    </user>
+  </users>
+</profile>
