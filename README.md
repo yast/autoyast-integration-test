@@ -77,3 +77,10 @@ To use the official SLES12 ISO (default setting) for tests just call:
 
     $ rake build_iso[default]
 
+
+Jenkins
+-------
+
+These AutoYaST integration tests are running on a SUSE jenkins node:
+
+http://river.suse.de/job/autoyast-integration-test/
