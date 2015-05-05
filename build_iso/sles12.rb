@@ -43,12 +43,12 @@ Dir.chdir(File.join( cache_dir, "yast-packages")) {
     unless package.start_with?("#")
       #Remove already downloaded RPMs
       rpm_name = `rpm -qp --qf \"%{NAME}\" #{package}`
-      Dir.glob("./**/#{rpm_name}*.rpm").each { |exchange_rpm|
+      Dir.glob("./**/#{rpm_name}*.rpm").each do |exchange_rpm|
         if `rpm -qp --qf \"%{NAME}\" #{exchange_rpm}` == rpm_name
           puts "\n   Removing #{exchange_rpm}"
           FileUtils.remove_file(exchange_rpm)
         end
-      }
+      end
       puts "\n   Copying #{package}"
       FileUtils.cp(package,".")
     end
