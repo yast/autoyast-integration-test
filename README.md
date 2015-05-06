@@ -32,8 +32,8 @@ Installation
 
   6. Clone autoyast_test repository and install needed GEMs
 
-        $ git clone https://github.com/schubi2/autoyast_test
-        $ cd autoyast_test
+        $ https://github.com/yast/autoyast-integration-test
+        $ cd autoyast-integration-test
         $ bundle install
 
   7. Only in Tumbleweed, update the vagrant-libvirt plugin:
