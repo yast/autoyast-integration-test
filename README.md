@@ -22,21 +22,21 @@ Installation
 
   3. Generate a ssh-key (e.g. with ssh-keygen) if you do not have one.
 
-  4. Configure default network for libvirt:
-
-    $ virsh net-start default
-    $ virsh net-autostart default # if you want the default network to be started automatically.
-
-  5. Install [pennyworth](https://github.com/SUSE/pennyworth#installation). If you’re running Tumbleweed,
+  4. Install [Pennyworth](https://github.com/SUSE/pennyworth#installation). If you're running Tumbleweed,
      you must install the `net-tools-deprecated` package.
 
-  6. Clone autoyast_test repository and install needed GEMs
+  5. Configure default network for libvirt:
 
-        $ https://github.com/yast/autoyast-integration-test
+        $ virsh net-start default
+        $ virsh net-autostart default # if you want the default network to be started automatically.
+
+  6. Clone autoyast-integration-test repository and install needed GEMs
+
+        $ git clone https://github.com/yast/autoyast-integration-test
         $ cd autoyast-integration-test
         $ bundle install
 
-  7. Only in Tumbleweed, update the vagrant-libvirt plugin:
+  7. Only in Tumbleweed, you must update the vagrant-libvirt plugin:
 
         $ NOKOGIRI_USE_SYSTEM_LIBRARIES=true vagrant plugin install vagrant-libvirt
 
