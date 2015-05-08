@@ -25,10 +25,13 @@ Installation
   4. Install [Pennyworth](https://github.com/SUSE/pennyworth#installation). If you're running Tumbleweed,
      you must install the `net-tools-deprecated` package.
 
-  5. Configure default network for libvirt:
+  5. Configure default network and storage for libvirt:
 
         $ virsh net-start default
         $ virsh net-autostart default # if you want the default network to be started automatically.
+        $ virsh pool-define-as default dir - - - - /var/lib/libvirt/images
+        $ virsh pool-start default
+        $ virsh pool-autostart default
 
   6. Clone autoyast-integration-test repository and install needed GEMs
 
@@ -36,10 +39,16 @@ Installation
         $ cd autoyast-integration-test
         $ bundle install
 
-  7. Only in Tumbleweed, you must update the vagrant-libvirt plugin:
+  7. If the host is running a firewall, you must permit connections from
+     libvirt default network to host’s port 8888. For example, if you’re
+     running SuSEfirewall2 and your libvirt default network is 192.168.122.0
+     (you can check it on `/etc/libvirt/qemu/networks/default.xml`), you could
+     add a custom rule allowing incoming connections from 192.168.122.0/24 to
+     port 8888.
+
+  8. Only in Tumbleweed, you must update the vagrant-libvirt plugin:
 
         $ NOKOGIRI_USE_SYSTEM_LIBRARIES=true vagrant plugin install vagrant-libvirt
-
 
 
 Running
