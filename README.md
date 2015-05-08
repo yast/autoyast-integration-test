@@ -22,8 +22,7 @@ Installation
 
   3. Generate a ssh-key (e.g. with ssh-keygen) if you do not have one.
 
-  4. Install [Pennyworth](https://github.com/SUSE/pennyworth#installation). If you're running Tumbleweed,
-     you must install the `net-tools-deprecated` package.
+  4. Install [Pennyworth](https://github.com/SUSE/pennyworth#installation).
 
   5. Configure default network and storage for libvirt:
 
@@ -44,7 +43,8 @@ Installation
      running SuSEfirewall2 and your libvirt default network is 192.168.122.0
      (you can check it on `/etc/libvirt/qemu/networks/default.xml`), you could
      add a custom rule allowing incoming connections from 192.168.122.0/24 to
-     port 8888.
+     port 8888. After that, you must reboot your system to be sure everything
+     is working properly (libvirt iptables rules, ip forwarding, etc.).
 
   8. Only in Tumbleweed, you must update the vagrant-libvirt plugin:
 
