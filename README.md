@@ -11,23 +11,43 @@ Features
   * Checking these KVM images with rspec tests.
   * Generating own installation ISOs with local built RPMs or the newest one from OBS.
 
+Supported Scenarios
+-------------------
+
+These integration tests need to start virtual machines for their operation.
+For that reason, support for hardware virtualization is vitally important.
+Check it on your host system
+
+    $ grep --only-matching '\(svm\|vmx\)' /proc/cpuinfo
 
 Installation
 ------------
 
-  1. Install packages 'mkdud' and 'mksusecd' from OBS.
+  1. Install packages [mkdud](http://software.opensuse.org/download.html?project=openSUSE%3AFactory&package=mkdud)
+     and [mksusecd](http://software.opensuse.org/download.html?project=home%3Asnwint&package=mksusecd)
+     from OBS.
 
-  2. Configure `sudo` in order to run the `mksusecd`, `systemctl start
-     libvirtd` and `zypper in` commands as root.
+       $ zypper install ./mkdud-*.rpm ./mksusecd-*.rpm
 
-  3. Generate a ssh-key (e.g. with ssh-keygen) if you do not have one.
+  2. Unless you run tests as 'root', configure `sudo` in order to run the `mksusecd`,
+     `systemctl start libvirtd` and `zypper in` commands as root.
+
+     This will grant access to execute every command for user <username> as root without
+     asking for password, unsecure
+
+        echo '<username> ALL=NOPASSWD: ALL' >> /etc/sudoers
+
+  3. Generate a ssh-key for vagrant (e.g. with ssh-keygen) unless you already have one.
 
   4. Install [Pennyworth](https://github.com/SUSE/pennyworth#installation).
 
-  5. Configure default network and storage for libvirt:
+  5. Enable and start libvirt and configure default network and storage
 
+        $ systemctl enable libvirtd
+        $ systemctl start libvirtd
         $ virsh net-start default
-        $ virsh net-autostart default # if you want the default network to be started automatically.
+        $ # if you want the default network to be started automatically.
+        $ virsh net-autostart default
         $ virsh pool-define-as default dir - - - - /var/lib/libvirt/images
         $ virsh pool-start default
         $ virsh pool-autostart default
@@ -42,14 +62,17 @@ Installation
      libvirt default network to host’s port 8888. For example, if you’re
      running SuSEfirewall2 and your libvirt default network is 192.168.122.0
      (you can check it on `/etc/libvirt/qemu/networks/default.xml`), you could
-     add a custom rule allowing incoming connections from 192.168.122.0/24 to
-     port 8888. After that, you must reboot your system to be sure everything
-     is working properly (libvirt iptables rules, ip forwarding, etc.).
+     add a custom rule to /etc/sysconfig/SuSEfirewall2 allowing incoming
+     connections from 192.168.122.0/24 to TCP port 8888, e.g.:
+
+        FW_SERVICES_ACCEPT_EXT="192.168.122.0/24,tcp,8888"
+
+     After that, you must reboot your system to be sure everything works
+     properly (libvirt iptables rules, ip forwarding, etc.).
 
   8. Only in Tumbleweed, you must update the vagrant-libvirt plugin:
 
         $ NOKOGIRI_USE_SYSTEM_LIBRARIES=true vagrant plugin install vagrant-libvirt
-
 
 Running
 -------
@@ -75,6 +98,10 @@ To run only one single test use:
 
 e.g. `rake test[/src/autoyast_test/spec/sles12.rb]`
 
+or you can also run any single script directly
+
+    $ rspec [<absolute_path_to_test_file>]
+
 To generate a new installation image based on SLES12 call:
 
     $ rake build_iso[sles12]
@@ -93,6 +120,18 @@ To use the official SLES12 ISO (default setting) for tests just call:
 
     $ rake build_iso[default]
 
+Solving Problems
+----------------
+
+If you are experiencing *There was a problem opening a connection to libvirt:
+libvirt is not a recognized compute provider* error, you might need to
+downgrade gems 'fog' and 'fog' core to version 1.30 to 1.29
+
+    $ gem list fog
+    $ gem install fog --version 1.29
+    $ gem uninstall fog --version 1.30
+    $ gem install fog-core --version 1.29
+    $ gem uninstall fog-core --version 1.30
 
 Jenkins
 -------
