@@ -1,6 +1,16 @@
 <?xml version="1.0"?>
 <!DOCTYPE profile>
 <profile xmlns="http://www.suse.com/1.0/yast2ns" xmlns:config="http://www.suse.com/1.0/configns">
+  <!-- These are not supported anymore; bug 925381 -->
+  <sshd>
+    <x config:type="boolean">false</x>
+  </sshd>
+  <autofs>
+    <x config:type="boolean">false</x>
+  </autofs>
+  <restore>
+    <x config:type="boolean">false</x>
+  </restore>
 
   <general>
     <mode>
@@ -77,7 +87,9 @@ chmod 755 /srv/tftpboot
     <errors>
       <log config:type="boolean">true</log>
       <show config:type="boolean">true</show>
-      <timeout config:type="integer">0</timeout>
+      <!-- Error popup of not supported YaST modules must disapper
+        after 10 seconds in order not stopping the installation. Bug 925381 -->
+      <timeout config:type="integer">10</timeout>
     </errors>
     <messages>
       <log config:type="boolean">true</log>
