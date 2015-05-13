@@ -17,7 +17,7 @@ describe "SLES 12 TFTP server " do
   end
 
   # bug 925381
-  it "checks, for unsupported YAST modules" do
+  it "checks, whether unsupported YaST modules are reported" do
     run_test_script("unsupported_modules.sh")
   end
 
