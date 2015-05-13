@@ -16,6 +16,11 @@ describe "SLES 12 TFTP server " do
     run_test_script("host.sh")
   end
 
+  # bug 925381
+  it "checks, for unsupported YAST modules" do
+    run_test_script("unsupported_modules.sh")
+  end
+
   after(:all) do
     # Shutdown the vagrant box.
     $vm.stop
