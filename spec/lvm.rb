@@ -17,7 +17,7 @@ describe "LVM partition;" do
   end
 
   # bnc #928987
-  it "sets peer/restrict sections in default ntp.conf" do
+  it "sets peer/restrict in autoinst.xml by using default ntp.conf" do
     run_test_script("ntp.sh")
   end
 
