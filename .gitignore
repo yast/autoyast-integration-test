@@ -2,6 +2,7 @@
 *.swp
 *.box
 import_state.yaml
+.bundle
 .vagrant
 cache
 *~
