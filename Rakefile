@@ -15,6 +15,9 @@
 # To contact SUSE about this file by physical or electronic mail,
 # you may find current contact information at www.suse.com
 
+require "bundler/setup"
+Bundler.require(:default)
+
 desc "Running autoyast integration tests"
 task :test, [:name] do |name, args|
   base_dir = File.dirname(__FILE__)
@@ -42,16 +45,8 @@ task :test, [:name] do |name, args|
     # (including DB update)
     system "sudo virsh vol-delete vagrant_autoyast_vm.img default"
 
-    pennyworth_bin = File.join(base_dir,"/../pennyworth/bin/pennyworth")
-    unless File.exist?(pennyworth_bin)
-      puts "\n**************************************************************************"
-      puts "Please install pennyworth from https://github.com/SUSE/pennyworth and adapt"
-      puts "the path of /bin/pennyworth in Rakefile."
-      puts "**************************************************************************"
-      exit 1
-    end
     puts "\n****** Importing vagrant box into pennyworth ******\n"
-    system "#{pennyworth_bin} -d #{base_dir} import-base"
+    system "pennyworth -d #{base_dir} import-base"
 
     if File.exist?(test_file)
       puts "\n****** Running test on created system ******\n"
