@@ -17,8 +17,9 @@
 
 source "https://rubygems.org"
 
-group :test do
-  gem "rspec", "~> 3.1.0"
-  gem "veewee"
-  gem "ruby-libvirt"
-end
+gem "rspec", "~> 3.1.0"
+gem "veewee"
+gem "ruby-libvirt"
+gem "pennyworth-tool"
+gem "fog", "~> 1.29.0"
+gem "fog-core", "~> 1.29.0"
