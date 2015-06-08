@@ -48,6 +48,10 @@ describe "SLES 12 checks," do
     run_test_script("no_registration.sh")
   end
 
+  it "after installation snapshot has been created" do
+    run_test_script("installation_snapshot.sh")
+  end
+
   after(:all) do
     # Shutdown the vagrant box.
     $vm.stop
