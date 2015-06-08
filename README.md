@@ -39,7 +39,9 @@ Installation
 
   3. Generate a ssh-key for vagrant (e.g. with ssh-keygen) unless you already have one.
 
-  4. Install [Pennyworth](https://github.com/SUSE/pennyworth#installation).
+  4. Install [Pennyworth](https://github.com/SUSE/pennyworth#installation) but instead
+     of cloning the repository, install the
+     [pennyworth-tool gem](https://rubygems.org/gems/pennyworth-tool/).
 
   5. Enable and start libvirt and configure default network and storage
 

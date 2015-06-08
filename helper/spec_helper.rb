@@ -16,8 +16,8 @@
 # you may find current contact information at www.suse.com
 
 # Require the spec.rb from pennyworth. Adjust the path to where you checked out pennyworth from git.
-require_relative "../../pennyworth/lib/spec"
-require_relative "../../pennyworth/lib/ssh_keys_importer"
+require "pennyworth/spec"
+require "pennyworth/ssh_keys_importer"
 
 def run_test_script(script, expected = "AUTOYAST OK")
   shell =  File.join(File.dirname(__FILE__),"../spec", script)

@@ -1,8 +1,8 @@
 *.gem
 *.swp
-Gemfile.lock
 *.box
 import_state.yaml
+.bundle
 .vagrant
 cache
 *~
