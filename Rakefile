@@ -18,6 +18,8 @@
 require "bundler/setup"
 Bundler.require(:default)
 
+require "rake/clean"
+
 desc "Running autoyast integration tests"
 task :test, [:name] do |name, args|
   base_dir = File.dirname(__FILE__)
@@ -63,6 +65,12 @@ task :build_iso, [:name] do |name, args|
     puts "ERROR: name is needed"
     exit 1
   end
+  FileUtils.mkdir("iso") unless File.exists?("iso")
   system "ruby #{File.join(File.dirname(__FILE__),"build_iso", args[:name]+".rb")}"
 end
 
+# Cleaning tasks
+# Temporary files
+CLEAN.include("build_iso/cache", "kiwi/import_state.yaml")
+# Final products
+CLOBBER.include("iso", "kiwi/autoyast.box", "kiwi/iso/testing.iso")
