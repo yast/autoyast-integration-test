@@ -15,18 +15,24 @@
 # To contact SUSE about this file by physical or electronic mail,
 # you may find current contact information at www.suse.com
 
-require "rubygems"
+require "open-uri"
 require "fileutils"
 
-#obs_url = "http://download.suse.de/ibs/Devel:/YaST:/SLE-12/SLE_12/"
 obs_url = "http://download.suse.de/ibs/Devel:/YaST:/Head/SLE-12-SP1/"
-iso_url = "http://dist.suse.de/install/SLE-12-Server-GM/SLE-12-Server-DVD-x86_64-GM-DVD1.iso"
 
+# Calculate ISO url (latest SLE12-SP1)
+iso_base_url = "http://dist.nue.suse.com/ibs/SUSE:/SLE-12-SP1:/GA/images/iso/"
+regexp = /<a href="(SLE-12-SP1-Server-DVD-x86_64-Build.+Media1.iso)"/
+uri = URI.parse(iso_base_url)
+matches = regexp.match(uri.read)
+iso_url = File.join(iso_base_url, matches[1])
+
+name = File.basename(__FILE__, ".rb")
 base_dir = File.dirname(__FILE__)
 iso_dir = File.join(base_dir, "..", "iso")
 iso_path = File.join(iso_dir, File.basename(iso_url))
 version = File.basename(__FILE__, ".rb")
-cache_dir = File.join(base_dir,"cache")
+cache_dir = File.join(base_dir, "cache", name)
 obs_packages = File.join(base_dir, version+".obs_packages")
 local_packages = File.join(base_dir, version+".local_packages")
 testing_iso = File.join(base_dir, "../kiwi/iso/testing.iso")
