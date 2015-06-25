@@ -1,5 +1,6 @@
 autoyast2
 autoyast2-installation
+libsnapper3
 libstorage6
 libstorage-ruby
 libyui6
@@ -10,6 +11,7 @@ libyui-qt-graph6
 libyui-qt-pkg6
 perl-Bootloader
 perl-Bootloader-YAML
+snapper
 yast2
 yast2-add-on
 yast2-bootloader
@@ -41,6 +43,7 @@ yast2-ruby-bindings
 yast2-security
 yast2-services-manager
 yast2-slp
+yast2-snapper
 yast2-storage
 yast2-transfer
 yast2-tune
