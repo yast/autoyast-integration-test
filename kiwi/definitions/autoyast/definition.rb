@@ -16,6 +16,7 @@ Veewee::Definition.declare({
     ' netdevice=eth0',
     ' instmode=dvd',
     ' textmode=1',
+    ' insecure=1',
     ' autoyast2=http://%IP%:8888/autoinst.xml',
     '<Enter>'
    ],

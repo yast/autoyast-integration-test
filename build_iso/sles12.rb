@@ -18,8 +18,8 @@
 require "rubygems"
 require "fileutils"
 
-#obs_url = "http://download.suse.de/ibs/Devel:/YaST:/SLE-12/SLE_12/"
-obs_url = "http://download.suse.de/ibs/Devel:/YaST:/Head/SLE-12-SP1/"
+#yast_url = "http://download.suse.de/ibs/Devel:/YaST:/SLE-12/SLE_12/"
+yast_url = "http://download.suse.de/ibs/Devel:/YaST:/Head/SLE-12-SP1/"
 iso_url = "http://dist.suse.de/install/SLE-12-Server-GM/SLE-12-Server-DVD-x86_64-GM-DVD1.iso"
 
 base_dir = File.dirname(__FILE__)
@@ -28,6 +28,7 @@ iso_path = File.join(iso_dir, File.basename(iso_url))
 version = File.basename(__FILE__, ".rb")
 cache_dir = File.join(base_dir,"cache")
 obs_packages = File.join(base_dir, version+".obs_packages")
+boot_dir = File.join(base_dir,"boot_sles12")
 local_packages = File.join(base_dir, version+".local_packages")
 testing_iso = File.join(base_dir, "../kiwi/iso/testing.iso")
 
@@ -40,10 +41,16 @@ Dir.chdir(iso_dir) do
 end
 
 puts "\n**** Fetching all required packages ****"
-system "zypper --root #{cache_dir} ar --no-gpgcheck #{obs_url} yast-packages"
+system "zypper --root #{cache_dir} ar --no-gpgcheck #{yast_url} download-packages"
 system "xargs -a #{obs_packages} zypper --root #{cache_dir} --pkg-cache-dir=#{cache_dir} download"
 
-Dir.chdir(File.join( cache_dir, "yast-packages")) do
+puts "\n**** Fetching latest grub2 packages ****"
+system "zypper --root #{cache_dir} rr download-packages"
+system "zypper --root #{cache_dir} ar --no-gpgcheck http://download.suse.de/ibs/SUSE:/SLE-12-SP1:/GA/standard/ download-packages"
+system "zypper --root #{cache_dir} --pkg-cache-dir=#{cache_dir} download grub2-2.02~beta2"
+system "zypper --root #{cache_dir} --pkg-cache-dir=#{cache_dir} download grub2-i386-pc-2.02~beta2"
+
+Dir.chdir(File.join( cache_dir, "download-packages")) do
   puts "\n**** Taking user defined RPMs ****"
   File.open(local_packages).each do |package|
     package.strip!
@@ -65,12 +72,13 @@ Dir.chdir(File.join( cache_dir, "yast-packages")) do
   system "find . -name \"*.rpm\"|xargs mkdud -c #{version}.dud -d sle12 -i instsys,repo --prefix=37"
 
   puts "\n**** Creating new ISO image with the updated packages ****"
-  system "sudo mksusecd -c testing.iso --initrd=#{version}.dud #{iso_path}"
+puts "sudo mksusecd -c testing.iso --initrd=#{version}.dud #{iso_path} #{boot_dir}"
+  system "sudo mksusecd -c testing.iso --initrd=#{version}.dud #{iso_path} #{boot_dir}"
 
   puts "\n**** Copy new ISO image to veewee/vagrant environment ****"
   puts "\n     destination: #{testing_iso}"
   FileUtils.cp("testing.iso", testing_iso)
 end
 
-puts "\n**** Cleanup ****"
-system("rm -rf #{cache_dir+'/*'}")
+#puts "\n**** Cleanup ****"
+#system("rm -rf #{cache_dir+'/*'}")
