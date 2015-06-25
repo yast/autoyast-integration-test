@@ -72,7 +72,6 @@ Dir.chdir(File.join( cache_dir, "download-packages")) do
   system "find . -name \"*.rpm\"|xargs mkdud -c #{version}.dud -d sle12 -i instsys,repo --prefix=37"
 
   puts "\n**** Creating new ISO image with the updated packages ****"
-puts "sudo mksusecd -c testing.iso --initrd=#{version}.dud #{iso_path} #{boot_dir}"
   system "sudo mksusecd -c testing.iso --initrd=#{version}.dud #{iso_path} #{boot_dir}"
 
   puts "\n**** Copy new ISO image to veewee/vagrant environment ****"
@@ -80,5 +79,5 @@ puts "sudo mksusecd -c testing.iso --initrd=#{version}.dud #{iso_path} #{boot_di
   FileUtils.cp("testing.iso", testing_iso)
 end
 
-#puts "\n**** Cleanup ****"
-#system("rm -rf #{cache_dir+'/*'}")
+puts "\n**** Cleanup ****"
+system("rm -rf #{cache_dir+'/*'}")
