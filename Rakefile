@@ -73,4 +73,4 @@ end
 # Temporary files
 CLEAN.include("build_iso/cache", "kiwi/import_state.yaml")
 # Final products
-CLOBBER.include("iso", "kiwi/autoyast.box", "kiwi/iso/testing.iso")
+CLOBBER.include("iso", "kiwi/autoyast.box", "kiwi/iso/testing.iso", "log")

@@ -1,12 +1,6 @@
 require_relative "../helper/spec_helper.rb"
 
 describe "SLES 12 checks," do
-
-  before(:all) do
-    # Start the previously create vagrant VM - opensuse_vm. 
-    $vm = start_system(box: "autoyast_vm")
-  end
-
   it "if user -vagrant- has been created" do
     run_test_script("user.sh")
   end
@@ -51,10 +45,5 @@ describe "SLES 12 checks," do
 
   it "after installation snapshot has been created" do
     run_test_script("installation_snapshot.sh")
-  end
-
-  after(:all) do
-    # Shutdown the vagrant box.
-    $vm.stop
   end
 end
