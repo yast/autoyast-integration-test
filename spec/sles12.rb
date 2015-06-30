@@ -33,10 +33,9 @@ describe "SLES 12 checks," do
   end
 
   # bnc #882982
-  # Due bug #935769 it fails currently
-#  it "if subvolumes are correctly in autoinst.xml" do
-#    run_test_script("subvolumes.sh")
-#  end
+  it "if subvolumes are correctly in autoinst.xml" do
+    run_test_script("subvolumes.sh")
+  end
 
   # bnc #888168
   it "if registration is not in autoinst.xml" do
