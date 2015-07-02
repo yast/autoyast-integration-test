@@ -14,4 +14,9 @@ describe "LVM partition;" do
   it "sets peer/restrict in autoinst.xml by using default ntp.conf" do
     run_test_script("ntp.sh")
   end
+
+  it "after installation snapshot has been created" do
+    run_test_script("installation_snapshot.sh")
+  end
+
 end
