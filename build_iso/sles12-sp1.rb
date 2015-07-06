@@ -67,8 +67,14 @@ Dir.chdir(File.join( cache_dir, "yast-packages")) do
     end
   end
 
+  puts "\n**** Creating DUD: Updating /etc/zypp/zypp.conf ****"
+  system "mkdud -c zypp.dud -d sle12 -i  instsys,repo --prefix=37 ../../dud/"
+
   puts "\n**** Creating DUD with updated packages ****"
-  system "find . -name \"*.rpm\"|xargs mkdud -c #{version}.dud -d sle12 -i instsys,repo --prefix=37"
+  system "find . -name \"*.rpm\"|xargs mkdud -c packages.dud -d sle12 -i instsys,repo --prefix=37"
+
+  puts "\n**** Creating DUD from zypp and packages ****"
+  system "mkdud -c #{version}.dud -d sle12 -i  instsys,repo --prefix=37 packages.dud zypp.dud"
 
   puts "\n**** Creating new ISO image with the updated packages ****"
   system "sudo mksusecd -c testing.iso --initrd=#{version}.dud #{iso_path}"
@@ -77,6 +83,3 @@ Dir.chdir(File.join( cache_dir, "yast-packages")) do
   puts "\n     destination: #{testing_iso}"
   FileUtils.cp("testing.iso", testing_iso)
 end
-
-puts "\n**** Cleanup ****"
-system("rm -rf #{cache_dir+'/*'}")
