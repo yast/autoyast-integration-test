@@ -67,8 +67,8 @@ Dir.chdir(File.join( cache_dir, "yast-packages")) do
     end
   end
 
-  puts "\n**** Creating DUD with updated packages ****"
-  system "find . -name \"*.rpm\"|xargs mkdud -c #{version}.dud -d sle12 -i instsys,repo --prefix=37"
+  puts "\n**** Creating DUD ****"
+  system "mkdud -c #{version}.dud -d sle12 -i  instsys,repo --prefix=37 $(find -name \*\.rpm) ../../dud/"
 
   puts "\n**** Creating new ISO image with the updated packages ****"
   system "sudo mksusecd -c testing.iso --initrd=#{version}.dud #{iso_path}"
@@ -77,6 +77,3 @@ Dir.chdir(File.join( cache_dir, "yast-packages")) do
   puts "\n     destination: #{testing_iso}"
   FileUtils.cp("testing.iso", testing_iso)
 end
-
-puts "\n**** Cleanup ****"
-system("rm -rf #{cache_dir+'/*'}")

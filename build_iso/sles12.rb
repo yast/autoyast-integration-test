@@ -44,11 +44,14 @@ puts "\n**** Fetching all required packages ****"
 system "zypper --root #{cache_dir} ar --no-gpgcheck #{yast_url} download-packages"
 system "xargs -a #{obs_packages} zypper --root #{cache_dir} --pkg-cache-dir=#{cache_dir} download"
 
-puts "\n**** Fetching latest grub2 packages ****"
+puts "\n**** Fetching latest grub2 and libzypp packages ****"
 system "zypper --root #{cache_dir} rr download-packages"
 system "zypper --root #{cache_dir} ar --no-gpgcheck http://download.suse.de/ibs/SUSE:/SLE-12-SP1:/GA/standard/ download-packages"
 system "zypper --root #{cache_dir} --pkg-cache-dir=#{cache_dir} download grub2-2.02~beta2"
 system "zypper --root #{cache_dir} --pkg-cache-dir=#{cache_dir} download grub2-i386-pc-2.02~beta2"
+system "zypper --root #{cache_dir} --pkg-cache-dir=#{cache_dir} download libzypp"
+system "zypper --root #{cache_dir} --pkg-cache-dir=#{cache_dir} download libsolv-tools"
+system "zypper --root #{cache_dir} --pkg-cache-dir=#{cache_dir} download zypper"
 
 Dir.chdir(File.join( cache_dir, "download-packages")) do
   puts "\n**** Taking user defined RPMs ****"
@@ -68,8 +71,8 @@ Dir.chdir(File.join( cache_dir, "download-packages")) do
     end
   end
 
-  puts "\n**** Creating DUD with updated packages ****"
-  system "find . -name \"*.rpm\"|xargs mkdud -c #{version}.dud -d sle12 -i instsys,repo --prefix=37"
+  puts "\n**** Creating DUD ****"
+  system "mkdud -c #{version}.dud -d sle12 -i  instsys,repo --prefix=37 $(find -name \*\.rpm) ../../dud/"
 
   puts "\n**** Creating new ISO image with the updated packages ****"
   system "sudo mksusecd -c testing.iso --initrd=#{version}.dud #{iso_path} #{boot_dir}"
@@ -78,6 +81,3 @@ Dir.chdir(File.join( cache_dir, "download-packages")) do
   puts "\n     destination: #{testing_iso}"
   FileUtils.cp("testing.iso", testing_iso)
 end
-
-puts "\n**** Cleanup ****"
-system("rm -rf #{cache_dir+'/*'}")
