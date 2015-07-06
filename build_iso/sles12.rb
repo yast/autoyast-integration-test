@@ -71,14 +71,8 @@ Dir.chdir(File.join( cache_dir, "download-packages")) do
     end
   end
 
-  puts "\n**** Creating DUD: Updating /etc/zypp/zypp.conf ****"
-  system "mkdud -c zypp.dud -d sle12 -i  instsys,repo --prefix=37 ../../dud/"
-
-  puts "\n**** Creating DUD with updated packages ****"
-  system "find . -name \"*.rpm\"|xargs mkdud -c packages.dud -d sle12 -i instsys,repo --prefix=37"
-
-  puts "\n**** Creating DUD from zypp and packages ****"
-  system "mkdud -c #{version}.dud -d sle12 -i  instsys,repo --prefix=37 packages.dud zypp.dud"
+  puts "\n**** Creating DUD ****"
+  system "mkdud -c #{version}.dud -d sle12 -i  instsys,repo --prefix=37 $(find -name \*\.rpm) ../../dud/"
 
   puts "\n**** Creating new ISO image with the updated packages ****"
   system "sudo mksusecd -c testing.iso --initrd=#{version}.dud #{iso_path} #{boot_dir}"
