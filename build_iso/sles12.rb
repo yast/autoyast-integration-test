@@ -74,6 +74,11 @@ Dir.chdir(File.join( cache_dir, "download-packages")) do
   puts "\n**** Creating DUD ****"
   system "mkdud -c #{version}.dud -d sle12 -i  instsys,repo --prefix=37 $(find -name \*\.rpm) ../../dud/"
 
+  puts "\n**** Syncing to disk ****"
+  system "sync"
+  puts "\nCreated DUD:"
+  system "ls -l #{version}.dud"
+
   puts "\n**** Creating new ISO image with the updated packages ****"
   system "sudo mksusecd -c testing.iso --initrd=#{version}.dud #{iso_path} #{boot_dir}"
 
