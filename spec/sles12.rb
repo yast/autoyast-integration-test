@@ -42,6 +42,11 @@ describe "SLES 12 checks," do
     run_test_script("no_registration.sh")
   end
 
+  # bnc #935066
+  it "if ntp time syncing has been passed" do
+    run_test_script("ntp_sync.sh")
+  end
+
   it "after installation snapshot has been created" do
     run_test_script("installation_snapshot.sh")
   end
