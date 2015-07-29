@@ -35,7 +35,7 @@ version = File.basename(__FILE__, ".rb")
 cache_dir = File.join(base_dir, "cache", name)
 obs_packages = File.join(base_dir, version+".obs_packages")
 local_packages = File.join(base_dir, version+".local_packages")
-testing_iso = File.join(base_dir, "../kiwi/iso/testing.iso")
+testing_iso = File.join(base_dir, "../kiwi/iso/obs.iso")
 
 puts "\n**** Cleanup ****"
 system("rm -rf #{cache_dir+'/*'}")

@@ -30,7 +30,7 @@ cache_dir = File.join(base_dir,"cache")
 obs_packages = File.join(base_dir, version+".obs_packages")
 boot_dir = File.join(base_dir,"boot_sles12")
 local_packages = File.join(base_dir, version+".local_packages")
-testing_iso = File.join(base_dir, "../kiwi/iso/testing.iso")
+testing_iso = File.join(base_dir, "../kiwi/iso/obs.iso")
 
 puts "\n**** Cleanup ****"
 system("rm -rf #{cache_dir+'/*'}")
