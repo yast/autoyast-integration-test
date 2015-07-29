@@ -41,10 +41,11 @@ task :test, [:name] do |name, args|
 
     # Set used iso
     unless test_name.start_with?("upgrade_")
-      # New installation workflow. So we are take the built OBS iso
+      # New installation workflow. So we take the built OBS iso
       FileUtils.ln(obs_iso, testing_iso) if File.file?(obs_iso)
     end
-    # Set download iso (if it is not already available)
+    # Set download iso path. This path will be taken for download, if the iso has not already been
+    # downloaded.
     src_definition = File.join(base_dir, "kiwi/definitions/autoyast/install_definition.rb")
     FileUtils.cp(src_definition, dest_definition)
     iso_path_file = File.join(base_dir, "spec", test_name + ".install_iso")
@@ -61,10 +62,10 @@ task :test, [:name] do |name, args|
     FileUtils.cp( autoinst, autoyast_file)
 
     puts "\n****** Creating KVM image ******\n"
-    Dir.chdir(File.join( base_dir, "kiwi")) {
+    Dir.chdir(File.join( base_dir, "kiwi")) do
       puts "\n**** Building KVM image ****\n" 
       system "veewee kvm build autoyast --force --auto"
-    }
+    end
 
     if test_name.start_with?("upgrade_")
       # upgrade workflow
@@ -92,7 +93,9 @@ task :test, [:name] do |name, args|
       src_definition = File.join(base_dir, "kiwi/definitions/autoyast/upgrade_definition.rb")
       FileUtils.cp(src_definition, dest_definition)
 
-      # Set download iso (if it is not already available)
+
+      # Set download iso path. This path will be taken for download, if the iso has not already been
+      # downloaded.
       iso_path_file = File.join(base_dir, "spec", test_name + ".upgrade_iso")
       if File.file?(iso_path_file)
         data = IO.binread(iso_path_file).chomp
@@ -109,16 +112,16 @@ task :test, [:name] do |name, args|
       end
       FileUtils.cp( autoinst, autoyast_file)
 
-      Dir.chdir(File.join( base_dir, "kiwi")) {
+      Dir.chdir(File.join( base_dir, "kiwi")) do
         puts "\n**** Updating KVM image ****\n"
         system "veewee kvm build autoyast --force --auto"
-      }
+      end
     end
 
-    Dir.chdir(File.join( base_dir, "kiwi")) {
+    Dir.chdir(File.join( base_dir, "kiwi")) do
       puts "\n**** Exporting KVM image into box file ****\n" 
       system "veewee kvm export autoyast --force"
-    }
+    end
     FileUtils.rm(autoyast_file, :force => true)
     FileUtils.rm(dest_definition, :force => true)
 
