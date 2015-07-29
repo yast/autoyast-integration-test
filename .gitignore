@@ -1,6 +1,7 @@
 *.gem
 *.swp
 *.box
+*.bak
 import_state.yaml
 .bundle
 .vagrant

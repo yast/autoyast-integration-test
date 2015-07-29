@@ -6,7 +6,7 @@ Veewee::Definition.declare({
   :hostiocache => 'off',
   :os_type_id => 'OpenSUSE_64',
   :iso_file => "testing.iso",
-  :iso_src => "http://dist.suse.de/install/SLE-12-Server-GM/SLE-12-Server-DVD-x86_64-GM-DVD1.iso",
+  :iso_src => "__iso_source_path__",
   :iso_md5 => "",
   :iso_download_timeout => "1000",
   :boot_wait => "10",
@@ -17,7 +17,8 @@ Veewee::Definition.declare({
     ' instmode=dvd',
     ' textmode=1',
     ' insecure=1',
-    ' autoyast2=http://%IP%:8888/autoinst.xml',
+    ' netsetup=dhcp',
+    ' autoyast=http://%IP%:8888/autoinst.xml',
     '<Enter>'
    ],
   :ssh_login_timeout => "10000",
