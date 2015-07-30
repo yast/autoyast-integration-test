@@ -50,8 +50,8 @@ Veewee::Definition.declare({
 
       # restoring obs image
       base_dir = File.dirname(__FILE__)
-      testing_iso = File.join(base_dir, "kiwi/iso/testing.iso")
-      obs_iso = File.join(base_dir, "kiwi/iso/obs.iso")
+      testing_iso = File.join(base_dir, "iso/testing.iso")
+      obs_iso = File.join(base_dir, "iso/obs.iso")
       FileUtils.ln(obs_iso, testing_iso) if File.file?(obs_iso) #Taking obs iso for upgrade
 
     end
