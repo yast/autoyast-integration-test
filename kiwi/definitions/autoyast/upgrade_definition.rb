@@ -54,7 +54,7 @@ Veewee::Definition.declare({
       obs_iso = File.join(base_dir, "iso/obs.iso")
       #Taking obs iso for upgrade
       if File.file?(obs_iso) && !File.file?(testing_iso)
-        FileUtils.ln(obs_iso, testing_iso) if File.file?(obs_iso)
+        FileUtils.ln(obs_iso, testing_iso)
       end
     end
 
