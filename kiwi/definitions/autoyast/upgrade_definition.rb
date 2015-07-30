@@ -42,11 +42,10 @@ Veewee::Definition.declare({
     end,
     :after_create => Proc.new do
       # Restoring old autoyast image which has to be updated.
-      system "sudo virsh dumpxml autoyast >autoyast_description.xml"
-      mac = `sudo xmllint --xpath  \"string(//domain/devices/interface/mac/@address)\" autoyast_description.xml`
-      system "sudo virsh undefine autoyast --remove-all-storage"
+      mac = `xmllint --xpath  \"string(//domain/devices/interface/mac/@address)\" autoyast_description.xml`
+      system "sudo virsh undefine autoyast --storage vda"
+      puts "generating autoyast image with mac address: #{mac}"
       system "sudo virt-clone -o autoyast_sav -n autoyast --file /var/lib/libvirt/images/autoyast.qcow2 --mac #{mac}"
-      system "sudo rm autoyast_description.*"
       system "sudo virsh undefine autoyast_sav --remove-all-storage"
     end
 
