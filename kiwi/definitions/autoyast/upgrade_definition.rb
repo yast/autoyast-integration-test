@@ -48,11 +48,11 @@ Veewee::Definition.declare({
       system "sudo virt-clone -o autoyast_sav -n autoyast --file /var/lib/libvirt/images/autoyast.qcow2 --mac #{mac}"
       system "sudo virsh undefine autoyast_sav --remove-all-storage"
 
-      # restoring obs image
+      # Restoring obs image
       base_dir = File.dirname(__FILE__)
       testing_iso = File.join(base_dir, "iso/testing.iso")
       obs_iso = File.join(base_dir, "iso/obs.iso")
-      #Taking obs iso for upgrade
+      # Taking obs iso for upgrade
       if File.file?(obs_iso) && !File.file?(testing_iso)
         FileUtils.ln(obs_iso, testing_iso)
       end
