@@ -42,12 +42,20 @@ Veewee::Definition.declare({
     end,
     :after_create => Proc.new do
       # Restoring old autoyast image which has to be updated.
-      system "sudo virsh dumpxml autoyast >autoyast_description.xml"
-      mac = `sudo xmllint --xpath  \"string(//domain/devices/interface/mac/@address)\" autoyast_description.xml`
+      mac = `xmllint --xpath  \"string(//domain/devices/interface/mac/@address)\" autoyast_description.xml`
       system "sudo virsh undefine autoyast --remove-all-storage"
+      puts "generating autoyast image with mac address: #{mac}"
       system "sudo virt-clone -o autoyast_sav -n autoyast --file /var/lib/libvirt/images/autoyast.qcow2 --mac #{mac}"
-      system "sudo rm autoyast_description.*"
       system "sudo virsh undefine autoyast_sav --remove-all-storage"
+
+      # Restoring obs image
+      base_dir = File.dirname(__FILE__)
+      testing_iso = File.join(base_dir, "iso/testing.iso")
+      obs_iso = File.join(base_dir, "iso/obs.iso")
+      # Taking obs iso for upgrade
+      if File.file?(obs_iso) && !File.file?(testing_iso)
+        FileUtils.ln(obs_iso, testing_iso)
+      end
     end
 
   }
