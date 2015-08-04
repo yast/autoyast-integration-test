@@ -50,4 +50,10 @@ describe "SLES 12 checks," do
   it "after installation snapshot has been created" do
     run_test_script("installation_snapshot.sh")
   end
+
+  # fate #319086
+  it "do not reinstall packages in the second stage" do
+    run_test_script("no_reinstall.sh")
+  end
+
 end

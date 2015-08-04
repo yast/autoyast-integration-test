@@ -731,6 +731,9 @@ ls -l /mnt/$BASE
       <package>bind</package>
       <package>SuSEfirewall2</package>
     </packages>
+    <post-packages config:type="list">
+      <post-package>bind</post-package>
+    </post-packages>
     <patterns config:type="list">
       <pattern>Minimal</pattern>
       <pattern>base</pattern>
