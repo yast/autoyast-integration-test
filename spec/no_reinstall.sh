@@ -2,4 +2,4 @@
 
 set -e -x
 
-! grep "job: install bind" y2log && echo "AUTOYAST OK" "job: install bind" y2log && echo "AUTOYAST OK"
+! grep "job: install bind" y2log && echo "AUTOYAST OK"
