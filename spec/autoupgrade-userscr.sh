@@ -4,7 +4,7 @@ set -e -x
 LOGFILE='/root/userscripts/userscr.log'
 RESULT=`cat $LOGFILE | sed -r -e s'@\:.*\:@:@' | tr '\n' '|'`
 RET="AUTOYAST OK"
-EXPECTED='1:clean|1b:ok|3:ok|5:ok|'
+EXPECTED='1:clean|1b:ok|2:ok|3:ok|5:ok|'
 
 set -e +x
 
