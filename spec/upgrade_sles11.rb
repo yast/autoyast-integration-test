@@ -29,4 +29,8 @@ describe "SLES11 - SLES12 upgrade checks," do
     run_test_script("ntp_sync.sh")
   end
 
+  it "if user scripts have been run" do
+    run_test_script("autoupgrade-userscr.sh")
+  end
+
 end
