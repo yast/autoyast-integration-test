@@ -72,7 +72,7 @@ Dir.chdir(File.join( cache_dir, "download-packages")) do
   end
 
   puts "\n**** Creating DUD ****"
-  system "mkdud -c #{version}.dud -d sle12 -i  instsys,repo --prefix=37 --format=tar.gz $(find -name \*\.rpm) ../../dud/"
+  system "mkdud -c #{version}.dud -d sle12 -i  instsys,repo --prefix=37 --format=tar.gz $(find -name \"\*\.rpm\") ../../dud/"
 
   puts "\n**** Syncing to disk ****"
   system "sync"
