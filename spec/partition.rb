@@ -1,6 +1,6 @@
 require_relative "../helper/spec_helper.rb"
 
-describe "Minimal patition checks," do
+describe "Minimal partition checks," do
   it "if user -vagrant- has been created" do
     run_test_script("user.sh")
   end
