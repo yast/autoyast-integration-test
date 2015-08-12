@@ -66,7 +66,7 @@ perl - opened <<EOP && IPTABLESRES=1
       \$res = -100;
     }
   }
-  if (\$res != 18158) {
+  if ((\$res != 18158) && (\$res != 17715)) {
     print "[ERROR] Some ports were not opened but expected or opened but not expected \$res \n";
     exit 1;
   }
