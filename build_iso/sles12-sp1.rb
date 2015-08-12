@@ -15,24 +15,17 @@
 # To contact SUSE about this file by physical or electronic mail,
 # you may find current contact information at www.suse.com
 
-require "open-uri"
+require "rubygems"
 require "fileutils"
 
-obs_url = "http://download.suse.de/ibs/Devel:/YaST:/Head/SLE-12-SP1/"
+yast_url = "http://download.suse.de/ibs/Devel:/YaST:/Head/SLE-12-SP1/"
+iso_url = "http://dist.suse.de/install/SLE-12-SP1-Server-Beta1/SLE-12-SP1-Server-DVD-x86_64-Beta1-DVD1.iso"
 
-# Calculate ISO url (latest SLE12-SP1)
-iso_base_url = "http://dist.nue.suse.com/ibs/SUSE:/SLE-12-SP1:/GA/images/iso/"
-regexp = /<a href="(SLE-12-SP1-Server-DVD-x86_64-Build.+Media1.iso)"/
-uri = URI.parse(iso_base_url)
-matches = regexp.match(uri.read)
-iso_url = File.join(iso_base_url, matches[1])
-
-name = File.basename(__FILE__, ".rb")
 base_dir = File.dirname(__FILE__)
 iso_dir = File.join(base_dir, "..", "iso")
 iso_path = File.join(iso_dir, File.basename(iso_url))
 version = File.basename(__FILE__, ".rb")
-cache_dir = File.join(base_dir, "cache", name)
+cache_dir = File.join(base_dir,"cache")
 obs_packages = File.join(base_dir, version+".obs_packages")
 local_packages = File.join(base_dir, version+".local_packages")
 testing_iso = File.join(base_dir, "../kiwi/iso/obs.iso")
@@ -46,10 +39,10 @@ Dir.chdir(iso_dir) do
 end
 
 puts "\n**** Fetching all required packages ****"
-system "zypper --root #{cache_dir} ar --no-gpgcheck #{obs_url} yast-packages"
+system "zypper --root #{cache_dir} ar --no-gpgcheck #{yast_url} download-packages"
 system "xargs -a #{obs_packages} zypper --root #{cache_dir} --pkg-cache-dir=#{cache_dir} download"
 
-Dir.chdir(File.join( cache_dir, "yast-packages")) do
+Dir.chdir(File.join( cache_dir, "download-packages")) do
   puts "\n**** Taking user defined RPMs ****"
   File.open(local_packages).each do |package|
     package.strip!
@@ -68,7 +61,12 @@ Dir.chdir(File.join( cache_dir, "yast-packages")) do
   end
 
   puts "\n**** Creating DUD ****"
-  system "mkdud -c #{version}.dud -d sle12 -i  instsys,repo --prefix=37 $(find -name \*\.rpm) ../../dud/"
+  system "mkdud -c #{version}.dud -d sle12 -i  instsys,repo --prefix=37 --format=tar.gz $(find -name \"\*\.rpm\") ../../dud/"
+
+  puts "\n**** Syncing to disk ****"
+  system "sync"
+  puts "\nCreated DUD:"
+  system "ls -l #{version}.dud"
 
   puts "\n**** Creating new ISO image with the updated packages ****"
   system "sudo mksusecd -c testing.iso --initrd=#{version}.dud #{iso_path}"
