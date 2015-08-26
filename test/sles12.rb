@@ -61,6 +61,11 @@ describe "SLES 12 checks," do
     run_test_script("profile_sections.sh")
   end
 
+  # bnc #882082
+  it "add multiple crashkernel options" do
+    run_test_script("kdump.sh")
+  end
+
   # bsc #948608
   it "handles zypper's pkgGpgCheck callback during installation" do
     run_test_script("handle_zypper_pkg_gpg_check.sh")
@@ -70,5 +75,4 @@ describe "SLES 12 checks," do
   it "configures network interfaces" do
     run_test_script("ifcfg_networking.sh")
   end
-
 end
