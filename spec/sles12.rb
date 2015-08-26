@@ -56,4 +56,9 @@ describe "SLES 12 checks," do
     run_test_script("no_reinstall.sh")
   end
 
+  # bnc #941948
+  it "all expected sections are present in autoinst.xml" do
+    run_test_script("profile_sections.sh")
+  end
+
 end
