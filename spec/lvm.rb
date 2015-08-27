@@ -16,7 +16,7 @@ describe "LVM partition;" do
   end
 
   # bnc #897129
-  it "sets firewall with exisiting network (keep_installed)" do
+  it "sets firewall with exisiting network (keep_install_network)" do
     run_test_script("firewall.sh")
   end
 
