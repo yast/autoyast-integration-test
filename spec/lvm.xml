@@ -35,6 +35,23 @@ mv /var/run/zypp.sav /var/run/zypp.pid
   <networking>
       <keep_install_network config:type="boolean">true</keep_install_network>
   </networking>
+  <firewall>
+    <FW_ALLOW_FW_BROADCAST_DMZ>no</FW_ALLOW_FW_BROADCAST_DMZ>
+    <FW_ALLOW_FW_BROADCAST_EXT>no</FW_ALLOW_FW_BROADCAST_EXT>
+    <FW_ALLOW_FW_BROADCAST_INT>no</FW_ALLOW_FW_BROADCAST_INT>
+    <FW_CONFIGURATIONS_EXT>apache2 apache2-ssl</FW_CONFIGURATIONS_EXT>
+    <FW_IGNORE_FW_BROADCAST_DMZ>no</FW_IGNORE_FW_BROADCAST_DMZ>
+    <FW_IGNORE_FW_BROADCAST_EXT>no</FW_IGNORE_FW_BROADCAST_EXT>
+    <FW_IGNORE_FW_BROADCAST_INT>no</FW_IGNORE_FW_BROADCAST_INT>
+    <FW_LOG_ACCEPT_ALL>no</FW_LOG_ACCEPT_ALL>
+    <FW_LOG_ACCEPT_CRIT>yes</FW_LOG_ACCEPT_CRIT>
+    <FW_LOG_DROP_ALL>no</FW_LOG_DROP_ALL>
+    <FW_LOG_DROP_CRIT>yes</FW_LOG_DROP_CRIT>
+    <FW_SERVICES_EXT_TCP>8080</FW_SERVICES_EXT_TCP>
+    <FW_SERVICES_EXT_UDP>9090</FW_SERVICES_EXT_UDP>
+    <enable_firewall config:type="boolean">false</enable_firewall>
+    <start_firewall config:type="boolean">false</start_firewall>
+  </firewall>
   <report>
     <errors>
       <log config:type="boolean">true</log>
@@ -110,6 +127,8 @@ mv /var/run/zypp.sav /var/run/zypp.pid
     </patterns>
     <packages config:type="list">
       <package>mc</package>
+      <package>apache2</package>
+      <package>apache2-prefork</package>
     </packages>
     <remove-packages config:type="list">
       <package>zsh</package>

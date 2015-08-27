@@ -3,11 +3,11 @@ autoyast2-installation
 libsnapper3
 libstorage6
 libstorage-ruby
-libyui6
-libyui-ncurses6
-libyui-ncurses-pkg6
-libyui-qt6
-libyui-qt-graph6
+libyui7
+libyui-ncurses7
+libyui-ncurses-pkg7
+libyui-qt7
+libyui-qt-graph7
 libyui-qt-pkg6
 perl-Bootloader
 perl-Bootloader-YAML

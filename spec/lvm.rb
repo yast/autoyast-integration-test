@@ -15,6 +15,11 @@ describe "LVM partition;" do
     run_test_script("ntp.sh")
   end
 
+  # bnc #897129
+  it "sets firewall with exisiting network (keep_install_network)" do
+    run_test_script("firewall.sh")
+  end
+
   it "after installation snapshot has been created" do
     run_test_script("installation_snapshot.sh")
   end
