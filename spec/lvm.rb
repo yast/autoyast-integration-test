@@ -24,4 +24,9 @@ describe "LVM partition;" do
     run_test_script("installation_snapshot.sh")
   end
 
+  # bsc #935858
+  it "creates @/.snapshots on LVM" do
+    run_test_script("btrfs_snapshots.sh")
+  end
+
 end
