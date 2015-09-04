@@ -14,7 +14,7 @@ describe "SLES 12 checks," do
     run_test_script("installation_snapshot.sh")
   end
 
-  it "AutoYaST2 packages are not installed" do
+  it "YaST2 packages are not installed" do
     run_test_script("no_yast2_packages.sh")
   end
 

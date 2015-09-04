@@ -1,5 +1,5 @@
 #!/bin/bash
 set -x
 
-# Check if AutoYaST2 packages were installed.
+# Check that YaST2 packages were not installed.
 rpm -qi yast2 || echo "AUTOYAST OK"
