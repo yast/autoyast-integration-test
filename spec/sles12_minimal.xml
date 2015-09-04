@@ -24,6 +24,8 @@
       <package>sudo</package>
       <package>curl</package>
       <package>ca-certificates-mozilla</package>
+      <!-- Workaround about missing glibc-locale -->
+      <package>glibc-locale</package>
     </packages>
   </software>
 
