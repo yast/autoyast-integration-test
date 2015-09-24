@@ -37,7 +37,7 @@ system("rm -rf #{cache_dir+'/*'}")
 
 Dir.chdir(iso_dir) do
   puts "\n**** Downloading source ISO image ****"
-  system "wget --no-clobber #{iso_url}"
+  system "wget --progress=dot:giga --no-clobber #{iso_url}"
 end
 
 puts "\n**** Fetching all required packages ****"
