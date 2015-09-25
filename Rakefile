@@ -31,9 +31,9 @@ end
 desc "Running autoyast integration tests"
 task :test, [:name] do |name, args|
   base_dir = File.dirname(__FILE__)
-  args[:name] ? tests = [args[:name]] : tests = Dir.glob(File.join( base_dir, "spec", "*.rb"))
+  tests = Array(args[:name] || Dir.glob(File.join( base_dir, "spec", "*.rb")))
 
-  tests.each do |test_file|
+  tests.sort.each do |test_file|
     test_name = File.basename(test_file, ".rb")
     puts "---------------------------------------------------------------------------------"
     puts "********** Running test #{test_name} **********"
