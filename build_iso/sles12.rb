@@ -18,9 +18,17 @@
 require "rubygems"
 require "fileutils"
 
+def iso_repo
+  if `hostname --domain`.chomp == "suse.cz"
+    "http://fallback.suse.cz"
+  else
+    "http://dist.suse.de"
+  end
+end
+
 #yast_url = "http://download.suse.de/ibs/Devel:/YaST:/SLE-12/SLE_12/"
 yast_url = "http://download.suse.de/ibs/Devel:/YaST:/Head/SLE-12-SP1/"
-iso_url = "http://dist.suse.de/install/SLE-12-Server-GM/SLE-12-Server-DVD-x86_64-GM-DVD1.iso"
+iso_url = iso_repo + "/install/SLE-12-Server-GM/SLE-12-Server-DVD-x86_64-GM-DVD1.iso"
 
 base_dir = File.dirname(__FILE__)
 iso_dir = File.join(base_dir, "..", "iso")

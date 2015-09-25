@@ -20,6 +20,14 @@ Bundler.require(:default)
 
 require "rake/clean"
 
+def iso_repo
+  if `hostname --domain`.chomp == "suse.cz"
+    "http://fallback.suse.cz"
+  else
+    "http://dist.suse.de"
+  end
+end
+
 desc "Running autoyast integration tests"
 task :test, [:name] do |name, args|
   base_dir = File.dirname(__FILE__)
@@ -35,7 +43,7 @@ task :test, [:name] do |name, args|
     obs_iso = File.join(base_dir, "kiwi/iso/obs.iso")
     autoyast_file = File.join(base_dir, "kiwi/definitions/autoyast/autoinst.xml")
     dest_definition = File.join(base_dir, "kiwi/definitions/autoyast/definition.rb")
-    default_iso = "http://dist.suse.de/install/SLE-12-Server-GM/SLE-12-Server-DVD-x86_64-GM-DVD1.iso"
+    default_iso = iso_repo + "/install/SLE-12-Server-GM/SLE-12-Server-DVD-x86_64-GM-DVD1.iso"
     autoyast_description = File.join(base_dir, "kiwi/autoyast_description.xml")
 
     FileUtils.rm(testing_iso, :force => true)
