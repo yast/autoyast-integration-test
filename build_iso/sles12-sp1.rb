@@ -27,7 +27,7 @@ def iso_repo
 end
 
 yast_url = "http://download.suse.de/ibs/Devel:/YaST:/Head/SLE-12-SP1/"
-iso_url = iso_repo + "/install/SLE-12-SP1-Server-Beta1/SLE-12-SP1-Server-DVD-x86_64-Beta1-DVD1.iso"
+iso_url = "http://dist.suse.de/install/SLE-12-SP1-Server-RC1/SLE-12-SP1-Server-DVD-x86_64-RC1-DVD1.iso"
 
 base_dir = File.dirname(__FILE__)
 iso_dir = File.join(base_dir, "..", "iso")
