@@ -42,6 +42,11 @@ Installation
   4. Install [Pennyworth](https://github.com/SUSE/pennyworth#installation) but instead
      of cloning the repository, install the
      [pennyworth-tool gem](https://rubygems.org/gems/pennyworth-tool/).
+     An older version is necessary now because of an API change
+     in `Pennyworth::VM#run_command`.
+
+        $ gem install pennyworth-tool --no-format-executable --version "= 0.1.0"
+        $ pennyworth setup
 
   5. Enable and start libvirt and configure default network and storage
 
