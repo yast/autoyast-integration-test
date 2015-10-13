@@ -61,4 +61,9 @@ describe "SLES 12 checks," do
     run_test_script("profile_sections.sh")
   end
 
+  # bsc #948608
+  it "handles zypper's pkgGpgCheck callback during installation" do
+    run_test_script("handle_zypper_pkg_gpg_check.sh")
+  end
+
 end
