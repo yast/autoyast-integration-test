@@ -136,7 +136,7 @@ task :test, [:name] do |name, args|
     # Clean up Vagrant machine
     #
     Dir.chdir(File.join(base_dir, "vagrant")) do
-      system "vagrant destroy"
+      system "vagrant destroy autoyast_vm"
     end
     # Due a bug in vagrant-libvirt the images will not cleanuped correctly
     # in the /var/lib/libvirt directory. This has to be done manually
