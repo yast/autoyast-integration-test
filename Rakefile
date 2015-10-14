@@ -132,11 +132,20 @@ task :test, [:name] do |name, args|
     FileUtils.rm(autoyast_file, :force => true)
     FileUtils.rm(dest_definition, :force => true)
 
+    #
+    # Clean up Vagrant machine
+    #
+    Dir.chdir(File.join(base_dir, "vagrant")) do
+      system "vagrant destroy"
+    end
     # Due a bug in vagrant-libvirt the images will not cleanuped correctly
     # in the /var/lib/libvirt directory. This has to be done manually
     # (including DB update)
     system "sudo virsh vol-delete vagrant_autoyast_vm.img default"
 
+    #
+    # Import vagrant box into pennyworth
+    #
     puts "\n****** Importing vagrant box into pennyworth ******\n"
     system "pennyworth -d #{base_dir} import-base"
 
