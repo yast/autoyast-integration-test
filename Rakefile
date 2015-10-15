@@ -19,6 +19,8 @@ require "bundler/setup"
 Bundler.require(:default)
 
 require "rake/clean"
+$LOAD_PATH.unshift File.join(File.dirname(__FILE__), "lib")
+require "ay_tests"
 
 def iso_repo
   if `hostname --domain`.chomp == "suse.cz"
@@ -164,8 +166,11 @@ task :build_iso, [:name] do |name, args|
     puts "ERROR: name is needed"
     exit 1
   end
-  FileUtils.mkdir("iso") unless File.exists?("iso")
-  system "ruby #{File.join(File.dirname(__FILE__),"build_iso", args[:name]+".rb")}"
+
+  base_dir = Pathname.new(File.dirname(__FILE__))
+  config = YAML.load_file(base_dir.join("definitions.yml")).fetch(args[:name].to_sym)
+  builder = AYTests::MediaBuilder.new(config.merge(base_dir: base_dir, version: args[:name]))
+  builder.run
 end
 
 # Cleaning tasks

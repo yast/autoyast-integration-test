@@ -1,0 +1,6 @@
+:sles12:
+  :yast_url: "http://download.suse.de/ibs/Devel:/YaST:/Head/SLE-12-SP1/"
+  :iso_url: "http://dist.suse.de/install/SLE-12-Server-GM/SLE-12-Server-DVD-x86_64-GM-DVD1.iso"
+:sles12_sp1:
+  :yast_url: "http://download.suse.de/ibs/Devel:/YaST:/Head/SLE-12-SP1/"
+  :iso_url: "http://dist.suse.de/install/SLE-12-SP1-Server-RC1/SLE-12-SP1-Server-DVD-x86_64-RC1-DVD1.iso"
