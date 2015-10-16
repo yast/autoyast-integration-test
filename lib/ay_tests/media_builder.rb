@@ -16,18 +16,19 @@ module AYTests
 
     # Constructor
     #
-    # @params [Pathname] base_dir Base directory to work on
-    # @params [Pathname] yast_url YaST repository URL
-    # @params [Pathname] iso_url  Base ISO URL
+    # @params [Pathname] base_dir    Base directory to work on
+    # @params [Pathname] yast_url    YaST repository URL
+    # @params [Pathname] iso_url     Base ISO URL
+    # @params [Pathname] output_path Output ISO path
     # @params [String]   version  Distribution version (+sle12+, +sle12_sp1+, etc.)
     # @params [Logger]   log      Logger
-    def initialize(base_dir:, yast_url:, iso_url:, version:, log: nil)
+    def initialize(base_dir:, yast_url:, iso_url:, version:, output_path:, log: nil)
       # Directories
       @base_dir           = base_dir
       @cache_dir          = base_dir.join("cache")
       @iso_dir            = base_dir.join("iso")
       @local_packages_dir = base_dir.join("rpms", version)
-      @output_path        = cache_dir.join("testing.iso")
+      @output_path        = output_path
       @boot_dir           = base_dir.join("boot_#{version}")
       @iso_path           = iso_dir.join(File.basename(iso_url))
       @obs_pkg_list_path  = base_dir.join("build_iso", "#{version}.obs_packages")
@@ -124,7 +125,7 @@ module AYTests
       # TODO Created DUD message
 
       log.info "Creating new ISO image with the updated packages"
-      cmd = "sudo mksusecd -c #{iso_dir.join("testing.iso")} --initrd=#{dud_path} #{iso_path}"
+      cmd = "sudo mksusecd -c #{output_path} --initrd=#{dud_path} #{iso_path}"
       cmd << " #{boot_dir}" if boot_dir.directory?
       system cmd
     end

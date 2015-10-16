@@ -169,7 +169,8 @@ task :build_iso, [:name] do |name, args|
 
   base_dir = Pathname.new(File.dirname(__FILE__))
   config = YAML.load_file(base_dir.join("definitions.yml")).fetch(args[:name].to_sym)
-  builder = AYTests::MediaBuilder.new(config.merge(base_dir: base_dir, version: args[:name]))
+  output_path = base_dir.join("kiwi", "iso", "obs.iso")
+  builder = AYTests::MediaBuilder.new(config.merge(base_dir: base_dir, version: args[:name], output_path: output_path))
   builder.run
 end
 
