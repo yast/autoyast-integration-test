@@ -69,26 +69,18 @@ RSpec.describe AYTests::MediaBuilder do
   end
 
   describe "#download_iso" do
-    context "if ISO exists" do
-      it "does not download it again and returns true" do
-        allow(subject).to receive(:iso_path).and_return(double(exist?: true))
-        expect(Kernel).to_not receive(:system)
-        expect(subject.download_iso).to eq(true)
+    context "the ISO is retrieved successfully" do
+      let(:iso_path) { Pathname.new("my.iso") }
+
+      it "returns the path to the downloaded ISO" do
+        expect(AYTests::IsoRepo).to receive(:get).with(Pathname).and_return(iso_path)
+        expect(subject.download_iso).to eq(iso_path)
       end
     end
 
-    context "if ISO does not exists" do
-      before do
-        allow(subject).to receive(:iso_path).and_return(double(exist?: false))
-      end
-
-      it "returns true if the ISO was successfully downloaded" do
-        expect(subject).to receive(:system).and_return(true)
-        expect(subject.download_iso).to eq(true)
-      end
-
-      it "returns false if the ISO was not successfully downloaded" do
-        expect(subject).to receive(:system).and_return(false)
+    context "the ISO can't be retrieved" do
+      it "returns false" do
+        expect(AYTests::IsoRepo).to receive(:get).with(Pathname).and_return(false)
         expect(subject.download_iso).to eq(false)
       end
     end

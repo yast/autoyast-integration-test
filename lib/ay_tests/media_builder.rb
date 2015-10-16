@@ -10,9 +10,9 @@ module AYTests
   # * Grabs user packages from a given directory
   # * Builds a DUD using updated packages and finally builds the final ISO
   class MediaBuilder
-    attr_reader :base_dir, :cache_dir, :iso_dir, :local_packages_dir,
-      :output_path, :local_packages_dir, :boot_dir, :iso_path, :obs_pkg_list_path,
-      :yast_url, :iso_url, :version, :log
+    attr_reader :base_dir, :cache_dir, :local_packages_dir, :output_path,
+      :local_packages_dir, :boot_dir, :iso_path, :obs_pkg_list_path, :yast_url,
+      :iso_url, :version, :log
 
     # Constructor
     #
@@ -26,11 +26,10 @@ module AYTests
       # Directories
       @base_dir           = base_dir
       @cache_dir          = base_dir.join("cache")
-      @iso_dir            = base_dir.join("iso")
       @local_packages_dir = base_dir.join("rpms", version)
       @output_path        = output_path
       @boot_dir           = base_dir.join("boot_#{version}")
-      @iso_path           = iso_dir.join(File.basename(iso_url))
+      @iso_path           = nil
       @obs_pkg_list_path  = base_dir.join("build_iso", "#{version}.obs_packages")
 
       # URLs
@@ -73,8 +72,7 @@ module AYTests
 
     # Download the base ISO
     def download_iso
-      return true if iso_path.exist?
-      system("wget --no-clobber --progress=dot:giga -O #{iso_path} #@iso_url") unless iso_path.exist?
+      @iso_path = IsoRepo.get(iso_url)
     end
 
     # Fetch OBS packages

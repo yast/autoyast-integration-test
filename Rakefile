@@ -30,9 +30,11 @@ def iso_repo
   end
 end
 
+base_dir = File.dirname(__FILE__)
+AYTests::IsoRepo.init(Pathname.new(base_dir).join("iso"))
+
 desc "Running autoyast integration tests"
 task :test, [:name] do |name, args|
-  base_dir = File.dirname(__FILE__)
   tests = Array(args[:name] || Dir.glob(File.join( base_dir, "spec", "*.rb")))
 
   tests.sort.each do |test_file|
