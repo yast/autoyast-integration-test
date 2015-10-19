@@ -1,5 +1,6 @@
 require "logger"
 require "ay_tests/media_builder"
+require "ay_tests/image_builder.rb"
 require "ay_tests/iso_repo"
 
 module AYTests
