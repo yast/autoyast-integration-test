@@ -66,4 +66,9 @@ describe "SLES 12 checks," do
     run_test_script("handle_zypper_pkg_gpg_check.sh")
   end
 
+  # bsc#949193
+  it "configures network interfaces" do
+    run_test_script("ifcfg_networking.sh")
+  end
+
 end
