@@ -1,6 +1,7 @@
 require "logger"
+require "ay_tests/helpers"
 require "ay_tests/media_builder"
-require "ay_tests/image_builder.rb"
+require "ay_tests/image_builder"
 require "ay_tests/iso_repo"
 
 module AYTests
@@ -42,15 +43,5 @@ module AYTests
   # @return [Pathname] Path to the image.
   def self.obs_iso_path
     base_dir.join("kiwi", "iso", "obs.iso")
-  end
-
-  # A module which includes a logger method just for convenience.
-  module Helpers
-    # Return the logger object for AYTests
-    #
-  # @return [Logger] Logger object.
-    def log
-      AYTests.logger
-    end
   end
 end
