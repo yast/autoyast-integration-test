@@ -1,5 +1,3 @@
-require "logger"
-
 module AYTests
   # Builds an ISO to be used during integration tests
   #
@@ -10,7 +8,7 @@ module AYTests
   # * Grabs user packages from a given directory
   # * Builds a DUD using updated packages and finally builds the final ISO
   class MediaBuilder
-    attr_reader :base_dir, :cache_dir, :local_packages_dir, :output_path,
+    attr_reader :base_dir, :cache_dir, :local_packages_dir,
       :local_packages_dir, :boot_dir, :iso_path, :obs_pkg_list_path, :yast_url,
       :iso_url, :version, :log
 
@@ -19,17 +17,14 @@ module AYTests
     # @params [Pathname] base_dir    Base directory to work on
     # @params [Pathname] yast_url    YaST repository URL
     # @params [Pathname] iso_url     Base ISO URL
-    # @params [Pathname] output_path Output ISO path
     # @params [String]   version  Distribution version (+sle12+, +sle12_sp1+, etc.)
     # @params [Logger]   log      Logger
-    def initialize(base_dir:, yast_url:, iso_url:, version:, output_path:, log: nil)
+    def initialize(yast_url:, iso_url:, version:, base_dir: nil, log: nil)
       # Directories
-      @base_dir           = base_dir
+      @base_dir           = base_dir || AYTests.base_dir
       @cache_dir          = base_dir.join("cache")
       @local_packages_dir = base_dir.join("rpms", version)
-      @output_path        = output_path
       @boot_dir           = base_dir.join("boot_#{version}")
-      @iso_path           = nil
       @obs_pkg_list_path  = base_dir.join("build_iso", "#{version}.obs_packages")
 
       # URLs
@@ -55,13 +50,12 @@ module AYTests
     # @see fetch_obs_packages
     # @see fetch_local_packages
     # @see build_iso
-    def run
+    def build(output_path = nil)
       cleanup
-      download_iso
+      iso_path = download_iso
       fetch_obs_packages
       fetch_local_packages
-      build_iso
-      output_path
+      build_iso(iso_path, output_path || AYTests.obs_iso_path)
     end
 
     # Clean-up cache directory
@@ -72,7 +66,7 @@ module AYTests
 
     # Download the base ISO
     def download_iso
-      @iso_path = IsoRepo.get(iso_url)
+      IsoRepo.get(iso_url)
     end
 
     # Fetch OBS packages
@@ -110,7 +104,7 @@ module AYTests
     end
 
     # Build the final ISO
-    def build_iso
+    def build_iso(iso_path, output_path)
       log.info "Creating DUD"
       # why /dud/ ?
       dud_path = cache_dir.join("#{version}.dud")

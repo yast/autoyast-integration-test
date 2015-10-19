@@ -12,15 +12,23 @@ RSpec.describe AYTests::MediaBuilder do
       base_dir: base_dir, yast_url: yast_url, iso_url: iso_url, version: version)
   end
 
-  describe "#run" do
-    it "runs each building phase and returns output path" do
+  describe "#build" do
+    it "runs each building phase and returns true if build was successful" do
       expect(subject).to receive(:cleanup)
       expect(subject).to receive(:download_iso)
       expect(subject).to receive(:fetch_obs_packages)
       expect(subject).to receive(:fetch_local_packages)
-      expect(subject).to receive(:build_iso)
-      expect(subject).to receive(:output_path).and_return("/home/autoyast/output")
-      expect(subject.run).to eq("/home/autoyast/output")
+      expect(subject).to receive(:build_iso).and_return(true)
+      expect(subject.build("/home/autoyast/output/testing.iso")).to eq(true)
+    end
+
+    it "runs each building phase and returns false if build wasn't successful" do
+      expect(subject).to receive(:cleanup)
+      expect(subject).to receive(:download_iso)
+      expect(subject).to receive(:fetch_obs_packages)
+      expect(subject).to receive(:fetch_local_packages)
+      expect(subject).to receive(:build_iso).and_return(false)
+      expect(subject.build("/home/autoyast/output/testing.iso")).to eq(false)
     end
   end
 
@@ -30,11 +38,6 @@ RSpec.describe AYTests::MediaBuilder do
     end
   end
 
-  describe "#iso_dir" do
-    it "returns base_dir + 'iso'" do
-      expect(subject.iso_dir).to eq(Pathname.new("#{base_dir}/iso"))
-    end
-  end
 
   describe "#local_packages_dir" do
     it "returns local_packages_dir + 'rpms/VERSION'" do
@@ -45,12 +48,6 @@ RSpec.describe AYTests::MediaBuilder do
   describe "#boot_path" do
     it "returns cache_dir + boot_VERSION" do
       expect(subject.boot_dir).to eq(Pathname.new("#{base_dir}/boot_#{version}"))
-    end
-  end
-
-  describe "#iso_path" do
-    it "returns iso_dir + ISO basename (eg. sles12.iso)" do
-      expect(subject.iso_path).to eq(Pathname.new("#{base_dir}/iso/sles12.iso"))
     end
   end
 
