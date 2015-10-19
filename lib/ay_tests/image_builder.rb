@@ -45,7 +45,7 @@ module AYTests
       setup_iso(iso_url)
       setup_autoinst(autoinst)
       setup_definition(:upgrade)
-      change_boot_order(base_dir.join("kiwi", "autoyast_description.xml"))
+      change_boot_order(autoyast_description_path)
       backup_image
       build
     end
@@ -59,6 +59,15 @@ module AYTests
         log.info "Exporting KVM image into box file"
         system "veewee kvm export #{IMAGE_NAME} --force"
       end
+    end
+
+    # Clean up
+    #
+    # Clean up of some AutoYaST profile and Veewee definition.
+    def cleanup
+      FileUtils.rm(autoinst_path, force: true)
+      FileUtils.rm(definition_path, force: true)
+      FileUtils.rm(autoyast_description_path, force: true)
     end
 
     private
@@ -117,13 +126,16 @@ module AYTests
     #
     # It will use a temporal file that won't be deleted (as it will
     # be needed by Veewee's upgrade definition).
-    def change_boot_order(autoyast_description)
+    #
+    # @params [Pathname,String] definition Path to the libvirt domain definition
+    #   for the KVM image.
+    def change_boot_order(definition)
       system "sudo virsh destroy #{IMAGE_NAME}" # shutdown
-      system "sudo virsh dumpxml #{IMAGE_NAME} >#{autoyast_description}"
-      system "sed -i.bak s/dev=\\'cdrom\\'/dev=\\'cdrom_save\\'/g #{autoyast_description}"
-      system "sed -i.bak s/dev=\\'hd\\'/dev=\\'cdrom\\'/g #{autoyast_description}"
-      system "sed -i.bak s/dev=\\'cdrom_save\\'/dev=\\'hd\\'/g #{autoyast_description}"
-      system "sudo virsh define #{autoyast_description}"
+      system "sudo virsh dumpxml #{IMAGE_NAME} >#{definition}"
+      system "sed -i.bak s/dev=\\'cdrom\\'/dev=\\'cdrom_save\\'/g #{definition}"
+      system "sed -i.bak s/dev=\\'hd\\'/dev=\\'cdrom\\'/g #{definition}"
+      system "sed -i.bak s/dev=\\'cdrom_save\\'/dev=\\'hd\\'/g #{definition}"
+      system "sudo virsh define #{definition}"
     end
 
     # Backup image
@@ -134,12 +146,11 @@ module AYTests
       system "sudo virt-clone -o #{IMAGE_NAME} -n #{IMAGE_NAME}_sav --file /var/lib/libvirt/images/#{IMAGE_NAME}_sav.qcow2"
     end
 
-    # Clean up
+    # Path to the temporal libvirt description for the KVM domain
     #
-    # Clean up of some AutoYaST profile and Veewee definition.
-    def cleanup
-      FileUtils.rm(autoinst_path, force: true)
-      FileUtils.rm(definition_path, force: true)
+    # @see change_boot_order
+    def autoyast_description_path
+      base_dir.join("kiwi", "autoyast_description.xml")
     end
   end
 end
