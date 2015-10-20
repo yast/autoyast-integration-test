@@ -7,7 +7,7 @@ module AYTests
 
     include AYTests::Helpers
 
-    attr_reader :base_dir, :obs_iso_dir, :autoinst_path, :definition_path
+    attr_reader :base_dir, :obs_iso_dir, :autoinst_path, :definition_path, :kiwi_autoyast_dir
 
     IMAGE_NAME = "autoyast"
 
@@ -18,8 +18,9 @@ module AYTests
     def initialize(base_dir = nil)
       @base_dir = base_dir || AYTests.base_dir
       @obs_iso_dir = @base_dir.join("kiwi", "iso")
-      @autoinst_path = @base_dir.join("kiwi", "definitions", "autoyast", "autoinst.xml")
-      @definition_path = @base_dir.join("kiwi", "definitions", "autoyast", "definition.rb")
+      @kiwi_autoyast_dir = @base_dir.join("kiwi", "definitions", "autoyast")
+      @autoinst_path = kiwi_autoyast_dir.join("autoinst.xml")
+      @definition_path = kiwi_autoyast_dir.join("definition.rb")
     end
 
     # Run the installation using a given profile and an ISO URL
@@ -28,6 +29,12 @@ module AYTests
     # @param [Pathname|URI|String] iso_url  URI/path to the ISO to use.
     # @return [Boolean] true if the system was successfully built; return false
     #   otherwise.
+    #
+    # @see iso_url
+    # @see autoinst_path
+    # @see setup_iso
+    # @see setup_autoinst
+    # @see setup_definition
     def install(autoinst, iso_url)
       setup_iso(iso_url)
       setup_autoinst(autoinst)
@@ -41,6 +48,13 @@ module AYTests
     # @param [Pathname|URI|String] iso_url  URI/path to the ISO to use.
     # @return [Boolean] true if the system was successfully built; return false
     #   otherwise.
+    #
+    # @see iso_url
+    # @see autoinst_path
+    # @see autoyast_description_path
+    # @see setup_iso
+    # @see setup_autoinst
+    # @see setup_definition
     def upgrade(autoinst, iso_url)
       setup_iso(iso_url)
       setup_autoinst(autoinst)
@@ -61,15 +75,6 @@ module AYTests
       end
     end
 
-    # Clean up
-    #
-    # Clean up of some AutoYaST profile and Veewee definition.
-    def cleanup
-      FileUtils.rm(autoinst_path, force: true)
-      FileUtils.rm(definition_path, force: true)
-      FileUtils.rm(autoyast_description_path, force: true)
-    end
-
     private
 
     # Build a KVM image using Veewee
@@ -78,7 +83,7 @@ module AYTests
     #   otherwise.
     def build
       log.info "Creating KVM image"
-      Dir.chdir(File.join(base_dir, "kiwi")) do
+      Dir.chdir(base_dir.join("kiwi")) do
         log.info "Building KVM image"
         system "veewee kvm build #{IMAGE_NAME} --force --auto"
       end
@@ -107,16 +112,12 @@ module AYTests
     #
     # @param [String|Symbol] mode :install for installation or :upgrade for upgrade.
     def setup_definition(mode)
-      FileUtils.cp(base_dir.join("kiwi", "definitions", "autoyast", "#{mode}_definition.rb"),
-                   definition_path)
+      FileUtils.cp(kiwi_autoyast_dir.join("#{mode}_definition.rb"), definition_path)
     end
 
     # Set up AutoYaST profile
     #
-    # It will copy the AutoYaST profile to the location where Veewee
-    # will look for it (#autoinst_path).
-    #
-    # @see autoinst_path
+    # @param [String|Pathname] autoinst AutoYaST profile path.
     def setup_autoinst(autoinst)
       raise "ERROR: #{autoinst} not found" unless autoinst.file?
       FileUtils.cp(autoinst, autoinst_path)

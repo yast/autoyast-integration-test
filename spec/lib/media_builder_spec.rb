@@ -6,6 +6,7 @@ RSpec.describe AYTests::MediaBuilder do
   let(:yast_url) { Pathname.new("http://build.suse.de/yast") }
   let(:iso_url) { Pathname.new("http://dl.suse.de/sles12.iso") }
   let(:version) { "sle12" }
+  let(:output_path) { Pathname.new("/home/autoyast/output/testing.iso") }
 
   subject(:builder) do
     AYTests::MediaBuilder.new(
@@ -14,21 +15,14 @@ RSpec.describe AYTests::MediaBuilder do
 
   describe "#build" do
     it "runs each building phase and returns true if build was successful" do
-      expect(subject).to receive(:cleanup)
-      expect(subject).to receive(:download_iso)
+      expect(FileUtils).to receive(:rm_r).with(builder.cache_dir)
+      expect(AYTests::IsoRepo).to receive(:get).with(iso_url)
       expect(subject).to receive(:fetch_obs_packages)
       expect(subject).to receive(:fetch_local_packages)
-      expect(subject).to receive(:build_iso).and_return(true)
-      expect(subject.build("/home/autoyast/output/testing.iso")).to eq(true)
-    end
-
-    it "runs each building phase and returns false if build wasn't successful" do
-      expect(subject).to receive(:cleanup)
-      expect(subject).to receive(:download_iso)
-      expect(subject).to receive(:fetch_obs_packages)
-      expect(subject).to receive(:fetch_local_packages)
-      expect(subject).to receive(:build_iso).and_return(false)
-      expect(subject.build("/home/autoyast/output/testing.iso")).to eq(false)
+      expect(subject).to receive(:system).with(/mkdud/)
+      expect(subject).to receive(:system).with(/sync/)
+      expect(subject).to receive(:system).with(/mksusecd/).and_return(true)
+      expect(subject.build(output_path)).to eq(true)
     end
   end
 

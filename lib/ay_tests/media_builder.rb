@@ -14,6 +14,10 @@ module AYTests
       :local_packages_dir, :boot_dir, :iso_path, :obs_pkg_list_path, :yast_url,
       :iso_url, :version
 
+    MKDUD_CMD = "mkdud -c %<dud_path>s -d sle12 -i  instsys,repo --prefix=37 " \
+      "--format=tar.gz $(find -name \"\*\.rpm\") %<dud_dir>s"
+    MKSUSECD_CMD = "sudo mksusecd -c %<output_path>s --initrd=%<dud_path>s %<iso_path>s"
+
     # Constructor
     #
     # @params [Pathname] base_dir Set the base directory. By default it uses
@@ -131,13 +135,14 @@ module AYTests
       log.info "Creating DUD"
       dud_path = cache_dir.join("#{version}.dud")
       dud_dir = base_dir.join("build_iso", "dud")
-      system "mkdud -c #{dud_path} -d sle12 -i  instsys,repo --prefix=37 --format=tar.gz $(find -name \"\*\.rpm\") #{dud_dir}"
+      system format(MKDUD_CMD, dud_path: dud_path, dud_dir: dud_dir)
 
       log.info "Syncing to disk"
       system "sync"
 
       log.info "Creating new ISO image with the updated packages"
-      cmd = "sudo mksusecd -c #{output_path} --initrd=#{dud_path} #{iso_path}"
+      cmd = format(MKSUSECD_CMD, output_path: output_path, dud_path: dud_path,
+                   iso_path: iso_path)
       cmd << " #{boot_dir}" if boot_dir.directory?
       system cmd
     end
