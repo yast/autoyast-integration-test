@@ -109,10 +109,10 @@ module AYTests
       Dir[@local_packages_dir.join("*.rpm").to_s].each do |package|
         # Replace downloaded packages for local ones
         rpm_name = `rpm -qp --qf \"%{NAME}\" #{package}`
-        Dir[cache_dir.join("**", "*.rpm").to_s].each do |remote|
-          if `rpm -qp --qf \"%{NAME}\" #{exchange_rpm}` == rpm_name
-            log.info "Removing #{remote}"
-            FileUtils.remove_file(remote)
+        Dir[cache_dir.join("**", "*.rpm").to_s].each do |rpm_to_exchange|
+          if `rpm -qp --qf \"%{NAME}\" #{rpm_to_exchange}` == rpm_name
+            log.info "Removing #{rpm_to_exchange}"
+            FileUtils.remove_file(rpm_to_exchange)
           end
         end
         log.info "Copying #{package}"
