@@ -73,7 +73,7 @@ module AYTests
     # Clean-up cache directory
     def cleanup
       log.info("Cleaning up #{cache_dir}")
-      FileUtils.rm_r(cache_dir)
+      FileUtils.rm_rf(cache_dir)
     end
 
     # Download the base ISO
