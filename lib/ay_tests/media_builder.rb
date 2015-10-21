@@ -14,6 +14,7 @@ module AYTests
       :local_packages_dir, :boot_dir, :iso_path, :obs_pkg_list_path, :yast_url,
       :iso_url, :version
 
+    # --prefix=37 sets a directory prefix to avoid conflicts. Check mkdud README.
     MKDUD_CMD = "mkdud -c %<dud_path>s -d sle12 -i  instsys,repo --prefix=37 " \
       "--format=tar.gz $(find -name \"\*\.rpm\") %<dud_dir>s"
     MKSUSECD_CMD = "sudo mksusecd -c %<output_path>s --initrd=%<dud_path>s %<iso_path>s"
