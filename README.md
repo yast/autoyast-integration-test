@@ -96,18 +96,18 @@ To run the testsuite, use the `test` Rake task:
 
     $ rake test
 
-This runs all tests defined in spec/*.rb (e.g. spec/tftp.rb):
+This runs all tests defined in test/*.rb (e.g. test/tftp.rb):
 * Building a KVM image by using the AutoYaST configuration file (e.g. tftp.xml)
       You can watch the installation by using `virt-manager`. The image is `autoyast`.
 * Starting the built image.
   You can watch it by using `virt-manager`. The image is `vagrant_autoyast_vm`.
-* Running rspec tests on this machine which are defined in e.g. spec/tftp.rb.
+* Running rspec tests on this machine which are defined in e.g. test/tftp.rb.
 
 To run only one single test use:
 
     $ rake test[<absolute_path_to_test_file>]
 
-e.g. `rake test[/src/autoyast_test/spec/sles12.rb]`
+e.g. `rake test[/src/autoyast_test/test/sles12.rb]`
 
 or you can also run any single script directly
 

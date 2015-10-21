@@ -36,18 +36,18 @@ AYTests::IsoRepo.init(AYTests.base_dir.join("iso"))
 
 desc "Running autoyast integration tests"
 task :test, [:name] do |name, args|
-  tests = Array(args[:name] || Dir.glob(File.join(base_dir, "spec", "*.rb")))
+  tests = Array(args[:name] || Dir.glob(AYTests.tests_path.join("*.rb")))
 
   tests.sort.each do |test_file|
     test_name = File.basename(test_file, ".rb")
     puts "********** Running test #{test_name} **********"
 
-    autoinst = base_dir.join("spec", "#{test_name}.xml")
-    autoinst = base_dir.join("spec", "#{test_name}.install_xml") unless autoinst.file?
+    autoinst = AYTests.tests_path.join("#{test_name}.xml")
+    autoinst = AYTests.tests_path.join("#{test_name}.install_xml") unless autoinst.file?
 
     # Set download iso path. This path will be taken for download, if the iso has not already been
     # downloaded.
-    iso_path_file = File.join(base_dir, "spec", test_name + ".install_iso")
+    iso_path_file = AYTests.tests_path.join("#{test_name}.install_iso")
     iso_url = File.file?(iso_path_file) ? IO.binread(iso_path_file).chomp : AYTests.obs_iso_path
 
     builder = AYTests::ImageBuilder.new
@@ -56,11 +56,11 @@ task :test, [:name] do |name, args|
     if test_name.start_with?("upgrade_")
       # Set download iso path. This path will be taken for download, if the iso has not already been
       # downloaded.
-      iso_path_file = File.join(base_dir, "spec", test_name + ".upgrade_iso")
+      iso_path_file = AYTests.tests_path.join("#{test_name}.upgrade_iso")
       iso_url = File.file?(iso_path_file) ? IO.binread(iso_path_file).chomp : AYTests.obs_iso_path
 
       # Set autoinst.xml
-      autoinst = base_dir.join("spec", "#{test_name}.upgrade_xml")
+      autoinst = AYTests.tests_path.join("#{test_name}.upgrade_xml")
       builder.upgrade(autoinst, iso_url)
     end
 

@@ -44,4 +44,11 @@ module AYTests
   def self.obs_iso_path
     base_dir.join("kiwi", "iso", "obs.iso")
   end
+
+  # Return the path to the integration tests
+  #
+  # @return [Pathname] Path to the integration tests
+  def self.tests_path
+    base_dir.join("test")
+  end
 end
