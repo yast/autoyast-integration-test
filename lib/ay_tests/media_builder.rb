@@ -20,11 +20,11 @@ module AYTests
 
     # Constructor
     #
-    # @params [Pathname] base_dir Set the base directory. By default it uses
+    # @param [Pathname] base_dir Set the base directory. By default it uses
     #   AYTests.base_dir.
-    # @params [Pathname] yast_url YaST repository URL
-    # @params [Pathname] iso_url  Base ISO URL
-    # @params [String]   version  Distribution version (+sle12+, +sle12_sp1+, etc.)
+    # @param [Pathname] yast_url YaST repository URL
+    # @param [Pathname] iso_url  Base ISO URL
+    # @param [String]   version  Distribution version (+sle12+, +sle12_sp1+, etc.)
     def initialize(yast_url:, iso_url:, version:, base_dir: nil)
       # Directories
       @base_dir           = base_dir || AYTests.base_dir

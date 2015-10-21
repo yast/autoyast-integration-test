@@ -26,10 +26,10 @@ module AYTests
       @libvirt_definition_path = @base_dir.join("kiwi", "autoyast_description.xml")
     end
 
-    # Run the installation using a given profile and an ISO URL
+    # Run the installation using a given profile and an ISO
     #
     # @param [Pathname]            autoinst Path to the AutoYaST profile to use.
-    # @param [Pathname|URI|String] iso_url  URI/path to the ISO to use.
+    # @param [Pathname|URI|String] iso_url  URL/path to the ISO to use.
     # @return [Boolean] true if the system was successfully built; return false
     #   otherwise.
     #
@@ -38,6 +38,7 @@ module AYTests
     # @see setup_iso
     # @see setup_autoinst
     # @see setup_definition
+    # @see build
     def install(autoinst, iso_url)
       setup_iso(iso_url)
       setup_autoinst(autoinst)
@@ -45,10 +46,10 @@ module AYTests
       build
     end
 
-    # Run the installation using a given profile and an ISO URL
+    # Run the installation using a given profile and an ISO
     #
     # @param [Pathname]            autoinst Path to the AutoYaST profile to use.
-    # @param [Pathname|URI|String] iso_url  URI/path to the ISO to use.
+    # @param [Pathname|URI|String] iso_url  URL/path to the ISO to use.
     # @return [Boolean] true if the system was successfully built; return false
     #   otherwise.
     #
@@ -58,6 +59,9 @@ module AYTests
     # @see setup_iso
     # @see setup_autoinst
     # @see setup_definition
+    # @see change_boot_order
+    # @see backup_image
+    # @see build
     def upgrade(autoinst, iso_url)
       setup_iso(iso_url)
       setup_autoinst(autoinst)
@@ -120,7 +124,7 @@ module AYTests
 
     # Set up the definition
     #
-    # It will copy the Veewee definition depending on the mode. Definitions
+    # It copies the Veewee definition depending on the mode. Definitions
     # will live in kiwi/definitions/autoyast under base directory.
     #
     # @param [String|Symbol] mode :install for installation or :upgrade for upgrade.
@@ -129,6 +133,8 @@ module AYTests
     end
 
     # Set up AutoYaST profile
+    #
+    # It copies the AutoYaST profile so Veewee can use it.
     #
     # @param [String|Pathname] autoinst AutoYaST profile path.
     def setup_autoinst(autoinst)
@@ -150,6 +156,7 @@ module AYTests
       system "sed -i.bak s/dev=\\'hd\\'/dev=\\'cdrom\\'/g #{libvirt_definition_path}"
       system "sed -i.bak s/dev=\\'cdrom_save\\'/dev=\\'hd\\'/g #{libvirt_definition_path}"
       system "sudo virsh define #{libvirt_definition_path}"
+      FileUtils.rm(definition, force: true)
     end
 
     # Backup image
