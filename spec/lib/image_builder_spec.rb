@@ -55,6 +55,13 @@ RSpec.describe AYTests::ImageBuilder do
     end
   end
 
+  describe "#libvirt_definition_path" do
+    it "returns base_dir + /kiwi/autoyast_description.xml" do
+      expect(builder.libvirt_definition_path)
+        .to eq(base_dir.join("kiwi", "autoyast_description.xml"))
+    end
+  end
+
   describe "#install" do
     it "runs each building phase and returns true if build was successful" do
       # Retrieve and link ISO
@@ -124,9 +131,10 @@ RSpec.describe AYTests::ImageBuilder do
 
   describe "#cleanup" do
     it "removes copied AutoYaST profile and Veewee definition" do
-      expect(FileUtils).to receive(:rm).with(builder.autoinst_path)
-      expect(FileUtils).to receive(:rm).with(builder.definition_path)
-      expect(FileUtils).to receive(:rm).with(builder.obs_iso_dir.join("testing.iso"))
+      expect(FileUtils).to receive(:rm).with(builder.autoinst_path, force: true)
+      expect(FileUtils).to receive(:rm).with(builder.definition_path, force: true)
+      expect(FileUtils).to receive(:rm).with(builder.obs_iso_dir.join("testing.iso"), force: true)
+      expect(FileUtils).to receive(:rm).with(builder.libvirt_definition_path, force: true)
       builder.cleanup
     end
   end

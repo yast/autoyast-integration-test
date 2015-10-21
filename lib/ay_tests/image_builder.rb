@@ -7,7 +7,8 @@ module AYTests
 
     include AYTests::Helpers
 
-    attr_reader :base_dir, :obs_iso_dir, :autoinst_path, :definition_path, :kiwi_autoyast_dir
+    attr_reader :base_dir, :obs_iso_dir, :autoinst_path, :definition_path,
+      :kiwi_autoyast_dir, :libvirt_definition_path
 
     IMAGE_NAME = "autoyast"
 
@@ -21,6 +22,8 @@ module AYTests
       @kiwi_autoyast_dir = @base_dir.join("kiwi", "definitions", "autoyast")
       @autoinst_path = kiwi_autoyast_dir.join("autoinst.xml")
       @definition_path = kiwi_autoyast_dir.join("definition.rb")
+      # This file will be used by Veewee during upgrade.
+      @libvirt_definition_path = @base_dir.join("kiwi", "autoyast_description.xml")
     end
 
     # Run the installation using a given profile and an ISO URL
@@ -59,7 +62,7 @@ module AYTests
       setup_iso(iso_url)
       setup_autoinst(autoinst)
       setup_definition(:upgrade)
-      change_boot_order(autoyast_description_path)
+      change_boot_order
       backup_image
       build
     end
@@ -79,9 +82,10 @@ module AYTests
     #
     # Removes AutoYaST profile, Veewee definition and link to installation ISO
     def cleanup
-      FileUtils.rm(autoinst_path)
-      FileUtils.rm(definition_path)
-      FileUtils.rm(obs_iso_dir.join("testing.iso"))
+      FileUtils.rm(autoinst_path, force: true)
+      FileUtils.rm(definition_path, force: true)
+      FileUtils.rm(obs_iso_dir.join("testing.iso"), force: true)
+      FileUtils.rm(libvirt_definition_path, force: true)
     end
 
     private
@@ -139,13 +143,13 @@ module AYTests
     #
     # @params [Pathname,String] definition Path to the libvirt domain definition
     #   for the KVM image.
-    def change_boot_order(definition)
+    def change_boot_order
       system "sudo virsh destroy #{IMAGE_NAME}" # shutdown
-      system "sudo virsh dumpxml #{IMAGE_NAME} >#{definition}"
-      system "sed -i.bak s/dev=\\'cdrom\\'/dev=\\'cdrom_save\\'/g #{definition}"
-      system "sed -i.bak s/dev=\\'hd\\'/dev=\\'cdrom\\'/g #{definition}"
-      system "sed -i.bak s/dev=\\'cdrom_save\\'/dev=\\'hd\\'/g #{definition}"
-      system "sudo virsh define #{definition}"
+      system "sudo virsh dumpxml #{IMAGE_NAME} >#{libvirt_definition_path}"
+      system "sed -i.bak s/dev=\\'cdrom\\'/dev=\\'cdrom_save\\'/g #{libvirt_definition_path}"
+      system "sed -i.bak s/dev=\\'hd\\'/dev=\\'cdrom\\'/g #{libvirt_definition_path}"
+      system "sed -i.bak s/dev=\\'cdrom_save\\'/dev=\\'hd\\'/g #{libvirt_definition_path}"
+      system "sudo virsh define #{libvirt_definition_path}"
     end
 
     # Backup image
@@ -154,13 +158,6 @@ module AYTests
     # backup it and restore in Veewee's +after_create+ hook.
     def backup_image
       system "sudo virt-clone -o #{IMAGE_NAME} -n #{IMAGE_NAME}_sav --file /var/lib/libvirt/images/#{IMAGE_NAME}_sav.qcow2"
-    end
-
-    # Path to the temporal libvirt description for the KVM domain
-    #
-    # @see change_boot_order
-    def autoyast_description_path
-      base_dir.join("kiwi", "autoyast_description.xml")
     end
   end
 end
