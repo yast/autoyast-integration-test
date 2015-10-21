@@ -121,4 +121,13 @@ RSpec.describe AYTests::ImageBuilder do
       expect(builder.export).to eq(false)
     end
   end
+
+  describe "#cleanup" do
+    it "removes copied AutoYaST profile and Veewee definition" do
+      expect(FileUtils).to receive(:rm).with(builder.autoinst_path)
+      expect(FileUtils).to receive(:rm).with(builder.definition_path)
+      expect(FileUtils).to receive(:rm).with(builder.obs_iso_dir.join("testing.iso"))
+      builder.cleanup
+    end
+  end
 end

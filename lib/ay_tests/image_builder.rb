@@ -66,13 +66,22 @@ module AYTests
 
     # Export the created machine
     #
-    # @return [Boolean] tru if the system was successfully exported; false
+    # @return [Boolean] true if the system was successfully exported; false
     #   otherwise.
     def export
       Dir.chdir(base_dir.join("kiwi")) do
         log.info "Exporting KVM image into box file"
         system "veewee kvm export #{IMAGE_NAME} --force"
       end
+    end
+
+    # Clean up used files
+    #
+    # Removes AutoYaST profile, Veewee definition and link to installation ISO
+    def cleanup
+      FileUtils.rm(autoinst_path)
+      FileUtils.rm(definition_path)
+      FileUtils.rm(obs_iso_dir.join("testing.iso"))
     end
 
     private
