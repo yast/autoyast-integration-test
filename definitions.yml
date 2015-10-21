@@ -1,0 +1,12 @@
+common: &common
+  :extra_repos:
+    - :server: "http://download.suse.de/ibs/SUSE:/SLE-12-SP1:/GA/standard/"
+      :packages: ["grub2-2.02~beta2", "grub2-i386-pc-2.02~beta2", "libzypp", "libsolv-tools", "zypper"]
+:sles12:
+  <<: *common
+  :yast_url: "http://download.suse.de/ibs/Devel:/YaST:/Head/SLE-12-SP1/"
+  :iso_url: "http://dist.suse.de/install/SLE-12-Server-GM/SLE-12-Server-DVD-x86_64-GM-DVD1.iso"
+:sles12-sp1:
+  <<: *common
+  :yast_url: "http://download.suse.de/ibs/Devel:/YaST:/Head/SLE-12-SP1/"
+  :iso_url: "http://dist.suse.de/install/SLE-12-SP1-Server-RC1/SLE-12-SP1-Server-DVD-x86_64-RC1-DVD1.iso"

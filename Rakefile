@@ -19,6 +19,8 @@ require "bundler/setup"
 Bundler.require(:default)
 
 require "rake/clean"
+$LOAD_PATH.unshift File.join(File.dirname(__FILE__), "lib")
+require "ay_tests"
 
 def iso_repo
   if `hostname --domain`.chomp == "suse.cz"
@@ -28,109 +30,42 @@ def iso_repo
   end
 end
 
+base_dir = Pathname.new(File.dirname(__FILE__))
+AYTests.base_dir = base_dir
+AYTests::IsoRepo.init(AYTests.base_dir.join("iso"))
+
 desc "Running autoyast integration tests"
 task :test, [:name] do |name, args|
-  base_dir = File.dirname(__FILE__)
-  tests = Array(args[:name] || Dir.glob(File.join( base_dir, "spec", "*.rb")))
+  tests = Array(args[:name] || Dir.glob(AYTests.tests_path.join("*.rb")))
 
   tests.sort.each do |test_file|
     test_name = File.basename(test_file, ".rb")
-    puts "---------------------------------------------------------------------------------"
     puts "********** Running test #{test_name} **********"
-    puts "---------------------------------------------------------------------------------"
 
-    testing_iso = File.join(base_dir, "kiwi/iso/testing.iso")
-    obs_iso = File.join(base_dir, "kiwi/iso/obs.iso")
-    autoyast_file = File.join(base_dir, "kiwi/definitions/autoyast/autoinst.xml")
-    dest_definition = File.join(base_dir, "kiwi/definitions/autoyast/definition.rb")
-    default_iso = iso_repo + "/install/SLE-12-Server-GM/SLE-12-Server-DVD-x86_64-GM-DVD1.iso"
-    autoyast_description = File.join(base_dir, "kiwi/autoyast_description.xml")
+    autoinst = AYTests.tests_path.join("#{test_name}.xml")
+    autoinst = AYTests.tests_path.join("#{test_name}.install_xml") unless autoinst.file?
 
-    FileUtils.rm(testing_iso, :force => true)
-
-    # Set used iso
-    unless test_name.start_with?("upgrade_")
-      # New installation workflow. So we take the built OBS iso
-      FileUtils.ln(obs_iso, testing_iso) if File.file?(obs_iso)
-    end
     # Set download iso path. This path will be taken for download, if the iso has not already been
     # downloaded.
-    src_definition = File.join(base_dir, "kiwi/definitions/autoyast/install_definition.rb")
-    FileUtils.cp(src_definition, dest_definition)
-    iso_path_file = File.join(base_dir, "spec", test_name + ".install_iso")
-    if File.file?(iso_path_file)
-      data = IO.binread(iso_path_file).chomp
-    else
-      data = default_iso
-    end
-    system "sed -i.bak s,__iso_source_path__,#{data},g #{dest_definition}"
+    iso_path_file = AYTests.tests_path.join("#{test_name}.install_iso")
+    iso_url = File.file?(iso_path_file) ? IO.binread(iso_path_file).chomp : AYTests.obs_iso_path
 
-    # Set autoinst.xml
-    autoinst = File.join(base_dir, "spec", test_name + ".xml")
-    autoinst = File.join(base_dir, "spec", test_name + ".install_xml") unless File.file?(autoinst)
-    FileUtils.cp( autoinst, autoyast_file)
-
-    puts "\n****** Creating KVM image ******\n"
-    Dir.chdir(File.join( base_dir, "kiwi")) do
-      puts "\n**** Building KVM image ****\n"
-      system "veewee kvm build autoyast --force --auto"
-    end
+    builder = AYTests::ImageBuilder.new
+    builder.install(autoinst, iso_url)
 
     if test_name.start_with?("upgrade_")
-      # upgrade workflow
-      # Take the generated image and run a autoyast upgrade workflow
-
-      # Set used iso
-      FileUtils.rm(testing_iso, :force => true)
-      FileUtils.ln(obs_iso, testing_iso) if File.file?(obs_iso) #Taking obs iso for upgrade
-
-      # Change boot order to CD on the top
-      system "sudo virsh destroy autoyast" #shutdown
-      system "sudo virsh dumpxml autoyast >#{autoyast_description}"
-      system "sed -i.bak s/dev=\\'cdrom\\'/dev=\\'cdrom_save\\'/g #{autoyast_description}"
-      system "sed -i.bak s/dev=\\'hd\\'/dev=\\'cdrom\\'/g #{autoyast_description}"
-      system "sed -i.bak s/dev=\\'cdrom_save\\'/dev=\\'hd\\'/g #{autoyast_description}"
-      system "sudo virsh define #{autoyast_description}"
-
-      # Save generated autoyast image which has to be updated. Because it will be overwritten by
-      # veewee in the next call. The restore process will be done in the after_create section of veewee defintion.
-      system "sudo virt-clone -o autoyast -n autoyast_sav --file /var/lib/libvirt/images/autoyast_sav.qcow2"
-
-      # Take update definition for veewee
-      src_definition = File.join(base_dir, "kiwi/definitions/autoyast/upgrade_definition.rb")
-      FileUtils.cp(src_definition, dest_definition)
-
       # Set download iso path. This path will be taken for download, if the iso has not already been
       # downloaded.
-      iso_path_file = File.join(base_dir, "spec", test_name + ".upgrade_iso")
-      if File.file?(iso_path_file)
-        data = IO.binread(iso_path_file).chomp
-      else
-        data = default_iso
-      end
-      system "sed -i.bak s,__iso_source_path__,#{data},g #{dest_definition}"
+      iso_path_file = AYTests.tests_path.join("#{test_name}.upgrade_iso")
+      iso_url = File.file?(iso_path_file) ? IO.binread(iso_path_file).chomp : AYTests.obs_iso_path
 
       # Set autoinst.xml
-      autoinst = File.join(base_dir, "spec", test_name + ".upgrade_xml")
-      unless File.file?(autoinst)
-        puts "ERROR: #{autoinst} not found"
-        exit 1
-      end
-      FileUtils.cp( autoinst, autoyast_file)
-
-      Dir.chdir(File.join( base_dir, "kiwi")) do
-        puts "\n**** Updating KVM image ****\n"
-        system "veewee kvm build autoyast --force --auto"
-      end
-      system "rm #{autoyast_description}*"
+      autoinst = AYTests.tests_path.join("#{test_name}.upgrade_xml")
+      builder.upgrade(autoinst, iso_url)
     end
 
-    Dir.chdir(File.join( base_dir, "kiwi")) do
-      puts "\n**** Exporting KVM image into box file ****\n" 
-      system "veewee kvm export autoyast --force"
-    end
-    FileUtils.rm(autoyast_file, :force => true)
-    FileUtils.rm(dest_definition, :force => true)
+    builder.export
+    builder.cleanup
 
     #
     # Clean up Vagrant machine
@@ -164,8 +99,11 @@ task :build_iso, [:name] do |name, args|
     puts "ERROR: name is needed"
     exit 1
   end
-  FileUtils.mkdir("iso") unless File.exists?("iso")
-  system "ruby #{File.join(File.dirname(__FILE__),"build_iso", args[:name]+".rb")}"
+
+  base_dir = Pathname.new(File.dirname(__FILE__))
+  config = YAML.load_file(base_dir.join("definitions.yml")).fetch(args[:name].to_sym)
+  builder = AYTests::MediaBuilder.new(config.merge(base_dir: base_dir, version: args[:name]))
+  builder.build
 end
 
 # Cleaning tasks
