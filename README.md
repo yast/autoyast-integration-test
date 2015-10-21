@@ -29,7 +29,11 @@ Installation
 
        $ zypper install ./mkdud-*.rpm ./mksusecd-*.rpm
 
-  2. Unless you run tests as 'root', configure `sudo` in order to run the `mksusecd`,
+  2. Install `virt-install` package
+
+       $ zypper install virt-install
+
+  3. Unless you run tests as 'root', configure `sudo` in order to run the `mksusecd`,
      `systemctl start libvirtd` and `zypper in` commands as root.
 
      This will grant access to execute every command for user <username> as root without
@@ -37,9 +41,9 @@ Installation
 
         echo '<username> ALL=NOPASSWD: ALL' >> /etc/sudoers
 
-  3. Generate a ssh-key for vagrant (e.g. with ssh-keygen) unless you already have one.
+  4. Generate a ssh-key for vagrant (e.g. with ssh-keygen) unless you already have one.
 
-  4. Install [Pennyworth](https://github.com/SUSE/pennyworth#installation) but instead
+  5. Install [Pennyworth](https://github.com/SUSE/pennyworth#installation) but instead
      of cloning the repository, install the
      [pennyworth-tool gem](https://rubygems.org/gems/pennyworth-tool/).
      An older version is necessary now because of an API change
@@ -48,7 +52,7 @@ Installation
         $ gem install pennyworth-tool --no-format-executable --version "= 0.1.0"
         $ pennyworth setup
 
-  5. Enable and start libvirt and configure default network and storage
+  6. Enable and start libvirt and configure default network and storage
 
         $ systemctl enable libvirtd
         $ systemctl start libvirtd
@@ -59,13 +63,13 @@ Installation
         $ virsh pool-start default
         $ virsh pool-autostart default
 
-  6. Clone autoyast-integration-test repository and install needed GEMs
+  7. Clone autoyast-integration-test repository and install needed GEMs
 
         $ git clone https://github.com/yast/autoyast-integration-test
         $ cd autoyast-integration-test
         $ bundle install
 
-  7. If the host is running a firewall, you must permit connections from
+  8. If the host is running a firewall, you must permit connections from
      libvirt default network to host’s port 8888. For example, if you’re
      running SuSEfirewall2 and your libvirt default network is 192.168.122.0
      (you can check it on `/etc/libvirt/qemu/networks/default.xml`), you could
@@ -77,7 +81,7 @@ Installation
      After that, you must reboot your system to be sure everything works
      properly (libvirt iptables rules, ip forwarding, etc.).
 
-  8. Only in Tumbleweed, you must update the vagrant-libvirt plugin:
+  9. Only in Tumbleweed, you must update the vagrant-libvirt plugin:
 
         $ NOKOGIRI_USE_SYSTEM_LIBRARIES=true vagrant plugin install vagrant-libvirt
 
