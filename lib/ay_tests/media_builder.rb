@@ -25,7 +25,10 @@ module AYTests
     # @param [Pathname] yast_url YaST repository URL
     # @param [Pathname] iso_url  Base ISO URL
     # @param [String]   version  Distribution version (+sle12+, +sle12_sp1+, etc.)
-    def initialize(yast_url:, iso_url:, version:, base_dir: nil)
+    # @param [Array<Hash>] extra_repos Extra repositories and packages to add to the
+    #   ISO. The information for each repository consists in a Hash with +:server+
+    #   and a +:packages+ keys.
+    def initialize(yast_url:, iso_url:, version:, base_dir: nil, extra_repos: [])
       # Directories
       @base_dir           = base_dir || AYTests.base_dir
       @cache_dir          = base_dir.join("cache")
@@ -38,7 +41,8 @@ module AYTests
       @iso_url  = iso_url
 
       # Misc data
-      @version = version
+      @version     = version
+      @extra_repos = extra_repos
     end
 
     # Build a new ISO using packages from OBS
@@ -85,21 +89,20 @@ module AYTests
 
     # Fetch OBS packages
     #
-    # Method #obs_pkg_list_path will point to the list of packages to be downloaded.
-    # Moreover, some extra packages are downloaded (grub2, libzypp, libsolv-tools and zypper).
+    # Method #obs_pkg_list_path will point to the list of packages to be
+    # downloaded. If @extra_repos contains a list of repositories and packages,
+    # it will download those packages as well.
     def fetch_obs_packages
       puts "\n**** Fetching all required packages ****"
       system "zypper --root #{cache_dir} ar --no-gpgcheck #{yast_url} download-packages"
       system "xargs -a #{obs_pkg_list_path} zypper --root #{cache_dir} --pkg-cache-dir=#{cache_dir} download"
 
       puts "\n**** Fetching latest grub2 and libzypp packages ****"
-      system "zypper --root #{cache_dir} rr download-packages"
-      system "zypper --root #{cache_dir} ar --no-gpgcheck http://download.suse.de/ibs/SUSE:/SLE-12-SP1:/GA/standard/ download-packages"
-      system "zypper --root #{cache_dir} --pkg-cache-dir=#{cache_dir} download grub2-2.02~beta2"
-      system "zypper --root #{cache_dir} --pkg-cache-dir=#{cache_dir} download grub2-i386-pc-2.02~beta2"
-      system "zypper --root #{cache_dir} --pkg-cache-dir=#{cache_dir} download libzypp"
-      system "zypper --root #{cache_dir} --pkg-cache-dir=#{cache_dir} download libsolv-tools"
-      system "zypper --root #{cache_dir} --pkg-cache-dir=#{cache_dir} download zypper"
+      @extra_repos.each do |repo|
+        system "zypper --root #{cache_dir} rr download-packages"
+        system "zypper --root #{cache_dir} ar --no-gpgcheck #{repo[:server]} download-packages"
+        system "zypper --root #{cache_dir} --pkg-cache-dir=#{cache_dir} download #{repo[:packages].join(" ")}"
+      end
     end
 
     # Fetch local packages
