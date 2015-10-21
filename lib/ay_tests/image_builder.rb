@@ -11,6 +11,7 @@ module AYTests
       :kiwi_autoyast_dir, :libvirt_definition_path
 
     IMAGE_NAME = "autoyast"
+    ISO_FILE_NAME = "testing.iso"
 
     # Constructor
     #
@@ -88,7 +89,7 @@ module AYTests
     def cleanup
       FileUtils.rm(autoinst_path, force: true)
       FileUtils.rm(definition_path, force: true)
-      FileUtils.rm(obs_iso_dir.join("testing.iso"), force: true)
+      FileUtils.rm(obs_iso_dir.join(ISO_FILE_NAME), force: true)
       FileUtils.rm(libvirt_definition_path, force: true)
     end
 
@@ -108,7 +109,7 @@ module AYTests
 
     # Set up the ISO image
     #
-    # It will link the ISO image through a link called +testing.iso+.
+    # It will link the ISO image through a link called +ISO_FILE_NAME+.
     # The directory where this link will live is determined through
     # the #obs_iso_dir method.
     #
@@ -118,8 +119,8 @@ module AYTests
     # @see obs_iso_dir
     def setup_iso(iso_url)
       iso_path = URI(iso_url.to_s).host ? IsoRepo.get(iso_url) : iso_url
-      FileUtils.rm(obs_iso_dir.join("testing.iso"), force: true)
-      FileUtils.ln_s(iso_path, obs_iso_dir.join("testing.iso"))
+      FileUtils.rm(obs_iso_dir.join(ISO_FILE_NAME), force: true)
+      FileUtils.ln_s(iso_path, obs_iso_dir.join(ISO_FILE_NAME))
     end
 
     # Set up the definition
