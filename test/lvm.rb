@@ -1,4 +1,4 @@
-require_relative "../helper/spec_helper.rb"
+require_relative "spec_helper"
 
 describe "LVM partition;" do
   it "creates lvm partitions" do

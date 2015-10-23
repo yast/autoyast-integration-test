@@ -1,4 +1,4 @@
-require_relative "../helper/spec_helper.rb"
+require_relative "spec_helper"
 
 describe "SLES 12 checks," do
   it "if user -vagrant- has been created" do
