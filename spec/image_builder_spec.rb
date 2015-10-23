@@ -3,7 +3,7 @@ require "ay_tests/image_builder"
 require "ay_tests/iso_repo"
 
 RSpec.describe AYTests::ImageBuilder do
-  let(:base_dir) { Pathname.new(File.dirname(__FILE__)).join("..", "..") }
+  let(:base_dir) { Pathname.new(File.dirname(__FILE__)).join("..") }
   let(:autoinst_path) { base_dir.join("autoinst.xml") }
   let(:iso_url) { "http://dl.opensuse.org/leap-42.1.iso" }
   let(:path_to_iso) { base_dir.join("iso", "leap-42.1.iso") }
