@@ -15,51 +15,43 @@
 # To contact SUSE about this file by physical or electronic mail,
 # you may find current contact information at www.suse.com
 
-# Require the spec.rb from pennyworth. Adjust the path to where you checked out pennyworth from git.
-require "pennyworth/spec"
-require "pennyworth/ssh_keys_importer"
-
 def run_test_script(script, expected = "AUTOYAST OK")
   shell =  File.join(File.dirname(__FILE__),"../test", script)
-  if File.exists?(shell)
-    # Copy the file to be tested to /tmp inside the booted box and execute it.
-    $vm.inject_file(shell, "/tmp")
-    actual = $vm.run_command("source /tmp/#{File.basename(shell)}", stdout: :capture, as: "root")
-
-    # Compare the expected value.
-    expect(actual.split("\n").last).to eq(expected)
-  end
+  expect(File.exists?(shell)).to eq(true) # Check if the script exists
+  result = $vm.run(shell, sudo: true)
+  expect(result[:stdout].split("\n").last).to eq(expected), proc { result[:stderr] }
 end
 
 # Copy YaST2 logs from virtual machine to a given directory
 #
+# It relies on AYTests::VagrantRunner#download_logs method.
 # The logs will be stored in a tar.gz file. To avoid collisions,
 # the compressed file's name will contain a timestamp.
 #
-# @param [Pennyworth::VM] vm   Virtual machine
-# @param [String]         dest Directory where the logs will be stored.
-def copy_logs(vm, dest = "log")
-  tar_path = "/var/log/YaST2-#{Time.now.strftime('%Y%m%d%H%M%S')}.tar.gz"
+# @param [AYTests::VagrantRunner] runner Virtual machine runner
+# @param [String]                 dest   Directory where the logs will be stored
+#
+# @see AYTests::VagrantRunner#download_logs
+def copy_logs(runner, dest = "log")
   FileUtils.mkdir(dest) unless Dir.exists?(dest)
-  vm.run_command("/bin/tar cfz #{tar_path} /var/log/YaST2", as: "root")
-  vm.extract_file(tar_path, dest)
+  runner.download_logs(dest)
 end
 
 RSpec.configure do |config|
-  config.vagrant_dir = File.join( Dir.getwd, "vagrant" )
-
   config.before(:all) do
-    # Start the previously create vagrant VM - opensuse_vm.
-    $vm = start_system(box: "autoyast_vm")
+    AYTests.base_dir = Pathname.new(File.dirname(__FILE__)).join("..")
 
-    # This is the only way of execute this after(:all) block
-    # before the system is stopped.
-    self.class.after(:all) do
-      examples = RSpec.world.filtered_examples.values.flatten
-      # Copy the logs if some test fails.
-      if examples.any?(&:exception)
-        copy_logs($vm)
-      end
-    end
+    # Start the previously create vagrant VM - autoyast_vm
+    $vm = AYTests::VagrantRunner.new(AYTests.base_dir.join("vagrant"), AYTests.provider)
+    $vm.cleanup
+    $vm.start
+  end
+
+  config.after(:all) do
+    examples = RSpec.world.filtered_examples.values.flatten
+    # Copy the logs if some test fails.
+    copy_logs($vm) if examples.any?(&:exception)
+    $vm.stop
+    $vm.cleanup
   end
 end

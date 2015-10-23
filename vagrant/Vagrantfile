@@ -133,5 +133,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       domain.nested = false
       domain.volume_cache = 'none'
     end
+
+    opensuse.vm.provider :virtualbox do |vb|
+      vb.memory = 1024
+    end
   end
 end
