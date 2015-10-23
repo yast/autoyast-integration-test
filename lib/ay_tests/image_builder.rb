@@ -89,7 +89,6 @@ module AYTests
     def cleanup
       FileUtils.rm(autoinst_path, force: true)
       FileUtils.rm(definition_path, force: true)
-      FileUtils.rm(obs_iso_dir.join(ISO_FILE_NAME), force: true)
       FileUtils.rm(libvirt_definition_path, force: true)
     end
 

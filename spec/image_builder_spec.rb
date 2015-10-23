@@ -3,7 +3,7 @@ require "ay_tests/image_builder"
 require "ay_tests/iso_repo"
 
 RSpec.describe AYTests::ImageBuilder do
-  let(:base_dir) { Pathname.new(File.dirname(__FILE__)).join("..", "..") }
+  let(:base_dir) { Pathname.new(File.dirname(__FILE__)).join("..") }
   let(:autoinst_path) { base_dir.join("autoinst.xml") }
   let(:iso_url) { "http://dl.opensuse.org/leap-42.1.iso" }
   let(:path_to_iso) { base_dir.join("iso", "leap-42.1.iso") }
@@ -133,7 +133,6 @@ RSpec.describe AYTests::ImageBuilder do
     it "removes copied AutoYaST profile and Veewee definition" do
       expect(FileUtils).to receive(:rm).with(builder.autoinst_path, force: true)
       expect(FileUtils).to receive(:rm).with(builder.definition_path, force: true)
-      expect(FileUtils).to receive(:rm).with(builder.obs_iso_dir.join("testing.iso"), force: true)
       expect(FileUtils).to receive(:rm).with(builder.libvirt_definition_path, force: true)
       builder.cleanup
     end

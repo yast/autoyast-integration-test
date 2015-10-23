@@ -20,7 +20,7 @@ require "pennyworth/spec"
 require "pennyworth/ssh_keys_importer"
 
 def run_test_script(script, expected = "AUTOYAST OK")
-  shell =  File.join(File.dirname(__FILE__),"../spec", script)
+  shell =  File.join(File.dirname(__FILE__),"../test", script)
   if File.exists?(shell)
     # Copy the file to be tested to /tmp inside the booted box and execute it.
     $vm.inject_file(shell, "/tmp")
