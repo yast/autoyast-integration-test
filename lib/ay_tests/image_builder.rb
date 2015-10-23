@@ -8,16 +8,18 @@ module AYTests
     include AYTests::Helpers
 
     attr_reader :base_dir, :obs_iso_dir, :autoinst_path, :definition_path,
-      :kiwi_autoyast_dir, :libvirt_definition_path
+      :kiwi_autoyast_dir, :libvirt_definition_path, :provider
 
     IMAGE_NAME = "autoyast"
     ISO_FILE_NAME = "testing.iso"
 
     # Constructor
     #
-    # @param [Pathname] base_dir Set the base directory. By default it uses
-    #   AYTests.base_dir.
-    def initialize(base_dir = nil)
+    # @param [Pathname] base_dir Set the base directory. By default it
+    #   uses AYTests.base_dir
+    # @param [Symbol]   provider Provider to be used by Vagrant
+    #   (:libvirt or :virtualbox)
+    def initialize(base_dir: nil, provider: :libvirt)
       @base_dir = base_dir || AYTests.base_dir
       @obs_iso_dir = @base_dir.join("kiwi", "iso")
       @kiwi_autoyast_dir = @base_dir.join("kiwi", "definitions", "autoyast")
@@ -25,6 +27,7 @@ module AYTests
       @definition_path = kiwi_autoyast_dir.join("definition.rb")
       # This file will be used by Veewee during upgrade.
       @libvirt_definition_path = @base_dir.join("kiwi", "autoyast_description.xml")
+      @provider = provider
     end
 
     # Run the installation using a given profile and an ISO
@@ -78,8 +81,8 @@ module AYTests
     #   otherwise.
     def export
       Dir.chdir(base_dir.join("kiwi")) do
-        log.info "Exporting KVM image into box file"
-        system "veewee kvm export #{IMAGE_NAME} --force"
+        log.info "Exporting #{veewee_provider} image into box file"
+        system "veewee #{veewee_provider} export #{IMAGE_NAME} --force"
       end
     end
 
@@ -90,19 +93,41 @@ module AYTests
       FileUtils.rm(autoinst_path, force: true)
       FileUtils.rm(definition_path, force: true)
       FileUtils.rm(libvirt_definition_path, force: true)
+      if provider == :libvirt
+        # Due a bug in vagrant-libvirt the images will not cleanuped correctly
+        # in the /var/lib/libvirt directory. This has to be done manually
+        # (including DB update)
+        system "sudo virsh vol-delete vagrant_autoyast_vm.img default"
+      end
+    end
+
+    # Veewee provider
+    #
+    # Translates Vagrant provider to Veewee.
+    #
+    # @return [Symbol] Veewee provider's name.
+    def veewee_provider
+      @veewee_provider =
+        case @provider
+        when :libvirt
+          :kvm
+        when :virtualbox
+          :vbox
+        else
+          :unknown
+        end
     end
 
     private
 
-    # Build a KVM image using Veewee
+    # Build a Vagrant image using Veewee
     #
     # @return [Boolean] true if the system was successfully built; return false
     #   otherwise.
     def build
-      log.info "Creating KVM image"
       Dir.chdir(base_dir.join("kiwi")) do
-        log.info "Building KVM image"
-        system "veewee kvm build #{IMAGE_NAME} --force --auto"
+        log.info "Creating #{veewee_provider} image"
+        system "veewee #{veewee_provider} build #{IMAGE_NAME} --force --auto --nogui"
       end
     end
 
@@ -140,6 +165,9 @@ module AYTests
     def setup_autoinst(autoinst)
       raise "ERROR: #{autoinst} not found" unless autoinst.file?
       FileUtils.cp(autoinst, autoinst_path)
+      if provider == :virtualbox
+        system "sed -e 's/\\/dev\\/vd/\\/dev\\/sd/g' -i #{autoinst_path}"
+      end
     end
 
     # Change boot order for libvirt definition

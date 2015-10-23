@@ -50,7 +50,7 @@ task :test, [:name] do |name, args|
     iso_path_file = AYTests.tests_path.join("#{test_name}.install_iso")
     iso_url = File.file?(iso_path_file) ? IO.binread(iso_path_file).chomp : AYTests.obs_iso_path
 
-    builder = AYTests::ImageBuilder.new
+    builder = AYTests::ImageBuilder.new(provider: AYTests.provider)
     builder.install(autoinst, iso_url)
 
     if test_name.start_with?("upgrade_")
@@ -66,23 +66,6 @@ task :test, [:name] do |name, args|
 
     builder.export
     builder.cleanup
-
-    #
-    # Clean up Vagrant machine
-    #
-    Dir.chdir(File.join(base_dir, "vagrant")) do
-      system "vagrant destroy autoyast_vm"
-    end
-    # Due a bug in vagrant-libvirt the images will not cleanuped correctly
-    # in the /var/lib/libvirt directory. This has to be done manually
-    # (including DB update)
-    system "sudo virsh vol-delete vagrant_autoyast_vm.img default"
-
-    #
-    # Import vagrant box into pennyworth
-    #
-    puts "\n****** Importing vagrant box into pennyworth ******\n"
-    system "pennyworth -d #{base_dir} import-base"
 
     if File.exist?(test_file)
       puts "\n****** Running test on created system ******\n"

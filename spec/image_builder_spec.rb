@@ -7,8 +7,9 @@ RSpec.describe AYTests::ImageBuilder do
   let(:autoinst_path) { base_dir.join("autoinst.xml") }
   let(:iso_url) { "http://dl.opensuse.org/leap-42.1.iso" }
   let(:path_to_iso) { base_dir.join("iso", "leap-42.1.iso") }
+  let(:provider) { :libvirt }
 
-  subject(:builder) { AYTests::ImageBuilder.new(base_dir) }
+  subject(:builder) { AYTests::ImageBuilder.new(base_dir: base_dir, provider: provider) }
 
   describe ".new" do
     context "when no base directory is given" do
@@ -22,8 +23,28 @@ RSpec.describe AYTests::ImageBuilder do
     context "when a base directory is given" do
       it "is used as base directory" do
         expect(AYTests).not_to receive(:base_dir)
-        builder = AYTests::ImageBuilder.new(Pathname.new("/some-directory"))
+        builder = AYTests::ImageBuilder.new(base_dir: Pathname.new("/some-directory"))
         expect(builder.base_dir).to eq(Pathname.new("/some-directory"))
+      end
+    end
+
+    context "when no provider is given" do
+      subject(:builder) do
+        AYTests::ImageBuilder.new(base_dir: base_dir)
+      end
+
+      it "selects :libvirt" do
+        expect(builder.provider).to eq(:libvirt)
+      end
+    end
+
+    context "when a provider is given" do
+      subject(:builder) do
+        AYTests::ImageBuilder.new(base_dir: base_dir, provider: :virtualbox)
+      end
+
+      it "selects the given provider" do
+        expect(builder.provider).to eq(:virtualbox)
       end
     end
   end
@@ -79,9 +100,12 @@ RSpec.describe AYTests::ImageBuilder do
       expect(FileUtils).to receive(:cp)
         .with(autoinst_path, builder.autoinst_path)
 
+      # Uses Veewee provider
+      expect(builder).to receive(:veewee_provider).at_least(1).and_return(:kvm)
+
       # Build
       expect(builder).to receive(:system)
-        .with("veewee kvm build #{AYTests::ImageBuilder::IMAGE_NAME} --force --auto")
+        .with("veewee kvm build #{AYTests::ImageBuilder::IMAGE_NAME} --force --auto --nogui")
         .and_return(true)
 
       expect(builder.install(autoinst_path, iso_url)).to eq(true)
@@ -110,7 +134,7 @@ RSpec.describe AYTests::ImageBuilder do
 
       # Build
       expect(builder).to receive(:system)
-        .with("veewee kvm build #{AYTests::ImageBuilder::IMAGE_NAME} --force --auto")
+        .with("veewee kvm build #{AYTests::ImageBuilder::IMAGE_NAME} --force --auto --nogui")
         .and_return(true)
 
       expect(builder.upgrade(autoinst_path, iso_url)).to eq(true)
@@ -130,11 +154,44 @@ RSpec.describe AYTests::ImageBuilder do
   end
 
   describe "#cleanup" do
-    it "removes copied AutoYaST profile and Veewee definition" do
-      expect(FileUtils).to receive(:rm).with(builder.autoinst_path, force: true)
-      expect(FileUtils).to receive(:rm).with(builder.definition_path, force: true)
-      expect(FileUtils).to receive(:rm).with(builder.libvirt_definition_path, force: true)
-      builder.cleanup
+    context "when provider is :libvirt" do
+      it "removes copied AutoYaST profile, Veewee definition and vm storage" do
+        expect(FileUtils).to receive(:rm).with(builder.autoinst_path, force: true)
+        expect(FileUtils).to receive(:rm).with(builder.definition_path, force: true)
+        expect(FileUtils).to receive(:rm).with(builder.libvirt_definition_path, force: true)
+        expect(builder).to receive(:system)
+          .with("sudo virsh vol-delete vagrant_autoyast_vm.img default")
+          .and_return(false)
+        builder.cleanup
+      end
+    end
+
+    context "when provider is :virtualbox" do
+      let(:provider) { :virtualbox }
+
+      it "removes copied AutoYaST profile, Veewee definition" do
+        expect(FileUtils).to receive(:rm).with(builder.autoinst_path, force: true)
+        expect(FileUtils).to receive(:rm).with(builder.definition_path, force: true)
+        expect(FileUtils).to receive(:rm).with(builder.libvirt_definition_path, force: true)
+        expect(builder).to_not receive(:system)
+        builder.cleanup
+      end
+    end
+  end
+
+  describe "#veewee_provider" do
+    context "when given provider is :libvirt" do
+      it "returns :kvm" do
+        expect(builder.veewee_provider).to eq(:kvm)
+      end
+    end
+
+    context "when given provider is :virtualbox" do
+      let(:provider) { :virtualbox }
+
+      it "returns :vbox" do
+        expect(builder.veewee_provider).to eq(:vbox)
+      end
     end
   end
 end
