@@ -1,75 +1,70 @@
 AutoYaST Integration Tests
 ===========================
 
-Test framework for running AutoYaST integration tests by using veewee,
- vagrant and pennyworth.
+Test framework for running AutoYaST integration tests by using Veewee and
+Vagrant.
 
 Features
 --------
 
-  * Building KVM images by using AutoYaST profiles.
-  * Checking these KVM images with rspec tests.
-  * Generating own installation ISOs with local built RPMs or the newest one from OBS.
+  * Building Vagrant images by using AutoYaST profiles.
+  * Checking these images with RSpec tests.
+  * Generating own installation ISO images with local built RPMs or the newest
+    one from OBS.
+  * KVM (through libvirt) and VirtualBox are supported.
 
 Supported Scenarios
 -------------------
 
 These integration tests need to start virtual machines for their operation.
-For that reason, support for hardware virtualization is vitally important.
-Check it on your host system
+If you want to use KVM, support for hardware virtualization is vitally important.
+Check it on your host system:
 
     $ grep --only-matching '\(svm\|vmx\)' /proc/cpuinfo
+
+Alternatively, you can just use VirtualBox (no hardware virtualization support
+is needed).
+
+If you prefer, you can install the framework in a KVM machine. For that
+scenario to work you must enable _nested virtualization_. For example, if
+you're using libvirt, you can achieve that setting `cpu mode` to `host-model`
+or `host-passthrough`. You can find more information in the [official
+documentation](https://libvirt.org/formatdomain.html#elementsCPU).
 
 Installation
 ------------
 
-  1. Install packages [mkdud](http://software.opensuse.org/download.html?project=openSUSE%3AFactory&package=mkdud)
-     and [mksusecd](http://software.opensuse.org/download.html?project=home%3Asnwint&package=mksusecd)
+  1. Install packages [mkdud](https://software.opensuse.org/package/mkdud?search_term=mkdud)
+     and [mksusecd](https://software.opensuse.org/package/mksusecd?search_term=mksusecd)
      from OBS.
 
-       $ zypper install ./mkdud-*.rpm ./mksusecd-*.rpm
+        $ zypper install ./mkdud-*.rpm ./mksusecd-*.rpm
 
-  2. Install `virt-install` package
-
-       $ zypper install virt-install
-
-  3. Unless you run tests as 'root', configure `sudo` in order to run the `mksusecd`,
+  2. Unless you run tests as 'root', configure `sudo` in order to run the `mksusecd`,
      `systemctl start libvirtd` and `zypper in` commands as root.
 
      This will grant access to execute every command for user <username> as root without
-     asking for password, unsecure
+     asking for password (unsecure):
 
         echo '<username> ALL=NOPASSWD: ALL' >> /etc/sudoers
 
-  4. Generate a ssh-key for vagrant (e.g. with ssh-keygen) unless you already have one.
-
-  5. Install [Pennyworth](https://github.com/SUSE/pennyworth#installation) but instead
-     of cloning the repository, install the
-     [pennyworth-tool gem](https://rubygems.org/gems/pennyworth-tool/).
-     An older version is necessary now because of an API change
-     in `Pennyworth::VM#run_command`.
-
-        $ gem install pennyworth-tool --no-format-executable --version "= 0.1.0"
-        $ pennyworth setup
-
-  6. Enable and start libvirt and configure default network and storage
-
-        $ systemctl enable libvirtd
-        $ systemctl start libvirtd
-        $ virsh net-start default
-        $ # if you want the default network to be started automatically.
-        $ virsh net-autostart default
-        $ virsh pool-define-as default dir - - - - /var/lib/libvirt/images
-        $ virsh pool-start default
-        $ virsh pool-autostart default
-
-  7. Clone autoyast-integration-test repository and install needed GEMs
+  3. Clone autoyast-integration-test repository and install needed gems.
+     The use of the `--path` option is recommended to avoid polluting your
+     system:
 
         $ git clone https://github.com/yast/autoyast-integration-test
         $ cd autoyast-integration-test
-        $ bundle install
+        $ zypper install rubygem-bundler
+        $ bundle config --local build.nokogiri --use-system-libraries
+        $ bundle install --without test --path vendor/bundle
 
-  8. If the host is running a firewall, you must permit connections from
+  4. The task `setup` will do a lot of work for you. After that, you need to install
+     the missing gems:
+
+        $ rake setup
+        $ bundle install --without ''
+
+  5. If the host is running a firewall, you must permit connections from
      libvirt default network to host’s port 8888. For example, if you’re
      running SuSEfirewall2 and your libvirt default network is 192.168.122.0
      (you can check it on `/etc/libvirt/qemu/networks/default.xml`), you could
@@ -80,10 +75,6 @@ Installation
 
      After that, you must reboot your system to be sure everything works
      properly (libvirt iptables rules, ip forwarding, etc.).
-
-  9. Only in Tumbleweed, you must update the vagrant-libvirt plugin:
-
-        $ NOKOGIRI_USE_SYSTEM_LIBRARIES=true vagrant plugin install vagrant-libvirt
 
 Running
 -------
@@ -130,6 +121,13 @@ This new ISO image will be used for running tests in the future.
 To use the official SLES12 ISO (default setting) for tests just call:
 
     $ rake build_iso[default]
+
+Caveats
+-------
+
+* At this time, `upgrade scenarios` are not supported when using VirtualBox.
+* VirtualBox and KVM can't be work at the same time. If you want to use
+  VirtualBox, make sure that KVM kernel modules aren't loaded.
 
 Solving Problems
 ----------------

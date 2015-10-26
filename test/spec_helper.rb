@@ -15,6 +15,8 @@
 # To contact SUSE about this file by physical or electronic mail,
 # you may find current contact information at www.suse.com
 
+require "ay_tests"
+
 def run_test_script(script, expected = "AUTOYAST OK")
   shell =  File.join(File.dirname(__FILE__),"../test", script)
   expect(File.exists?(shell)).to eq(true) # Check if the script exists

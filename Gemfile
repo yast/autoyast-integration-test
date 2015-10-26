@@ -17,9 +17,11 @@
 
 source "https://rubygems.org"
 
-gem "rspec", "~> 3.1.0"
-gem "veewee"
-gem "ruby-libvirt"
-gem "fog", "~> 1.29.0"
-gem "fog-core", "~> 1.29.0"
-gem "net-ssh-simple", "~> 1.6.11"
+group :test do
+  gem "rspec", "~> 3.1.0"
+  gem "veewee"
+  gem "ruby-libvirt"
+  gem "net-ssh-simple", "~> 1.6.11"
+end
+
+gem "cheetah"

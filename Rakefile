@@ -19,8 +19,7 @@ require "bundler/setup"
 Bundler.require(:default)
 
 require "rake/clean"
-$LOAD_PATH.unshift File.join(File.dirname(__FILE__), "lib")
-require "ay_tests"
+require "yaml"
 
 def iso_repo
   if `hostname --domain`.chomp == "suse.cz"
@@ -31,11 +30,17 @@ def iso_repo
 end
 
 base_dir = Pathname.new(File.dirname(__FILE__))
-AYTests.base_dir = base_dir
-AYTests::IsoRepo.init(AYTests.base_dir.join("iso"))
+Dir[base_dir.join("lib", "tasks", "*")].each { |t| require_relative t }
+
+task :bootstrap do
+  $LOAD_PATH.unshift File.join(File.dirname(__FILE__), "lib")
+  require "ay_tests"
+  AYTests.base_dir = base_dir
+  AYTests::IsoRepo.init(AYTests.base_dir.join("iso"))
+end
 
 desc "Running autoyast integration tests"
-task :test, [:name] do |name, args|
+task :test, [:name] => :bootstrap do |name, args|
   tests = Array(args[:name] || Dir.glob(AYTests.tests_path.join("*.rb")))
 
   tests.sort.each do |test_file|
@@ -77,14 +82,14 @@ task :test, [:name] do |name, args|
 end
 
 desc "Building boot image <name>- reset with name \"reset\""
-task :build_iso, [:name] do |name, args|
+task :build_iso, [:name] => :bootstrap do |name, args|
   unless args[:name]
     puts "ERROR: name is needed"
     exit 1
   end
 
   base_dir = Pathname.new(File.dirname(__FILE__))
-  config = YAML.load_file(base_dir.join("definitions.yml")).fetch(args[:name].to_sym)
+  config = YAML.load_file(base_dir.join("config", "definitions.yml")).fetch(args[:name].to_sym)
   builder = AYTests::MediaBuilder.new(config.merge(base_dir: base_dir, version: args[:name]))
   builder.build
 end
