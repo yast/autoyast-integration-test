@@ -94,11 +94,11 @@ module AYTests
     # downloaded. If @extra_repos contains a list of repositories and packages,
     # it will download those packages as well.
     def fetch_obs_packages
-      puts "\n**** Fetching all required packages ****"
+      log.info "Fetching all required packages"
       system "zypper --root #{cache_dir} ar --no-gpgcheck #{yast_url} download-packages"
       system "xargs -a #{obs_pkg_list_path} zypper --root #{cache_dir} --pkg-cache-dir=#{cache_dir} download"
 
-      puts "\n**** Fetching latest grub2 and libzypp packages ****"
+      log.info "Fetching latest grub2 and libzypp packages"
       @extra_repos.each do |repo|
         system "zypper --root #{cache_dir} rr download-packages"
         system "zypper --root #{cache_dir} ar --no-gpgcheck #{repo[:server]} download-packages"
