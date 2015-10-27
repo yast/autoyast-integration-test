@@ -141,15 +141,31 @@ RSpec.describe AYTests::ImageBuilder do
     end
   end
 
-  describe "#export" do
+  describe "#import" do
+    before do
+      allow(builder).to receive(:export_from_veewee).and_return(true)
+    end
+
+    it "imports the machine using Vagrant and returns true if it was successful" do
+      expect(builder).to receive(:system).with(/vagrant box add/).and_return(true)
+      expect(builder.import).to eq(true)
+    end
+
+    it "tries to import machine using Vagrant and returns false if it wasn't successful" do
+      expect(builder).to receive(:system).with(/vagrant box add/).and_return(false)
+      expect(builder.import).to eq(false)
+    end
+  end
+
+  describe "#export_from_veewee" do
     it "relies on Veewee and returns true if it was successful" do
       expect(builder).to receive(:system).with(/veewee kvm export/).and_return(true)
-      expect(builder.export).to eq(true)
+      expect(builder.export_from_veewee).to eq(true)
     end
 
     it "relies on Veewee and returns false if it was not successful" do
       expect(builder).to receive(:system).with(/veewee kvm export/).and_return(false)
-      expect(builder.export).to eq(false)
+      expect(builder.export_from_veewee).to eq(false)
     end
   end
 

@@ -75,11 +75,26 @@ module AYTests
       build
     end
 
+    # Import Veewee image into Vagrant
+    #
+    # @return [Boolean] true if the image was successfully imported; false
+    #   otherwise.
+    #
+    # @see export_from_veewee
+    def import
+      export_from_veewee
+      box_file = base_dir.join("kiwi").join("#{IMAGE_NAME}.box")
+      log.info "Importing #{veewee_provider} image into Vagrant"
+      system "vagrant box add 'autoyast' #{box_file}"
+    end
+
     # Export the created machine
     #
-    # @return [Boolean] true if the system was successfully exported; false
+    # The machine will be exported to +kiwi/IMAGE_NAME.box+.
+    #
+    # @return [Boolean] true if the image was successfully exported; false
     #   otherwise.
-    def export
+    def export_from_veewee
       Dir.chdir(base_dir.join("kiwi")) do
         log.info "Exporting #{veewee_provider} image into box file"
         system "veewee #{veewee_provider} export #{IMAGE_NAME} --force"

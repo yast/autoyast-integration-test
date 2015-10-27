@@ -69,7 +69,7 @@ task :test, [:name] => :bootstrap do |name, args|
       builder.upgrade(autoinst, iso_url)
     end
 
-    builder.export
+    builder.import
     builder.cleanup
 
     if File.exist?(test_file)
