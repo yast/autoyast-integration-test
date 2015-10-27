@@ -16,7 +16,7 @@ module AYTests
 
     # --prefix=37 sets a directory prefix to avoid conflicts. Check mkdud README.
     MKDUD_CMD = "mkdud -c %<dud_path>s -d sle12 -i  instsys,repo --prefix=37 " \
-      "--format=tar.gz $(find -name \"\*\.rpm\") %<dud_dir>s"
+      "--format=tar.gz $(find %<rpms_dir>s -name \"\*\.rpm\") %<dud_dir>s"
     MKSUSECD_CMD = "sudo mksusecd -c %<output_path>s --initrd=%<dud_path>s %<iso_path>s"
 
     # Constructor
@@ -139,7 +139,8 @@ module AYTests
       log.info "Creating DUD"
       dud_path = cache_dir.join("#{version}.dud")
       dud_dir = base_dir.join("build_iso", "dud")
-      system format(MKDUD_CMD, dud_path: dud_path, dud_dir: dud_dir)
+      system format(MKDUD_CMD, dud_path: dud_path, dud_dir: dud_dir,
+                    rpms_dir: cache_dir)
 
       log.info "Syncing to disk"
       system "sync"
