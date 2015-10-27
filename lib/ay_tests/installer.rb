@@ -5,7 +5,7 @@ module AYTests
   class Installer
     attr_reader :config, :user, :log
 
-    GROUPS = ["libvirt", "qemu", "kvm"]
+    GROUPS = ["libvirt", "qemu", "kvm", "vboxusers"]
     POLKIT_RULES_PATH = "/etc/polkit-1/rules.d/99-libvirt.rules"
     POLKIT_RULES_SAMPLE = File.join(File.dirname(__FILE__), "..", "..", "files", "99-libvirt.rules")
 
