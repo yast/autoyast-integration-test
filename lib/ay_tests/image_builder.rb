@@ -1,4 +1,5 @@
 require "uri"
+require "socket"
 
 module AYTests
   class ImageBuilder
@@ -181,6 +182,7 @@ module AYTests
     def setup_autoinst(autoinst)
       raise "ERROR: #{autoinst} not found" unless autoinst.file?
       FileUtils.cp(autoinst, autoinst_path)
+      system "sed -e 's/%IP%/#{local_ip}/g' -i #{autoinst_path}"
       if provider == :virtualbox
         system "sed -e 's/\\/dev\\/vd/\\/dev\\/sd/g' -i #{autoinst_path}"
       end
@@ -209,6 +211,23 @@ module AYTests
     # backup it and restore in Veewee's +after_create+ hook.
     def backup_image
       system "sudo virt-clone -o #{IMAGE_NAME} -n #{IMAGE_NAME}_sav --file /var/lib/libvirt/images/#{IMAGE_NAME}_sav.qcow2"
+    end
+
+    # Determine the host IP
+    #
+    # @return [String] Host IP address.
+    #
+    # Taken from Veewee to make sure that the IP matches.
+    def local_ip
+      # turn off reverse DNS resolution temporarily
+      orig, Socket.do_not_reverse_lookup = Socket.do_not_reverse_lookup, true
+
+      UDPSocket.open do |s|
+        s.connect '64.233.187.99', 1 # google
+        s.addr.last
+      end
+    ensure
+      Socket.do_not_reverse_lookup = orig
     end
   end
 end
