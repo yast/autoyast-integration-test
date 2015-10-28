@@ -85,7 +85,7 @@ module AYTests
       export_from_veewee
       box_file = base_dir.join("kiwi").join("#{IMAGE_NAME}.box")
       log.info "Importing #{veewee_provider} image into Vagrant"
-      system "vagrant box add 'autoyast' #{box_file}"
+      system "vagrant box add 'autoyast' #{box_file} --force"
     end
 
     # Export the created machine
