@@ -12,6 +12,7 @@ module AYTests
 
     IMAGE_NAME = "autoyast"
     ISO_FILE_NAME = "testing.iso"
+    IMAGE_BOX_NAME = "autoyast_vagrant_box_image_0.img"
 
     # Constructor
     #
@@ -112,7 +113,7 @@ module AYTests
         # Due a bug in vagrant-libvirt the images will not cleanuped correctly
         # in the /var/lib/libvirt directory. This has to be done manually
         # (including DB update)
-        system "sudo virsh vol-delete vagrant_autoyast_vm.img default"
+        system "sudo virsh vol-delete #{IMAGE_BOX_NAME} default"
       end
     end
 
