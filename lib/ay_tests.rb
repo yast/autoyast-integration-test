@@ -1,8 +1,10 @@
 require "logger"
+require "net/ssh/simple"
 require "ay_tests/helpers"
 require "ay_tests/media_builder"
 require "ay_tests/image_builder"
 require "ay_tests/iso_repo"
+require "ay_tests/vagrant_runner.rb"
 
 module AYTests
   # Set the base directory for AYTests
@@ -50,5 +52,24 @@ module AYTests
   # @return [Pathname] Path to the integration tests
   def self.tests_path
     base_dir.join("test")
+  end
+
+  # Return the provider to be used by Vagrant
+  #
+  # If it was not set by using AYTests.provider= method, it will be
+  # taken from +AYTESTS_PROVIDER+ environment variable. Possible values
+  # are +libvirt+ and +virtualbox+.
+  #
+  # @return [Symbol] Provider to be used by Vagrant (+libvirt+ or +virtualbox+)
+  def self.provider
+    @provider ||= (ENV["AYTESTS_PROVIDER"] || "libvirt").to_sym
+  end
+
+  # Set the Vagrant provider
+  #
+  # @param [Symbol] provider Provider to be used by Vagrant
+  #    (:libvirt or :virtualbox)
+  def self.provider=(provider)
+    @provider = provider
   end
 end

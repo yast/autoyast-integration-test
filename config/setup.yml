@@ -1,0 +1,18 @@
+packages:
+  common:
+    - curl
+    - gcc
+    - make
+    - ruby-devel
+    - libxml2-devel    # Needed by libvirt plugin from Vagrant
+    - libxslt-devel    # Needed by libvirt plugin from Vagrant
+    - libvirt          # Needed to run virtual machines
+    - libvirt-devel    # Needed to compile libvirt Vagrant plugin
+    - virtualbox
+  "13.1":
+     - kvm                  # Needed to run VMs
+     - libvirt-daemon-qemu  # Needed to run QEMU in 13.1
+  "13.2":
+     - qemu-kvm             # Needed to run VMs
+  remote:
+    vagrant: https://dl.bintray.com/mitchellh/vagrant/vagrant_1.7.4_x86_64.rpm

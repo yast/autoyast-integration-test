@@ -12,6 +12,7 @@ Veewee::Definition.declare({
   :boot_wait => "10",
   :boot_cmd_sequence => [
     '<Esc><Enter>',
+    '     ', # Workaround to avoid timing problems with VirtualBox
     'linux',
     ' netdevice=eth0',
     ' instmode=dvd',
