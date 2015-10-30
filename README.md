@@ -140,7 +140,7 @@ module and load `vboxdrv` and friends.
 Caveats
 -------
 
-* At this time, `upgrade scenarios` are not supported when using VirtualBox.
+* The framework can be a little bit fragile. Polishing is needed.
 
 Solving Problems
 ----------------

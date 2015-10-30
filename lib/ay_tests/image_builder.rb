@@ -16,6 +16,10 @@ module AYTests
     IMAGE_BOX_NAME = "autoyast_vagrant_box_image_0.img"
     SLEEP_TIME_AFTER_UPGRADE = 150
     SLEEP_TIME_AFTER_SHUTDOWN = 15
+    SSH_USER = "vagrant"
+    SSH_PASSWORD = "vagrant"
+    SSH_ADDRESS = "127.0.0.1"
+    SSH_PORT = "22"
 
     # Constructor
     #
@@ -70,6 +74,7 @@ module AYTests
     # @see change_boot_order
     # @see backup_image
     # @see build
+    # @see run_postinstall
     def upgrade(autoinst, iso_url)
       setup_iso(iso_url)
       setup_autoinst(autoinst)
@@ -83,6 +88,7 @@ module AYTests
       # properly. We should find a cleaner solution.
       log.info "Waiting #{SLEEP_TIME_AFTER_UPGRADE} seconds for upgrade process to finish"
       sleep SLEEP_TIME_AFTER_UPGRADE
+      run_postinstall
       true
     end
 
@@ -142,6 +148,18 @@ module AYTests
         else
           :unknown
         end
+    end
+
+    # Run post-install script in the virtual machine
+    #
+    # Veewee won't be able to run post-install script after upgrade.
+    def run_postinstall
+      Net::SSH::Simple.sync do
+        log.info "Running post-install script"
+        data = vm_ip(IMAGE_NAME)
+        ssh data[:address], "sudo env postinstall.sh",
+          { port: data[:port], user: SSH_USER, password: SSH_PASSWORD }
+      end
     end
 
     private
@@ -252,6 +270,36 @@ module AYTests
       end
     ensure
       Socket.do_not_reverse_lookup = orig
+    end
+
+    def vm_ip(name)
+      case provider
+      when :libvirt
+        libvirt_vm_ip(name)
+      when :virtualbox
+        virtualbox_vm_ip(name)
+      end
+    end
+
+    # Determine libvirt domain IP
+    #
+    # @param  [String] libvirt domain name
+    # @return [Hash]   IP address and port
+    def libvirt_vm_ip(name)
+      mac = `sudo virsh domiflist #{name} | tail -n +3 | tr -s " " | cut -f 5 -d " "`.strip
+      address = `arp | grep -i #{mac} | cut -f1 -d " "`.chomp
+      { address: address, port: SSH_PORT }
+    end
+
+    # Determine VirtualBox VM IP
+    #
+    # @param  [String] VirtualBox machine name
+    # @return [Hash]   IP address and port
+    def virtualbox_vm_ip(name)
+      mac_string = `VBoxManage showvminfo #{name} --machinereadable | grep Forwarding`
+      data = mac_string.match(/.+="\w+,tcp,,(\d+),,22"/)
+      port = data[1].to_i
+      { address: SSH_ADDRESS, port: port }
     end
   end
 end
