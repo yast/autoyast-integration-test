@@ -14,6 +14,8 @@ module AYTests
     IMAGE_NAME = "autoyast"
     ISO_FILE_NAME = "testing.iso"
     IMAGE_BOX_NAME = "autoyast_vagrant_box_image_0.img"
+    SLEEP_TIME_AFTER_UPGRADE = 150
+    SLEEP_TIME_AFTER_SHUTDOWN = 15
 
     # Constructor
     #
@@ -75,6 +77,13 @@ module AYTests
       change_boot_order
       backup_image
       build
+      # During upgrade, Veewee will fail because SSH is disabled by PAM during
+      # booting. So Veewee will get a "Authentication Failure" and it will give
+      # up. At this time, we'll wait some time so installation process can finish
+      # properly. We should find a cleaner solution.
+      log.info "Waiting #{SLEEP_TIME_AFTER_UPGRADE} seconds for upgrade process to finish"
+      sleep SLEEP_TIME_AFTER_UPGRADE
+      true
     end
 
     # Import Veewee image into Vagrant
@@ -196,6 +205,7 @@ module AYTests
     # @params [Pathname,String] definition Path to the libvirt domain definition
     #   for the KVM image.
     def change_boot_order
+      return unless provider == :libvirt
       system "sudo virsh destroy #{IMAGE_NAME}" # shutdown
       system "sudo virsh dumpxml #{IMAGE_NAME} >#{libvirt_definition_path}"
       system "sed -i.bak s/dev=\\'cdrom\\'/dev=\\'cdrom_save\\'/g #{libvirt_definition_path}"
@@ -210,7 +220,22 @@ module AYTests
     # The image will be destroyed be Veewee when starting the upgrade. So we need to
     # backup it and restore in Veewee's +after_create+ hook.
     def backup_image
-      system "sudo virt-clone -o #{IMAGE_NAME} -n #{IMAGE_NAME}_sav --file /var/lib/libvirt/images/#{IMAGE_NAME}_sav.qcow2"
+      case provider
+      when :libvirt
+        system "sudo virt-clone -o #{IMAGE_NAME} -n #{IMAGE_NAME}_sav --file /var/lib/libvirt/images/#{IMAGE_NAME}_sav.qcow2"
+      when :virtualbox
+        # Shutdown the system
+        system "VBoxManage controlvm #{IMAGE_NAME} acpipowerbutton"
+        sleep SLEEP_TIME_AFTER_SHUTDOWN
+        system "VBoxManage controlvm #{IMAGE_NAME} poweroff"
+
+        # Copy the virtual machine (this is the only way of having an identical system)
+        vm_config = `VBoxManage showvminfo #{IMAGE_NAME} | grep "Config file" | cut -f2 -d:`.strip
+        vm_dir = File.dirname(vm_config)
+        system "VBoxManage unregistervm #{IMAGE_NAME}"
+        FileUtils.mv vm_dir, "#{vm_dir}.sav"
+        system "sync"
+      end
     end
 
     # Determine the host IP
