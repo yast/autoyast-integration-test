@@ -8,6 +8,7 @@ RSpec.describe AYTests::ImageBuilder do
   let(:iso_url) { "http://dl.opensuse.org/leap-42.1.iso" }
   let(:path_to_iso) { base_dir.join("iso", "leap-42.1.iso") }
   let(:provider) { :libvirt }
+  let(:local_ip) { "192.168.122.232" }
 
   subject(:builder) { AYTests::ImageBuilder.new(base_dir: base_dir, provider: provider) }
 
@@ -108,6 +109,13 @@ RSpec.describe AYTests::ImageBuilder do
         .with("veewee kvm build #{AYTests::ImageBuilder::IMAGE_NAME} --force --auto --nogui")
         .and_return(true)
 
+      # Prepare the AutoYaST profile
+      expect(builder).to receive(:local_ip)
+        .and_return(local_ip)
+      expect(builder).to receive(:system)
+        .with("sed -e 's/%IP%/#{local_ip}/g' -i #{builder.autoinst_path}")
+        .and_return(true)
+
       expect(builder.install(autoinst_path, iso_url)).to eq(true)
     end
   end
@@ -132,10 +140,22 @@ RSpec.describe AYTests::ImageBuilder do
       expect(builder).to receive(:change_boot_order)
       expect(builder).to receive(:backup_image)
 
+      # Prepare the AutoYaST profile
+      expect(builder).to receive(:local_ip)
+        .and_return(local_ip)
+      expect(builder).to receive(:system)
+        .with("sed -e 's/%IP%/#{local_ip}/g' -i #{builder.autoinst_path}")
+        .and_return(true)
+
+      # Run post-install script
+      expect(builder).to receive(:run_postinstall)
+
       # Build
       expect(builder).to receive(:system)
         .with("veewee kvm build #{AYTests::ImageBuilder::IMAGE_NAME} --force --auto --nogui")
         .and_return(true)
+
+      allow(builder).to receive(:sleep)
 
       expect(builder.upgrade(autoinst_path, iso_url)).to eq(true)
     end
@@ -176,7 +196,7 @@ RSpec.describe AYTests::ImageBuilder do
         expect(FileUtils).to receive(:rm).with(builder.definition_path, force: true)
         expect(FileUtils).to receive(:rm).with(builder.libvirt_definition_path, force: true)
         expect(builder).to receive(:system)
-          .with("sudo virsh vol-delete vagrant_autoyast_vm.img default")
+          .with("sudo virsh vol-delete #{AYTests::ImageBuilder::IMAGE_BOX_NAME} default")
           .and_return(false)
         builder.cleanup
       end
