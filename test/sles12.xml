@@ -1,6 +1,20 @@
 <?xml version="1.0"?>
 <!DOCTYPE profile>
 <profile xmlns="http://www.suse.com/1.0/yast2ns" xmlns:config="http://www.suse.com/1.0/configns">
+  <add-on>
+    <add_on_products config:type="list">
+      <listentry>
+        <media_url><![CDATA[http://%IP%:8888/static/repos/sles12]]></media_url>
+        <product>custom</product>
+        <product_dir>/</product_dir>
+        <name>Customized</name>
+        <signature-handling>
+          <accept_unknown_gpg_key config:type="boolean">true</accept_unknown_gpg_key>
+          <accept_unsigned_file config:type="boolean">true</accept_unsigned_file>
+        </signature-handling>
+      </listentry>
+    </add_on_products>
+  </add-on>
   <bootloader>
     <device_map config:type="list">
       <device_map_entry>
@@ -225,7 +239,7 @@ ls -l /mnt/$BASE
         ST='fail'
       else
         STR=$STR':parent correct:'
-      fi      
+      fi
       STR=$STR$ST
       echo $STR
       echo $STR >> $BASE/userscr.log
@@ -732,7 +746,8 @@ ls -l /mnt/$BASE
       <package>SuSEfirewall2</package>
     </packages>
     <post-packages config:type="list">
-      <post-package>bind</post-package>
+      <package>bind</package>
+      <package>dummy-package</package>
     </post-packages>
     <patterns config:type="list">
       <pattern>Minimal</pattern>
