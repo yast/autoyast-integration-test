@@ -60,6 +60,7 @@ Veewee::Definition.declare({
         puts "generating autoyast image with mac address: #{mac}"
         system "sudo virt-clone -o autoyast_sav -n autoyast --file /var/lib/libvirt/images/autoyast.qcow2 --mac #{mac}"
         system "sudo virsh undefine autoyast_sav --remove-all-storage"
+        FileUtils.rm("autoyast_description.xml", force: true)
       end
 
       # Restoring obs image

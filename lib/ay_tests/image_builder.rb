@@ -212,7 +212,6 @@ module AYTests
       system "sed -i.bak s/dev=\\'hd\\'/dev=\\'cdrom\\'/g #{libvirt_definition_path}"
       system "sed -i.bak s/dev=\\'cdrom_save\\'/dev=\\'hd\\'/g #{libvirt_definition_path}"
       system "sudo virsh define #{libvirt_definition_path}"
-      FileUtils.rm(definition, force: true)
     end
 
     # Backup image
