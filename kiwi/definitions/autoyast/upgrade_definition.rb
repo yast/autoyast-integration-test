@@ -48,11 +48,13 @@ Veewee::Definition.declare({
       # Restoring old autoyast image which has to be updated.
       # FIXME: it's a little bit tricky and it deserves some refactoring/cleanup.
       if ENV["AYTESTS_PROVIDER"] == "virtualbox"
+        puts "restoring the saved autoyast virtual machine"
         vm_config = `VBoxManage showvminfo autoyast | grep "Config file" | cut -f2 -d:`.strip
         vm_dir = File.dirname(vm_config)
         system "VBoxManage unregistervm autoyast --delete"
         FileUtils.mv vm_dir.sub("autoyast", "autoyast.sav"), vm_dir
         system "VBoxManage registervm \"#{vm_config}\""
+        puts "changing boot order (DVD first)"
         system "VBoxManage modifyvm autoyast --boot1 dvd --boot2 disk --boot3 none --boot4 none"
       else
         mac = `xmllint --xpath  \"string(//domain/devices/interface/mac/@address)\" autoyast_description.xml`

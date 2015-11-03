@@ -234,7 +234,7 @@ module AYTests
 
     # Backup image
     #
-    # The image will be destroyed be Veewee when starting the upgrade. So we need to
+    # The image will be destroyed by Veewee when starting the upgrade. So we need to
     # backup it and restore in Veewee's +after_create+ hook.
     def backup_image
       case provider
