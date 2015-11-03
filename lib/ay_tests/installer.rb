@@ -33,6 +33,7 @@ module AYTests
     # * Enable services and configure libvirt network and storage.
     def run
       # Install software
+      log.info "Installing lsb-release in order to determine system version"
       zypper_install("lsb-release") # Needed to determine system version
       install_packages_from_repos
       install_additional_packages
@@ -67,7 +68,7 @@ module AYTests
         packages += config["packages"][base_system]
       end
 
-      log.info "Installing packages from repositories: #{packages.join(" ")}"
+      log.info "Installing packages from repositories"
       zypper_install(packages)
     end
 
@@ -217,7 +218,21 @@ module AYTests
         "--auto-agree-with-licenses",
         "--name"
       ]
-      Cheetah.run(parts + Array(packages))
+      candidates = Array(packages)
+      to_install = candidates.select do |name|
+        begin
+          Cheetah.run "rpm", "-qi", name
+          false
+        rescue
+          true
+        end
+      end
+      if to_install.empty?
+        log.info "All needed packages were already installed (#{candidates.join(" ")})"
+      else
+        log.info "Installing: #{to_install.join(" ")}"
+        Cheetah.run(parts + to_install)
+      end
     end
 
     # Determine the system version through lsb_release
