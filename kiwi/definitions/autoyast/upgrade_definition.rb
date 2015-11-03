@@ -46,11 +46,24 @@ Veewee::Definition.declare({
     end,
     :after_create => Proc.new do
       # Restoring old autoyast image which has to be updated.
-      mac = `xmllint --xpath  \"string(//domain/devices/interface/mac/@address)\" autoyast_description.xml`
-      system "sudo virsh undefine autoyast --remove-all-storage"
-      puts "generating autoyast image with mac address: #{mac}"
-      system "sudo virt-clone -o autoyast_sav -n autoyast --file /var/lib/libvirt/images/autoyast.qcow2 --mac #{mac}"
-      system "sudo virsh undefine autoyast_sav --remove-all-storage"
+      # FIXME: it's a little bit tricky and it deserves some refactoring/cleanup.
+      if ENV["AYTESTS_PROVIDER"] == "virtualbox"
+        puts "restoring the saved autoyast virtual machine"
+        vm_config = `VBoxManage showvminfo autoyast | grep "Config file" | cut -f2 -d:`.strip
+        vm_dir = File.dirname(vm_config)
+        system "VBoxManage unregistervm autoyast --delete"
+        FileUtils.mv vm_dir.sub("autoyast", "autoyast.sav"), vm_dir
+        system "VBoxManage registervm \"#{vm_config}\""
+        puts "changing boot order (DVD first)"
+        system "VBoxManage modifyvm autoyast --boot1 dvd --boot2 disk --boot3 none --boot4 none"
+      else
+        mac = `xmllint --xpath  \"string(//domain/devices/interface/mac/@address)\" autoyast_description.xml`
+        system "sudo virsh undefine autoyast --remove-all-storage"
+        puts "generating autoyast image with mac address: #{mac}"
+        system "sudo virt-clone -o autoyast_sav -n autoyast --file /var/lib/libvirt/images/autoyast.qcow2 --mac #{mac}"
+        system "sudo virsh undefine autoyast_sav --remove-all-storage"
+        FileUtils.rm("autoyast_description.xml", force: true)
+      end
 
       # Restoring obs image
       base_dir = File.dirname(__FILE__)

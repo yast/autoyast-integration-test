@@ -104,21 +104,19 @@ or you can also run any single script directly
 
     $ bundle exec rspec [<path_to_test_file>]
 
-To generate a new installation image based on SLES12 call:
+To generate a new installation image based on SLES12 SP1 call:
 
-    $ rake build_iso[sles12]
+    $ rake build_iso[sles12-sp1]
 
-The process is defined in build_iso/sles12.rb:
-
-* Fetching all RPMs (defined in build_iso/sles12.obs_packages) from OBS.
+* Fetching all RPMs (defined in build_iso/sles12-sp1.obs_packages) from OBS.
 * Fetching all local RPMs (drop packages in `rpms/VERSION` directory).
-* Fetching official SLES12 ISO.
-* Generating a new SLES12 ISO with this new RPM packages.
-* Copying new SLES12 ISO into test environment (directory kiwi/iso).
+* Fetching official SLES12 SP1 ISO.
+* Generating a new SLES12 SP1 ISO with this new RPM packages.
+* Copying new SLES12 SP1 ISO into test environment (directory kiwi/iso).
 
 This new ISO image will be used for running tests in the future.
 
-To use the official SLES12 ISO (default setting) for tests just call:
+To use the official SLES12 SP1 ISO (default setting) for tests just call:
 
     $ rake build_iso[default]
 
@@ -140,7 +138,7 @@ module and load `vboxdrv` and friends.
 Caveats
 -------
 
-* At this time, `upgrade scenarios` are not supported when using VirtualBox.
+* The framework can be a little bit fragile. Polishing is needed.
 
 Solving Problems
 ----------------

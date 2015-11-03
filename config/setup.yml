@@ -2,12 +2,13 @@ packages:
   common:
     - curl
     - gcc
-    - make
-    - ruby-devel
-    - libxml2-devel    # Needed by libvirt plugin from Vagrant
-    - libxslt-devel    # Needed by libvirt plugin from Vagrant
     - libvirt          # Needed to run virtual machines
     - libvirt-devel    # Needed to compile libvirt Vagrant plugin
+    - libxml2-devel    # Needed by libvirt plugin from Vagrant
+    - libxslt-devel    # Needed by libvirt plugin from Vagrant
+    - make
+    - ruby-devel
+    - virt-install     # Needed to clone QEMU/KVM machines during upgrade
     - virtualbox
   "13.1":
      - kvm                  # Needed to run VMs

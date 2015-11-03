@@ -15,7 +15,7 @@ RSpec.describe AYTests::MediaBuilder do
 
   describe "#build" do
     it "runs each building phase and returns true if build was successful" do
-      expect(FileUtils).to receive(:rm_r).with(builder.cache_dir)
+      expect(FileUtils).to receive(:rm_rf).with(builder.cache_dir)
       expect(AYTests::IsoRepo).to receive(:get).with(iso_url)
       expect(subject).to receive(:fetch_obs_packages)
       expect(subject).to receive(:fetch_local_packages)
@@ -54,7 +54,7 @@ RSpec.describe AYTests::MediaBuilder do
 
   describe "#cleanup" do
     it "cleans cache dir" do
-      expect(FileUtils).to receive(:rm_r).with(subject.cache_dir)
+      expect(FileUtils).to receive(:rm_rf).with(subject.cache_dir)
       subject.cleanup
     end
   end

@@ -14,6 +14,12 @@ module AYTests
     IMAGE_NAME = "autoyast"
     ISO_FILE_NAME = "testing.iso"
     IMAGE_BOX_NAME = "autoyast_vagrant_box_image_0.img"
+    SLEEP_TIME_AFTER_UPGRADE = 150
+    SLEEP_TIME_AFTER_SHUTDOWN = 15
+    SSH_USER = "vagrant"
+    SSH_PASSWORD = "vagrant"
+    SSH_ADDRESS = "127.0.0.1"
+    SSH_PORT = "22"
 
     # Constructor
     #
@@ -68,6 +74,7 @@ module AYTests
     # @see change_boot_order
     # @see backup_image
     # @see build
+    # @see run_postinstall
     def upgrade(autoinst, iso_url)
       setup_iso(iso_url)
       setup_autoinst(autoinst)
@@ -75,6 +82,14 @@ module AYTests
       change_boot_order
       backup_image
       build
+      # During upgrade, Veewee will fail because SSH is disabled by PAM during
+      # booting. So Veewee will get a "Authentication Failure" and it will give
+      # up. At this time, we'll wait some time so installation process can finish
+      # properly. We should find a cleaner solution.
+      log.info "Waiting #{SLEEP_TIME_AFTER_UPGRADE} seconds for upgrade process to finish"
+      sleep SLEEP_TIME_AFTER_UPGRADE
+      run_postinstall
+      true
     end
 
     # Import Veewee image into Vagrant
@@ -133,6 +148,18 @@ module AYTests
         else
           :unknown
         end
+    end
+
+    # Run post-install script in the virtual machine
+    #
+    # Veewee won't be able to run post-install script after upgrade.
+    def run_postinstall
+      Net::SSH::Simple.sync do
+        log.info "Running post-install script"
+        data = vm_ip(IMAGE_NAME)
+        ssh data[:address], "sudo env postinstall.sh",
+          { port: data[:port], user: SSH_USER, password: SSH_PASSWORD }
+      end
     end
 
     private
@@ -196,21 +223,36 @@ module AYTests
     # @params [Pathname,String] definition Path to the libvirt domain definition
     #   for the KVM image.
     def change_boot_order
+      return unless provider == :libvirt
       system "sudo virsh destroy #{IMAGE_NAME}" # shutdown
       system "sudo virsh dumpxml #{IMAGE_NAME} >#{libvirt_definition_path}"
       system "sed -i.bak s/dev=\\'cdrom\\'/dev=\\'cdrom_save\\'/g #{libvirt_definition_path}"
       system "sed -i.bak s/dev=\\'hd\\'/dev=\\'cdrom\\'/g #{libvirt_definition_path}"
       system "sed -i.bak s/dev=\\'cdrom_save\\'/dev=\\'hd\\'/g #{libvirt_definition_path}"
       system "sudo virsh define #{libvirt_definition_path}"
-      FileUtils.rm(definition, force: true)
     end
 
     # Backup image
     #
-    # The image will be destroyed be Veewee when starting the upgrade. So we need to
+    # The image will be destroyed by Veewee when starting the upgrade. So we need to
     # backup it and restore in Veewee's +after_create+ hook.
     def backup_image
-      system "sudo virt-clone -o #{IMAGE_NAME} -n #{IMAGE_NAME}_sav --file /var/lib/libvirt/images/#{IMAGE_NAME}_sav.qcow2"
+      case provider
+      when :libvirt
+        system "sudo virt-clone -o #{IMAGE_NAME} -n #{IMAGE_NAME}_sav --file /var/lib/libvirt/images/#{IMAGE_NAME}_sav.qcow2"
+      when :virtualbox
+        # Shutdown the system
+        system "VBoxManage controlvm #{IMAGE_NAME} acpipowerbutton"
+        sleep SLEEP_TIME_AFTER_SHUTDOWN
+        system "VBoxManage controlvm #{IMAGE_NAME} poweroff"
+
+        # Copy the virtual machine (this is the only way of having an identical system)
+        vm_config = `VBoxManage showvminfo #{IMAGE_NAME} | grep "Config file" | cut -f2 -d:`.strip
+        vm_dir = File.dirname(vm_config)
+        system "VBoxManage unregistervm #{IMAGE_NAME}"
+        FileUtils.mv vm_dir, "#{vm_dir}.sav"
+        system "sync"
+      end
     end
 
     # Determine the host IP
@@ -228,6 +270,36 @@ module AYTests
       end
     ensure
       Socket.do_not_reverse_lookup = orig
+    end
+
+    def vm_ip(name)
+      case provider
+      when :libvirt
+        libvirt_vm_ip(name)
+      when :virtualbox
+        virtualbox_vm_ip(name)
+      end
+    end
+
+    # Determine libvirt domain IP
+    #
+    # @param  [String] libvirt domain name
+    # @return [Hash]   IP address and port
+    def libvirt_vm_ip(name)
+      mac = `sudo virsh domiflist #{name} | tail -n +3 | tr -s " " | cut -f 5 -d " "`.strip
+      address = `arp | grep -i #{mac} | cut -f1 -d " "`.chomp
+      { address: address, port: SSH_PORT }
+    end
+
+    # Determine VirtualBox VM IP
+    #
+    # @param  [String] VirtualBox machine name
+    # @return [Hash]   IP address and port
+    def virtualbox_vm_ip(name)
+      mac_string = `VBoxManage showvminfo #{name} --machinereadable | grep Forwarding`
+      data = mac_string.match(/.+="\w+,tcp,,(\d+),,22"/)
+      port = data[1].to_i
+      { address: SSH_ADDRESS, port: port }
     end
   end
 end

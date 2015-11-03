@@ -15,6 +15,10 @@
 # To contact SUSE about this file by physical or electronic mail,
 # you may find current contact information at www.suse.com
 
+# Default environment variables
+ENV["VAGRANT_LOG"] ||= "warn"         # Set Vagrant log level to 'warn'
+ENV["AYTESTS_PROVIDER"] ||= "libvirt" # Set libvirt as the default provider
+
 require "bundler/setup"
 Bundler.require(:default)
 
