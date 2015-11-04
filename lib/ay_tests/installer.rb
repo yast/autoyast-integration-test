@@ -8,6 +8,7 @@ module AYTests
     GROUPS = ["libvirt", "qemu", "kvm", "vboxusers"]
     POLKIT_RULES_PATH = "/etc/polkit-1/rules.d/99-libvirt.rules"
     POLKIT_RULES_SAMPLE = File.join(File.dirname(__FILE__), "..", "..", "files", "99-libvirt.rules")
+    VAGRANT_LIBVIRT_VERSION = "0.0.32"
 
     # Constructor
     #
@@ -33,11 +34,12 @@ module AYTests
     # * Enable services and configure libvirt network and storage.
     def run
       # Install software
+      log.info "Installing lsb-release in order to determine system version"
       zypper_install("lsb-release") # Needed to determine system version
       install_packages_from_repos
       install_additional_packages
       reload_udev_rules
-      install_vagrant_plugin
+      install_vagrant_plugin(VAGRANT_LIBVIRT_VERSION)
 
       # Set up permissions
       add_user_to_groups
@@ -67,7 +69,7 @@ module AYTests
         packages += config["packages"][base_system]
       end
 
-      log.info "Installing packages from repositories: #{packages.join(" ")}"
+      log.info "Installing packages from repositories"
       zypper_install(packages)
     end
 
@@ -106,11 +108,13 @@ module AYTests
     #
     # Installation is skipped if plugin is installed for the current user.
     #
+    # @param [String] version Version needed.
+    #
     # Adapted from Pennyworth.
-    def install_vagrant_plugin
-      return if vagrant_libvirt_installed?
+    def install_vagrant_plugin(version)
+      return if vagrant_libvirt_installed?(version)
       log.info "Installing libvirt plugin for Vagrant"
-      Cheetah.run "vagrant", "plugin", "install", "vagrant-libvirt"
+      Cheetah.run "vagrant", "plugin", "install", "vagrant-libvirt", "--plugin-version", version
     end
 
     # Add user to virtualization groups
@@ -217,7 +221,21 @@ module AYTests
         "--auto-agree-with-licenses",
         "--name"
       ]
-      Cheetah.run(parts + Array(packages))
+      candidates = Array(packages)
+      to_install = candidates.select do |name|
+        begin
+          Cheetah.run "rpm", "-qi", name
+          false
+        rescue
+          true
+        end
+      end
+      if to_install.empty?
+        log.info "All needed packages were already installed (#{candidates.join(" ")})"
+      else
+        log.info "Installing: #{to_install.join(" ")}"
+        Cheetah.run(parts + to_install)
+      end
     end
 
     # Determine the system version through lsb_release
@@ -229,9 +247,13 @@ module AYTests
 
     # Check whether libvirt Vagrant plugin is installed or not
     #
+    # @param [String] version Version needed.
+    # @return [True,False] true if it's installed; false otherwise.
+    #
     # Adapted from Pennyworth.
-    def vagrant_libvirt_installed?
-      Cheetah.run(%w(vagrant plugin list), %w(grep vagrant-libvirt))
+    def vagrant_libvirt_installed?(version)
+      filter = "vagrant-libvirt .\*#{version}"
+      Cheetah.run(%w(vagrant plugin list), ["grep", "-E", filter])
       true
     rescue
       false

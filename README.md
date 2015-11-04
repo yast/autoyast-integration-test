@@ -133,7 +133,7 @@ time. If for example you want to switch to VirtualBox, unload `kvm` kernel
 module and load `vboxdrv` and friends.
 
     # rmmod kvm
-    # rcboxdrv start
+    # rcvboxdrv start
 
 Caveats
 -------
