@@ -173,4 +173,4 @@ Jenkins
 
 These AutoYaST integration tests are running on a SUSE Jenkins node:
 
-http://river.suse.de/job/autoyast-integration-test/
+https://ci.suse.de/view/YaST/job/yast-autoyast-integration-test/
