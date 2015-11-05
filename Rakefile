@@ -59,7 +59,7 @@ task :test, [:name] => :bootstrap do |name, args|
     iso_path_file = AYTests.tests_path.join("#{test_name}.install_iso")
     iso_url = File.file?(iso_path_file) ? IO.binread(iso_path_file).chomp : AYTests.obs_iso_path
 
-    builder = AYTests::ImageBuilder.new(provider: AYTests.provider)
+    builder = AYTests::ImageBuilder.new(provider: AYTests.provider, gui: ENV["AYTESTS_HEADLESS"] != "true")
     builder.install(autoinst, iso_url)
 
     if test_name.start_with?("upgrade_")
