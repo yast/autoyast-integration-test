@@ -1,11 +1,9 @@
-AutoYaST Integration Tests
-===========================
+# AutoYaST Integration Tests
 
 Test framework for running AutoYaST integration tests by using Veewee and
 Vagrant.
 
-Features
---------
+## Features
 
   * Building Vagrant images by using AutoYaST profiles.
   * Checking these images with RSpec tests.
@@ -13,8 +11,7 @@ Features
     one from OBS.
   * KVM (through libvirt) and VirtualBox are supported.
 
-Supported Scenarios
--------------------
+## Supported Scenarios
 
 These integration tests need to start virtual machines for their operation.
 If you want to use KVM, support for hardware virtualization is vitally important.
@@ -31,8 +28,7 @@ you're using libvirt, you can achieve that setting `cpu mode` to `host-model`
 or `host-passthrough`. You can find more information in the [official
 documentation](https://libvirt.org/formatdomain.html#elementsCPU).
 
-Installation
-------------
+## Installation
 
   1. Install packages [mkdud](https://software.opensuse.org/package/mkdud?search_term=mkdud)
      and [mksusecd](https://software.opensuse.org/package/mksusecd?search_term=mksusecd)
@@ -76,72 +72,106 @@ Installation
      After that, you must reboot your system to be sure everything works
      properly (libvirt iptables rules, ip forwarding, etc.).
 
-Running
--------
+## Running
 
-For a complete list of tasks, run:
+This is the workflow used to run integration tests:
 
-    $ rake -T
+* Create an ISO image to test. This ISO will contain the latest YaST packages,
+  although it's also possible to use any other image.
+* Install the system using the generated ISO and run the tests on the resulting
+  system. You can run the tests as many times as you want using the same
+  installed system.
 
-To run the testsuite, use the `test` Rake task:
+Actually, the second step can be seen as two different steps (building the
+system and running the tests). But for now, we'll keep them tied.
 
-    $ rake test
+After this brief introduction, let's go deeper into each step.
 
-This runs all tests defined in `test` directory (e.g. `test/tftp.rb`):
-* Building a KVM image by using the AutoYaST configuration file (e.g. `tftp.xml`)
-  You can watch the installation by using `virt-manager`. The image is `autoyast`.
-* Starting the built image.
-  You can watch it by using `virt-manager`. The image is `vagrant_autoyast_vm`.
-* Running RSpec tests on this machine which are defined in e.g. `test/tftp.rb`.
+### Generating an ISO
 
-To run only one single test use:
-
-    $ rake test[<path_to_test_file>]
-
-e.g. `rake test[test/sles12.rb]`
-
-or you can also run any single script directly
-
-    $ bundle exec rspec [<path_to_test_file>]
-
-To generate a new installation image based on SLES12 SP1 call:
+Generating a new ISO to use in tests is as easy as typing:
 
     $ rake build_iso[sles12-sp1]
 
-* Fetching all RPMs (defined in build_iso/sles12-sp1.obs_packages) from OBS.
-* Fetching all local RPMs (drop packages in `rpms/VERSION` directory).
-* Fetching official SLES12 SP1 ISO.
-* Generating a new SLES12 SP1 ISO with this new RPM packages.
-* Copying new SLES12 SP1 ISO into test environment (directory kiwi/iso).
+where `sles12-sp1` could be any of the values defined in
+[config/definitions.yml](https://github.com/yast/autoyast-integration-test/blob/master/config/definitions.yml).
+At this time SLE 12 (`sles12`) and SLE 12 SP1 (`sles12-sp1`) are supported.
 
-This new ISO image will be used for running tests in the future.
+These are the steps that will be performed by this task:
 
-To use the official SLES12 SP1 ISO (default setting) for tests just call:
+* If the original ISO is not found in the `iso` directory, it will be
+  downloaded. Optionally you can just copy the ISO (retaining its _original_
+  name) into the `iso` directory. You can find out the _original_ name in
+  [config/definitions.yml](https://github.com/yast/autoyast-integration-test/blob/master/config/definitions.yml).
+* Latest YaST packages will also be downloaded from build system (IBS/OBS). If you
+  want to include your own packages, just drop them into `rpms/<definition>` directory
+  (e.g. `rpms/sles12-sp1`).
+* Those packages will be included in a [Driver
+  Update](https://en.opensuse.org/SDB:Linuxrc#p_dud) (DUD).
+* Finally, the DUD will be added to the ISO. The new ISO will be copied to
+  `kiwi/iso/obs.iso`.
 
-    $ rake build_iso[default]
+If you want to use another ISO, just copy it to `kiwi/iso/obs.iso` and it will
+be used.
 
-Selecting a provider
---------------------
+### Running the tests
 
-You can select a provider for Vagrant using a environment variable called
-`AYTESTS_PROVIDER`. Possible values are `libvirt` (default) and `virtualbox`.
+Once the ISO is available, the tests are ready to run. All tests are defined in the
+`test` directory. For example, to run `test/tftp.rb` test, just type:
 
-    $ AYTESTS_PROVIDER="virtualbox" rake test[test/sles12.rb]
+    $ rake test[test/tftp.rb]
 
-You must take into account that KVM and VirtualBox can't be running at the same
-time. If for example you want to switch to VirtualBox, unload `kvm` kernel
-module and load `vboxdrv` and friends.
+If you want to run all the tests in `test` directory, just type:
 
-    # rmmod kvm
-    # rcvboxdrv start
+    $ rake test
 
-Caveats
--------
+By default, tests will run using libvirt/KVM as backend. But it's possible to select
+a different provider by setting the `AYTESTS_PROVIDER` environment variable. At this
+time, `libvirt` and `virtualbox` are supported:
+
+    $ AYTESTS_PROVIDER="virtualbox" rake test[test/tftp.rb]
+
+Now, the nitty-gritty details. For every file in `test`, these steps will be
+performed:
+
+* A new Vagrant box will be created using the ISO and the profile stored in
+  `test` (e.g. `test/tftp.xml`). [Veewee](https://github.com/jedi4ever/veewee)
+  will take care of this part.
+* Using the generated Vagrant box, a new virtual machine will be created and
+  the tests will run on that machine.
+* The virtual machine will be destroyed.
+
+### Re-running the tests
+
+Sometimes is useful to run only a given test but skipping the installation
+process, which is quite time consuming. To repeat the some test execution you
+can do:
+
+    $ bundle exec rspec <path/to/test.rb>
+
+For example:
+
+    $ bundle exec rspec test/tftp.rb
+
+## Cleaning-up
+
+Two tasks for cleaning-up stuff are available. To remove cache
+(`build_iso/cache`) and [Kiwi](https://doc.opensuse.org/projects/kiwi/doc/)
+state (`kiwi/import_state.yaml`) use:
+
+    $ rake clean
+
+If you also want to remove ISO images (downloaded and generated ones), logs and
+the Vagrant box file (`kiwi/autoyast.box`), just type:
+
+    $ rake clobber
+
+## Caveats
 
 * The framework can be a little bit fragile. Polishing is needed.
+* Usability also needs some love.
 
-Solving Problems
-----------------
+## Solving Problems
 
 ### Connection to libvirt
 
@@ -168,8 +198,16 @@ helpful:
 
 Finally, don't use `192.168.121.0/24` as it will be used by libvirt Vagrant plugin.
 
-Jenkins
--------
+### VirtualBox and KVM conflicts
+
+You must take into account that KVM and VirtualBox can't be running at the same
+time. If for example you want to switch to VirtualBox, unload `kvm` (and
+related) kernel module and load `vboxdrv` and friends.
+
+    # rmmod kvm
+    # rcvboxdrv start
+
+## Jenkins
 
 These AutoYaST integration tests are running on a SUSE Jenkins node:
 
