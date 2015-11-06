@@ -153,6 +153,16 @@ For example:
 
     $ bundle exec rspec test/tftp.rb
 
+### Headless mode
+
+VirtualBox can run in headless mode if needed. To do that, just set the
+`AYTESTS_HEADLESS` environment variable to `true`.
+
+    $ AYTESTS_HEADLESS="true" rake test
+
+This setting is not relevant to libvirt/KVM which will run in *headless* mode
+anyway.
+
 ## Cleaning-up
 
 Two tasks for cleaning-up stuff are available. To remove cache

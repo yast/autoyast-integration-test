@@ -9,7 +9,7 @@ module AYTests
     include AYTests::Helpers
 
     attr_reader :base_dir, :obs_iso_dir, :autoinst_path, :definition_path,
-      :kiwi_autoyast_dir, :libvirt_definition_path, :provider
+      :kiwi_autoyast_dir, :libvirt_definition_path, :provider, :gui
 
     IMAGE_NAME = "autoyast"
     ISO_FILE_NAME = "testing.iso"
@@ -27,7 +27,9 @@ module AYTests
     #   uses AYTests.base_dir
     # @param [Symbol]   provider Provider to be used by Vagrant
     #   (:libvirt or :virtualbox)
-    def initialize(base_dir: nil, provider: :libvirt)
+    # @param [Symbol]   gui      Enable GUI (only relevant for virtualbox
+    #   provider)
+    def initialize(base_dir: nil, provider: :libvirt, gui: false)
       @base_dir = base_dir || AYTests.base_dir
       @obs_iso_dir = @base_dir.join("kiwi", "iso")
       @kiwi_autoyast_dir = @base_dir.join("kiwi", "definitions", "autoyast")
@@ -35,6 +37,7 @@ module AYTests
       @definition_path = kiwi_autoyast_dir.join("definition.rb")
       # This file will be used by Veewee during upgrade.
       @libvirt_definition_path = @base_dir.join("kiwi", "autoyast_description.xml")
+      @gui = gui
       @provider = provider
     end
 
@@ -171,7 +174,9 @@ module AYTests
     def build
       Dir.chdir(base_dir.join("kiwi")) do
         log.info "Creating #{veewee_provider} image"
-        system "veewee #{veewee_provider} build #{IMAGE_NAME} --force --auto --nogui"
+        cmd = "veewee #{veewee_provider} build #{IMAGE_NAME} --force --auto"
+        cmd << " --nogui" unless gui
+        system cmd
       end
     end
 

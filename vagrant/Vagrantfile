@@ -136,6 +136,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
     opensuse.vm.provider :virtualbox do |vb|
       vb.memory = 1024
+      vb.gui = ENV["AYTESTS_HEADLESS"] != "true"
     end
   end
 end
