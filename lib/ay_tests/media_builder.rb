@@ -10,7 +10,7 @@ module AYTests
   class MediaBuilder
     include AYTests::Helpers
 
-    attr_reader :base_dir, :cache_dir, :local_packages_dir,
+    attr_reader :base_dir, :cache_dir,
       :local_packages_dir, :boot_dir, :iso_path, :obs_pkg_list_path, :yast_url,
       :iso_url, :version
 
@@ -25,7 +25,7 @@ module AYTests
     #   AYTests.base_dir.
     # @param [Pathname] yast_url YaST repository URL
     # @param [Pathname] iso_url  Base ISO URL
-    # @param [String]   version  Distribution version (+sle12+, +sle12_sp1+, etc.)
+    # @param [String]   version  Distribution version (+sles12+, +sles12-sp1+, etc.)
     # @param [Array<Hash>] extra_repos Extra repositories and packages to add to the
     #   ISO. The information for each repository consists in a Hash with +:server+
     #   and a +:packages+ keys.

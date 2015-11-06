@@ -5,7 +5,7 @@ RSpec.describe AYTests::MediaBuilder do
   let(:base_dir) { Pathname.new("/home/autoyast") }
   let(:yast_url) { Pathname.new("http://build.suse.de/yast") }
   let(:iso_url) { Pathname.new("http://dl.suse.de/sles12.iso") }
-  let(:version) { "sle12" }
+  let(:version) { "sles12" }
   let(:output_path) { Pathname.new("/home/autoyast/output/testing.iso") }
 
   subject(:builder) do
