@@ -45,7 +45,11 @@ end
 
 desc "Running autoyast integration tests"
 task :test, [:name] => :bootstrap do |name, args|
-  tests = Array(args[:name] || Dir.glob(AYTests.tests_path.join("*.rb")))
+  if args[:name]
+    tests = Array(args[:name])
+  else
+    tests = Dir.glob(AYTests.tests_path.join("*.rb")).reject { |f| File.basename(f) == "spec_helper.rb" }
+  end
 
   tests.sort.each do |test_file|
     test_name = File.basename(test_file, ".rb")
