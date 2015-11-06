@@ -99,11 +99,15 @@ At this time SLE 12 (`sles12`) and SLE 12 SP1 (`sles12-sp1`) are supported.
 
 These are the steps that will be performed by this task:
 
-* If the original ISO is not found in the `iso` directory, it will be downloaded.
+* If the original ISO is not found in the `iso` directory, it will be
+  downloaded. Optionally you can just copy the ISO (retaining its _original_
+  name) into the `iso` directory. You can find out the _original_ name in
+  [config/definitions.yml](https://github.com/yast/autoyast-integration-test/blob/master/config/definitions.yml).
 * Latest YaST packages will also be downloaded from build system (IBS/OBS). If you
   want to include your own packages, just drop them into `rpms/<definition>` directory
   (e.g. `rpms/sles12-sp1`).
-* Those packages will be included in a DUD.
+* Those packages will be included in a [Driver
+  Update](https://en.opensuse.org/SDB:Linuxrc#p_dud) (DUD).
 * Finally, the DUD will be added to the ISO. The new ISO will be copied to
   `kiwi/iso/obs.iso`.
 
@@ -148,6 +152,19 @@ can do:
 For example:
 
     $ bundle exec rspec test/tftp.rb
+
+## Cleaning-up
+
+Two tasks for cleaning-up stuff are available. To remove cache
+(`build_iso/cache`) and [Kiwi](https://doc.opensuse.org/projects/kiwi/doc/)
+state (`kiwi/import_state.yaml`) use:
+
+    $ rake clean
+
+If you also want to remove ISO images (downloaded and generated ones), logs and
+the Vagrant box file (`kiwi/autoyast.box`), just type:
+
+    $ rake clobber
 
 ## Caveats
 
