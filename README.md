@@ -11,6 +11,10 @@ Vagrant.
     one from OBS.
   * KVM (through libvirt) and VirtualBox are supported.
 
+## Overview
+
+![AutoYaST testing overview](https://github.com/yast/autoyast-integration-test/tree/master/doc/autoyast_test_workflow.jpg)
+
 ## Supported Scenarios
 
 These integration tests need to start virtual machines for their operation.
