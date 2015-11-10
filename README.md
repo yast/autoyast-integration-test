@@ -13,7 +13,7 @@ Vagrant.
 
 ## Overview
 
-![AutoYaST testing overview](https://github.com/yast/autoyast-integration-test/tree/master/doc/autoyast_test_workflow.jpg)
+![AutoYaST testing overview](https://raw.githubusercontent.com/yast/autoyast-integration-test/master/doc/autoyast_test_workflow.jpg)
 
 ## Supported Scenarios
 
