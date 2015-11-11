@@ -75,4 +75,9 @@ describe "SLES 12 checks," do
   it "configures network interfaces" do
     run_test_script("ifcfg_networking.sh")
   end
+
+  # bsc#944349
+  it "do not restart dbus and wickedd* services" do
+    run_test_script("restart_services.sh")
+  end
 end
