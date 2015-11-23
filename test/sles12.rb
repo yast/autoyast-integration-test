@@ -80,4 +80,8 @@ describe "SLES 12 checks," do
   it "do not restart dbus and wickedd* services" do
     run_test_script("restart_services.sh")
   end
+
+  it "check profile" do
+    run_test_script("check_schema.sh")
+  end
 end

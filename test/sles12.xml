@@ -742,6 +742,7 @@ ls -l /mnt/$BASE
       <package>kbd</package>
       <package>kernel-default</package>
       <package>less</package>
+      <package>libxml2-tools</package>
       <package>login</package>
       <package>mkinitrd</package>
       <package>module-init-tools</package>
