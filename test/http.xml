@@ -442,6 +442,11 @@ Tmr9shvqBQKa2NyWfUBcct9hvmlrZD6fnc9a4+3nTxv3TJRwxBUc9Q==
       <disable config:type="list">
         <service>apache2</service>
       </disable>
+      <!-- bug 956043 - YAST second stage must not restarted while activating -->
+      <enable config:type="list">
+        <service>YaST2-Firstboot</service>
+        <service>YaST2-Second-Stage</service>
+      </enable>
     </services>
   </services-manager>
 
