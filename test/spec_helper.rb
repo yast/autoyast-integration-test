@@ -39,11 +39,12 @@ RSpec.configure do |config|
   end
 end
 
-RSpec.shared_examples "test_scripts" do |name|
-  list_path =  File.join(File.dirname(__FILE__),"../test", "#{name}.list")
+RSpec.shared_examples "test_scripts" do |list|
+  list_path =  File.join(File.dirname(__FILE__),"../test", "#{list}.list")
 
-  File.readlines(list_path).map(&:chomp).each do |line|
-    test, description = line.split("#")
+  File.readlines(list_path).each do |line|
+    test, description = line.strip.split("#", 2)
+    next if test.nil?
 
     it "#{description || test}" do
       run_test_script(test.strip)
