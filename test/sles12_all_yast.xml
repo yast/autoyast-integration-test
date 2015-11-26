@@ -1,0 +1,120 @@
+<?xml version="1.0"?>
+<!DOCTYPE profile>
+<profile xmlns="http://www.suse.com/1.0/yast2ns" xmlns:config="http://www.suse.com/1.0/configns">
+  <general>
+    <mode>
+      <confirm config:type="boolean">false</confirm>
+    </mode>
+  </general>
+
+  <networking>
+    <keep_install_network config:type="boolean">true</keep_install_network>
+  </networking>
+
+  <software>
+    <install_recommended config:type="boolean">false</install_recommended>
+    <patterns config:type="list">
+      <pattern>Minimal</pattern>
+    </patterns>
+    <packages config:type="list">
+      <!-- An SSH server is needed to perform the integration tests -->
+      <package>openssh</package>
+      <!-- The following packages are needed to run postinstall.sh -->
+      <package>sudo</package>
+      <package>curl</package>
+      <package>ca-certificates-mozilla</package>
+      <!-- Install xmllint to check the profile -->
+      <package>libxml2-tools</package>
+      <!-- Install all YaST2 packages used to build yast2-schema -->
+      <package>yast2</package>
+      <package>yast2-add-on</package>
+      <package>yast2-audit-laf</package>
+      <package>yast2-auth-client</package>
+      <package>yast2-auth-server</package>
+      <package>yast2-bootloader</package>
+      <package>yast2-ca-management</package>
+      <package>yast2-country</package>
+      <package>yast2-dhcp-server</package>
+      <package>yast2-dns-server</package>
+      <package>yast2-firewall</package>
+      <package>yast2-firstboot</package>
+      <package>yast2-ftp-server</package>
+      <package>yast2-http-server</package>
+      <package>yast2-inetd</package>
+      <package>yast2-installation</package>
+      <package>yast2-iscsi-client</package>
+      <package>yast2-kdump</package>
+      <package>yast2-mail</package>
+      <package>yast2-network</package>
+      <package>yast2-nfs-client</package>
+      <package>yast2-nfs-server</package>
+      <package>yast2-nis-client</package>
+      <package>yast2-nis-server</package>
+      <package>yast2-ntp-client</package>
+      <package>yast2-online-update-configuration</package>
+      <package>yast2-printer</package>
+      <package>yast2-proxy</package>
+      <package>yast2-registration</package>
+      <package>yast2-samba-client</package>
+      <package>yast2-samba-server</package>
+      <package>yast2-schema</package>
+      <package>yast2-security</package>
+      <package>yast2-services-manager</package>
+      <package>yast2-sound</package>
+      <package>yast2-squid</package>
+      <package>yast2-sysconfig</package>
+      <package>yast2-users</package>
+    </packages>
+  </software>
+
+  <users config:type="list">
+    <user>
+      <encrypted config:type="boolean">false</encrypted>
+      <fullname>vagrant</fullname>
+      <gid>100</gid>
+      <home>/home/vagrant</home>
+      <shell>/bin/bash</shell>
+      <uid>1000</uid>
+      <user_password>vagrant</user_password>
+      <username>vagrant</username>
+    </user>
+    <user>
+      <encrypted config:type="boolean">false</encrypted>
+      <fullname>root</fullname>
+      <gid>0</gid>
+      <home>/root</home>
+      <shell>/bin/bash</shell>
+      <uid>0</uid>
+      <user_password>vagrant</user_password>
+      <username>root</username>
+    </user>
+  </users>
+
+  <scripts>
+    <init-scripts config:type="list">
+      <script>
+        <filename>init_ssh.sh</filename>
+        <chrooted config:type="boolean">true</chrooted>
+        <interpreter>shell</interpreter>
+        <source><![CDATA[
+          systemctl enable sshd
+          systemctl start sshd
+          ]]></source>
+      </script>
+    </init-scripts>
+
+    <post-scripts config:type="list">
+      <script>
+        <filename>yast_clone.sh</filename>
+        <interpreter>shell</interpreter>
+        <location/>
+        <feedback config:type="boolean">false</feedback>
+        <source><![CDATA[#!/bin/sh
+mv /var/run/zypp.pid /var/run/zypp.sav
+yast clone_system
+mv /var/run/zypp.sav /var/run/zypp.pid
+        ]]></source>
+      </script>
+    </post-scripts>
+  </scripts>
+</profile>
