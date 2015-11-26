@@ -16,12 +16,52 @@
 # you may find current contact information at www.suse.com
 
 require "ay_tests"
+require "open3"
 
+# Run a test script
+#
+# Run a script in the SUT and check if the last line matches
+# the expected value. The script is supposed to live on test/
+# directory.
+#
+# If ENV["AYTESTS_LOCAL"] == "true" then #local_run_test_script
+# will be called. Otherwise, #remote_run_test_script will be used.
+#
+# @param [String] script   Script name
+# @param [String] expected Expected value of stdout last line
 def run_test_script(script, expected = "AUTOYAST OK")
   shell =  File.join(File.dirname(__FILE__),"../test", script)
-  expect(File.exists?(shell)).to eq(true) # Check if the script exists
-  result = $vm.run(shell, sudo: true)
+  # Check if the script exists
+  expect(File.exists?(shell)).to eq(true), "test script does not exists: #{shell}"
+
+  if ENV["AYTESTS_LOCAL"] == "true"
+    local_run_test_script(shell, expected)
+  else
+    remote_run_test_script(vm, shell, expected)
+  end
+end
+
+# Run a test script in a SUT
+#
+# Run a script given the SUT is a virtual machine.
+#
+# @param [AYTests::VagrantRunner] runner   Virtual machine runner
+# @param [String]                 script   Full path to the script
+# @param [String]                 expected Expected value of stdout last line
+def remote_run_test_script(vm, path, expected = "AUTOYAST OK")
+  result = vm.run(path, sudo: true)
   expect(result[:stdout].split("\n").last).to eq(expected), proc { result[:stderr] }
+end
+
+# Run a test script in a SUT
+#
+# Run a script given the SUT is the local machine.
+#
+# @param [String]                 script   Full path to the script
+# @param [String]                 expected Expected value of stdout last line
+def local_run_test_script(path, expected = "AUTOYAST OK")
+  stdout, stderr, _status = Open3.capture3("sudo sh #{path}")
+  expect(stdout.split("\n").last).to eq(expected), proc { stderr }
 end
 
 # Copy YaST2 logs from virtual machine to a given directory
@@ -39,21 +79,36 @@ def copy_logs(runner, dest = "log")
   runner.download_logs(dest)
 end
 
+def start_vm(vm)
+  vm = AYTests::VagrantRunner.new(AYTests.base_dir.join("vagrant"), AYTests.provider)
+  vm.cleanup
+  vm.start
+end
+
+def shutdown_vm(vm)
+  vm.stop
+  vm.cleanup
+end
+
 RSpec.configure do |config|
   config.before(:all) do
     AYTests.base_dir = Pathname.new(File.dirname(__FILE__)).join("..")
 
-    # Start the previously create vagrant VM - autoyast_vm
-    $vm = AYTests::VagrantRunner.new(AYTests.base_dir.join("vagrant"), AYTests.provider)
-    $vm.cleanup
-    $vm.start
-  end
+  unless ENV["AYTESTS_LOCAL"] == "true"
+    require "ay_tests"
 
-  config.after(:all) do
-    examples = RSpec.world.filtered_examples.values.flatten
-    # Copy the logs if some test fails.
-    copy_logs($vm) if examples.any?(&:exception)
-    $vm.stop
-    $vm.cleanup
+    config.before(:all) do
+      AYTests.base_dir = Pathname.new(File.dirname(__FILE__)).join("..")
+      $vm = AYTests::VagrantRunner.new(AYTests.base_dir.join("vagrant"), AYTests.provider)
+      # Start the previously create vagrant VM - autoyast_vm
+      start_vm($vm)
+    end
+
+    config.after(:all) do
+      examples = RSpec.world.filtered_examples.values.flatten
+      # Copy the logs if some test fails.
+      copy_logs($vm) if examples.any?(&:exception)
+      shutdown_vm($vm)
+    end
   end
 end

@@ -167,6 +167,19 @@ VirtualBox can run in headless mode if needed. To do that, just set the
 This setting is not relevant to libvirt/KVM which will run in *headless* mode
 anyway.
 
+### Running on local system
+
+Sometimes could be useful to run the tests in the local system. To do that,
+the `AYTESTS_LOCAL` environment variable should be set to `true`.
+
+    $ AYTESTS_LOCAL="true" bundle exec rspec <path/to/test.rb>
+
+For example:
+
+    $ bundle exec rspec test/sles12.rb
+
+Take into account that `sudo` will be used to execute testing scripts.
+
 ## Cleaning-up
 
 Two tasks for cleaning-up stuff are available. To remove cache
