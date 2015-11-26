@@ -15,45 +15,26 @@
 # To contact SUSE about this file by physical or electronic mail,
 # you may find current contact information at www.suse.com
 
-require "ay_tests"
-
-def run_test_script(script, expected = "AUTOYAST OK")
-  shell =  File.join(File.dirname(__FILE__),"../test", script)
-  expect(File.exists?(shell)).to eq(true) # Check if the script exists
-  result = $vm.run(shell, sudo: true)
-  expect(result[:stdout].split("\n").last).to eq(expected), proc { result[:stderr] }
-end
-
-# Copy YaST2 logs from virtual machine to a given directory
-#
-# It relies on AYTests::VagrantRunner#download_logs method.
-# The logs will be stored in a tar.gz file. To avoid collisions,
-# the compressed file's name will contain a timestamp.
-#
-# @param [AYTests::VagrantRunner] runner Virtual machine runner
-# @param [String]                 dest   Directory where the logs will be stored
-#
-# @see AYTests::VagrantRunner#download_logs
-def copy_logs(runner, dest = "log")
-  FileUtils.mkdir(dest) unless Dir.exists?(dest)
-  runner.download_logs(dest)
-end
 
 RSpec.configure do |config|
-  config.before(:all) do
-    AYTests.base_dir = Pathname.new(File.dirname(__FILE__)).join("..")
+  require_relative "helpers"
+  config.include Helpers
 
-    # Start the previously create vagrant VM - autoyast_vm
-    $vm = AYTests::VagrantRunner.new(AYTests.base_dir.join("vagrant"), AYTests.provider)
-    $vm.cleanup
-    $vm.start
-  end
+  unless ENV["AYTESTS_LOCAL"] == "true"
+    require "ay_tests"
 
-  config.after(:all) do
-    examples = RSpec.world.filtered_examples.values.flatten
-    # Copy the logs if some test fails.
-    copy_logs($vm) if examples.any?(&:exception)
-    $vm.stop
-    $vm.cleanup
+    config.before(:all) do
+      AYTests.base_dir = Pathname.new(File.dirname(__FILE__)).join("..")
+      $vm = AYTests::VagrantRunner.new(AYTests.base_dir.join("vagrant"), AYTests.provider)
+      # Start the previously create vagrant VM - autoyast_vm
+      start_vm($vm)
+    end
+
+    config.after(:all) do
+      examples = RSpec.world.filtered_examples.values.flatten
+      # Copy the logs if some test fails.
+      copy_logs($vm) if examples.any?(&:exception)
+      shutdown_vm($vm)
+    end
   end
 end
