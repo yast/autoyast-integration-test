@@ -1,0 +1,3 @@
+tftp.sh                # tftp is running correctly
+host.sh                # host is in /etc/hosts (bsc#870998)
+unsupported_modules.sh # unsupported YaST modules were reported (bsc#925381)

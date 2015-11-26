@@ -1,0 +1,2 @@
+http.sh                    # apache2 and firewall are running
+no_restart_second_stage.sh # YaST2-Second-Stage was not restarted

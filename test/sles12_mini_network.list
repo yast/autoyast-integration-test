@@ -1,0 +1,4 @@
+user.sh                  # vagrant user has been created
+no_yast2_packages.sh     # YaST2 packages are not installed
+no_second_stage.sh       # second stage was not run
+check_dns.sh             # network has been set up (bnc#944942)
