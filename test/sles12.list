@@ -1,0 +1,17 @@
+user.sh                        # vagrant user has been created
+root.sh                        # root hast /root home (bnc#878427)
+tftp.sh                        # files can be downloaded from tftp server
+dns.sh                         # DNS server and network are available
+autoinst-userscr.sh            # user scripts have been run
+partition.sh                   # partition_id order fits (bnc#886808)
+tmpfs.sh                       # no tmpfs device in autoinst.xml (bnc#887126)
+subvolumes.sh                  # subvolumes are correctly in autoinst.xml (bnc#882982)
+no_registration.sh             # registration is not in autoinst.xml (bnc#888168)
+ntp_sync.sh                    # ntp time syncing has been passed (bnc#935066)
+installation_snapshot.sh       # snapshot has been created
+no_reinstall.sh                # do no reinstall packages in second stage (fate#319086)
+profile_sections.sh            # all expected sections are present in autoinst.xml (bnc#941948)
+kdump.sh                       # multiple crahskernel options were added to Kdump (bnc#882082)
+handle_zypper_pkg_gpg_check.sh # handles zypper's pkgGpgCheck callback during installation (bsc#948608)
+ifcfg_networking.sh            # configures network interfaces (bsc#949193)
+restart_services.sh            # do no restart dbus and wickedd* services (bsc#944349)

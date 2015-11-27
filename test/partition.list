@@ -1,0 +1,2 @@
+user.sh      # vagrant user has been created
+partition.sh # partition_id order fits (bnc#941096)

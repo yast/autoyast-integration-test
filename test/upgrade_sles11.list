@@ -1,0 +1,7 @@
+user.sh                # vagrant user has been created
+root.sh                # root hast /root home (bnc#878427)
+dns.sh                 # DNS server and network are available
+tmpfs.sh               # no tmpfs device in autoinst.xml (bnc#887126)
+no_registration.sh     # registration is not in autoinst.xml (bnc#888168)
+ntp_sync.sh            # ntp time syncing has been passed (#935066)
+autoupgrade-userscr.sh # user scripts have been run

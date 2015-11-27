@@ -1,0 +1,6 @@
+lvm.sh                   # creates lvm partitions
+keyboard.sh              # sets default keyboard (bnc#891808)
+ntp.sh                   # sets peer/restrict in autoinst.xml by using default ntp.conf (bnc#928987)
+firewall.sh              # sets firewall with existing network (keep_install_network) (bnc#897129)
+installation_snapshot.sh # snapshot has been created
+btrfs_snapshots.sh       # creates @/. snapshots on LVM (bnc#935858)
