@@ -474,7 +474,7 @@ Tmr9shvqBQKa2NyWfUBcct9hvmlrZD6fnc9a4+3nTxv3TJRwxBUc9Q==
       <home>/home/vagrant</home>
       <shell>/bin/bash</shell>
       <uid>1000</uid>
-      <user_password>vagrant</user_password>
+      <user_password>nots3cr3t</user_password>
       <username>vagrant</username>
     </user>
     <user>
@@ -484,7 +484,7 @@ Tmr9shvqBQKa2NyWfUBcct9hvmlrZD6fnc9a4+3nTxv3TJRwxBUc9Q==
       <home>/root</home>
       <shell>/bin/bash</shell>
       <uid>0</uid>
-      <user_password>vagrant</user_password>
+      <user_password>nots3cr3t</user_password>
       <username>root</username>
     </user>
   </users>
