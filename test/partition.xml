@@ -685,7 +685,7 @@ ls -l /mnt/$BASE
       <home>/home/vagrant</home>
       <shell>/bin/bash</shell>
       <uid>1000</uid>
-      <user_password>vagrant</user_password>
+      <user_password>nots3cr3t</user_password>
       <username>vagrant</username>
     </user>
     <user>
@@ -695,7 +695,7 @@ ls -l /mnt/$BASE
       <home>/root</home>
       <shell>/bin/bash</shell>
       <uid>0</uid>
-      <user_password>vagrant</user_password>
+      <user_password>nots3cr3t</user_password>
       <username>root</username>
     </user>
   </users>

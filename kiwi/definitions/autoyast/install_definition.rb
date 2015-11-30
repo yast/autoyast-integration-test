@@ -24,7 +24,7 @@ Veewee::Definition.declare({
    ],
   :ssh_login_timeout => "10000",
   :ssh_user => "vagrant",
-  :ssh_password => "vagrant",
+  :ssh_password => "nots3cr3t",
   :ssh_key => "",
   :ssh_host_port => "7222",
   :ssh_guest_port => "22",
