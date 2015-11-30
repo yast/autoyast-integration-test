@@ -4,7 +4,8 @@ require "ay_tests/helpers"
 require "ay_tests/media_builder"
 require "ay_tests/image_builder"
 require "ay_tests/iso_repo"
-require "ay_tests/vagrant_runner.rb"
+require "ay_tests/vagrant_runner"
+require "ay_tests/test_runner"
 
 module AYTests
   # Set the base directory for AYTests

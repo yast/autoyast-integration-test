@@ -25,3 +25,4 @@ group :test do
 end
 
 gem "cheetah"
+gem "thor"

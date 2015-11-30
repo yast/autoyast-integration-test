@@ -178,4 +178,5 @@ DEPENDENCIES
   net-ssh-simple (~> 1.6.11)
   rspec (~> 3.1.0)
   ruby-libvirt
+  thor
   veewee

@@ -61,7 +61,7 @@ documentation](https://libvirt.org/formatdomain.html#elementsCPU).
   4. The task `setup` will do a lot of work for you. After that, you need to install
      the missing gems:
 
-        $ rake setup
+        $ bin/ay-tests setup
         $ bundle install --without ''
 
   5. If the host is running a firewall, you must permit connections from
@@ -95,7 +95,7 @@ After this brief introduction, let's go deeper into each step.
 
 Generating a new ISO to use in tests is as easy as typing:
 
-    $ rake build_iso[sles12-sp1]
+    $ bin/ay-tests build_iso sles12-sp1
 
 where `sles12-sp1` could be any of the values defined in
 [config/definitions.yml](https://github.com/yast/autoyast-integration-test/blob/master/config/definitions.yml).
@@ -123,17 +123,17 @@ be used.
 Once the ISO is available, the tests are ready to run. All tests are defined in the
 `test` directory. For example, to run `test/tftp.rb` test, just type:
 
-    $ rake test[test/tftp.rb]
+    $ bin/ay-tests test test/tftp.rb
 
 If you want to run all the tests in `test` directory, just type:
 
-    $ rake test
+    $ bin/ay-tests test
 
 By default, tests will run using libvirt/KVM as backend. But it's possible to select
 a different provider by setting the `AYTESTS_PROVIDER` environment variable. At this
 time, `libvirt` and `virtualbox` are supported:
 
-    $ AYTESTS_PROVIDER="virtualbox" rake test[test/tftp.rb]
+    $ AYTESTS_PROVIDER="virtualbox" bin/ay-tests test test/tftp.rb
 
 Now, the nitty-gritty details. For every file in `test`, these steps will be
 performed:
@@ -162,7 +162,7 @@ For example:
 VirtualBox can run in headless mode if needed. To do that, just set the
 `AYTESTS_HEADLESS` environment variable to `true`.
 
-    $ AYTESTS_HEADLESS="true" rake test
+    $ AYTESTS_HEADLESS="true" bin/ay-tests test
 
 This setting is not relevant to libvirt/KVM which will run in *headless* mode
 anyway.
@@ -186,12 +186,12 @@ Two tasks for cleaning-up stuff are available. To remove cache
 (`build_iso/cache`) and [Kiwi](https://doc.opensuse.org/projects/kiwi/doc/)
 state (`kiwi/import_state.yaml`) use:
 
-    $ rake clean
+    $ bin/ay-tests clean
 
 If you also want to remove ISO images (downloaded and generated ones), logs and
 the Vagrant box file (`kiwi/autoyast.box`), just type:
 
-    $ rake clobber
+    $ bin/ay-tests clobber
 
 ## Caveats
 
