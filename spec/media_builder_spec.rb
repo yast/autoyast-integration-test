@@ -1,4 +1,4 @@
-require "ay_tests/media_builder"
+require "aytests/media_builder"
 require "pathname"
 
 RSpec.describe AYTests::MediaBuilder do

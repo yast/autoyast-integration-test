@@ -1,5 +1,5 @@
 require "spec_helper"
-require "ay_tests/iso_repo"
+require "aytests/iso_repo"
 
 RSpec.describe AYTests::IsoRepo do
   let(:iso_dir) { Pathname.new("/tmp") }

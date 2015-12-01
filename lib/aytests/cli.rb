@@ -3,6 +3,7 @@
 # This class implements the CLI.
 require "yaml"
 require "thor"
+require "pathname"
 
 module AYTests
   class CLI < Thor
@@ -36,7 +37,7 @@ module AYTests
 
     desc "setup", "Set up the environment for the current user"
     def setup
-      require "ay_tests/installer"
+      require "aytests/installer"
       config_file = base_dir.join("config", "setup.yml")
       installer = AYTests::Installer.new(YAML.load_file(config_file), ENV["LOGNAME"])
       installer.run
@@ -55,7 +56,7 @@ module AYTests
     private
 
     def bootstrap
-      require "ay_tests"
+      require "aytests"
       AYTests.base_dir = base_dir
       AYTests::IsoRepo.init(AYTests.base_dir.join("iso"))
     end

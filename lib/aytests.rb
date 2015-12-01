@@ -1,11 +1,12 @@
 require "logger"
 require "net/ssh/simple"
-require "ay_tests/helpers"
-require "ay_tests/media_builder"
-require "ay_tests/image_builder"
-require "ay_tests/iso_repo"
-require "ay_tests/vagrant_runner"
-require "ay_tests/test_runner"
+require "cheetah"
+require "aytests/helpers"
+require "aytests/media_builder"
+require "aytests/image_builder"
+require "aytests/iso_repo"
+require "aytests/vagrant_runner"
+require "aytests/test_runner"
 
 module AYTests
   # Set the base directory for AYTests

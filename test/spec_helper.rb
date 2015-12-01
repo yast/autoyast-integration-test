@@ -21,7 +21,7 @@ RSpec.configure do |config|
   config.include Helpers
 
   unless ENV["AYTESTS_LOCAL"] == "true"
-    require "ay_tests"
+    require "aytests"
 
     config.before(:all) do
       AYTests.base_dir = Pathname.new(File.dirname(__FILE__)).join("..")

@@ -1,5 +1,5 @@
 require "spec_helper"
-require "ay_tests/test_runner"
+require "aytests/test_runner"
 
 RSpec.describe AYTests::TestRunner do
   DEFAULT_ISO_PATH = Pathname.new("/home/autoyast/kiwi/iso/obs.iso")

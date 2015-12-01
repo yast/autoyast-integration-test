@@ -1,5 +1,5 @@
 require "spec_helper"
-require "ay_tests/vagrant_runner"
+require "aytests/vagrant_runner"
 
 RSpec.describe AYTests::VagrantRunner do
   VM_NAME = AYTests::VagrantRunner::VM_NAME

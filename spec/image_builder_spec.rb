@@ -1,6 +1,6 @@
 require "spec_helper"
-require "ay_tests/image_builder"
-require "ay_tests/iso_repo"
+require "aytests/image_builder"
+require "aytests/iso_repo"
 
 RSpec.describe AYTests::ImageBuilder do
   let(:base_dir) { Pathname.new(File.dirname(__FILE__)).join("..") }
