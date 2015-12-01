@@ -17,7 +17,7 @@ module AYTests
     SLEEP_TIME_AFTER_UPGRADE = 150
     SLEEP_TIME_AFTER_SHUTDOWN = 15
     SSH_USER = "vagrant"
-    SSH_PASSWORD = "vagrant"
+    SSH_PASSWORD = "nots3cr3t"
     SSH_ADDRESS = "127.0.0.1"
     SSH_PORT = "22"
 
