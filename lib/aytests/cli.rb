@@ -4,21 +4,25 @@
 require "yaml"
 require "thor"
 require "pathname"
+require "aytests"
+require "aytests/installer"
 
 module AYTests
   class CLI < Thor
+    option "work-dir", type: :string
     desc "build_iso NAME", "Build boot image <name>"
     def build_iso(name)
-      bootstrap
+      bootstrap(options["work-dir"])
       config = YAML.load_file(base_dir.join("config", "definitions.yml")).fetch(name.to_sym)
       builder = AYTests::MediaBuilder.new(config.merge(base_dir: base_dir, version: name))
       builder.build
     end
 
     option "skip-build", type: :boolean
+    option "work-dir", type: :string
     desc "test FILE", "Run integration tests"
     def test(file = nil)
-      bootstrap
+      bootstrap(options["work-dir"])
       tests = file ? Array(file) :
         Dir.glob(AYTests.tests_path.join("*.rb")).reject { |f| File.basename(f) == "spec_helper.rb" }
 
@@ -38,7 +42,6 @@ module AYTests
 
     desc "setup", "Set up the environment for the current user"
     def setup
-      require "aytests/installer"
       config_file = base_dir.join("config", "setup.yml")
       installer = AYTests::Installer.new(YAML.load_file(config_file), ENV["LOGNAME"])
       installer.run
@@ -62,7 +65,7 @@ module AYTests
     end
 
     def base_dir
-      Pathname.new(File.dirname(__FILE__)).join("..", "..")
+      AYTests.base_dir
     end
   end
 end
