@@ -25,6 +25,7 @@ module AYTests
       tests.sort.each do |test_file|
         if File.exist?(test_file)
           runner = AYTests::TestRunner.new(
+            work_dir: AYTests.work_dir,
             test_file: Pathname.new(test_file),
             default_iso_path: AYTests.obs_iso_path,
             skip_build: options["skip-build"] || false)
@@ -55,10 +56,9 @@ module AYTests
 
     private
 
-    def bootstrap
-      require "aytests"
-      AYTests.base_dir = base_dir
-      AYTests::IsoRepo.init(AYTests.base_dir.join("iso"))
+    def bootstrap(work_dir = nil)
+      AYTests.init(work_dir || Pathname.new(ENV["HOME"]).join("aytests-workspace"))
+      AYTests::IsoRepo.init(AYTests.work_dir.join("iso"))
     end
 
     def base_dir

@@ -9,19 +9,32 @@ require "aytests/vagrant_runner"
 require "aytests/test_runner"
 
 module AYTests
-  # Set the base directory for AYTests
-  #
-  # @param [Pathname, String] path Directory to use as base.
-  # @return [Pathname, String] Base directory (the provided argument).
-  def self.base_dir=(path)
-    @base_dir = Pathname.new(path)
+  def self.init(work_dir)
+    work_dir_path = Pathname.new(work_dir)
+    self.work_dir = work_dir_path.absolute? ? work_dir_path : work_dir_path.realdirpath
+    FileUtils.mkdir_p(work_dir) unless self.work_dir.exist?
   end
 
   # Return the base directory for AYTests
   #
-  # @param [Pathname] Directory used as base.
+  # @return [Pathname] Directory used as base.
   def self.base_dir
-    @base_dir
+    @base_dir ||= Pathname.new(File.dirname(__FILE__)).join("..")
+  end
+
+  # Set the work directory for AYTests
+  #
+  # @param [Pathname, String] path Directory to use as workspace.
+  # @return [Pathname, String] Work directory (the provided argument).
+  def self.work_dir=(path)
+    @work_dir = Pathname.new(path)
+  end
+
+  # Return the work directory for AYTests
+  #
+  # @return [Pathname] Directory used as workspace.
+  def self.work_dir
+    @work_dir || Pathname.pwd.join("aytests")
   end
 
   # Set the logger for AYTests messages
@@ -46,7 +59,7 @@ module AYTests
   #
   # @return [Pathname] Path to the image.
   def self.obs_iso_path
-    base_dir.join("kiwi", "iso", "obs.iso")
+    work_dir.join("veewee", "iso", "obs.iso")
   end
 
   # Return the path to the integration tests

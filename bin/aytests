@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 $LOAD_PATH.unshift File.join(File.dirname(__FILE__), "..", "lib")
-require "ay_tests/cli"
+require "aytests/cli"
 
 ENV["VAGRANT_LOG"] ||= "warn"         # Set Vagrant log level to 'warn'
 ENV["AYTESTS_PROVIDER"] ||= "libvirt" # Set libvirt as the default provider

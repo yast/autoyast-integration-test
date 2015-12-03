@@ -37,10 +37,13 @@ Veewee::Definition.declare({
     # autoyast profile to the installer. veewee's built in webserver solution
     # doesn't work reliably with autoyast due to some timing issues.
     :before_create => Proc.new do
-      require "../lib/aytests/web_server"
+      require "aytests/web_server"
       require "pathname"
       Thread.new do
-        AYTests::WebServer.new(base_dir: Pathname.pwd.join(".."), name: definition.box.name).start
+        AYTests::WebServer.new(
+          veewee_dir: Pathname.pwd.join("definitions", "autoyast"),
+          files_dir: File.join(ENV["AYTESTS_FILES_DIR"], "files"),
+          name: definition.box.name).start
       end
     end
   }

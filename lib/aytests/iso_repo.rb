@@ -3,10 +3,13 @@ module AYTests
   # If the image is not available in the repository directory,
   # it will be downloaded.
   class IsoRepo
+    attr_reader :dir
+
     # Initializes the repository
     #
     # @param [Pathname] Directory to use
     def self.init(dir)
+      FileUtils.mkdir_p(dir) unless dir.directory?
       @repo = IsoRepo.new(dir)
     end
 

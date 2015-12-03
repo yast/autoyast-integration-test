@@ -9,7 +9,8 @@ module AYTests
     include AYTests::Helpers
 
     attr_reader :base_dir, :obs_iso_dir, :autoinst_path, :definition_path,
-      :kiwi_autoyast_dir, :libvirt_definition_path, :provider, :gui
+      :kiwi_autoyast_dir, :libvirt_definition_path, :provider, :gui, :work_dir,
+      :files_dir
 
     IMAGE_NAME = "autoyast"
     ISO_FILE_NAME = "testing.iso"
@@ -25,20 +26,29 @@ module AYTests
     #
     # @param [Pathname] base_dir Set the base directory. By default it
     #   uses AYTests.base_dir
+    # @param [Pathname] work_dir Set the work directory. By default it
+    #   uses AYTests.work_dir
     # @param [Symbol]   provider Provider to be used by Vagrant
     #   (:libvirt or :virtualbox)
     # @param [Symbol]   gui      Enable GUI (only relevant for virtualbox
     #   provider)
-    def initialize(base_dir: nil, provider: :libvirt, gui: false)
+    def initialize(base_dir: nil, work_dir: nil, files_dir: nil, provider: :libvirt, gui: false)
       @base_dir = base_dir || AYTests.base_dir
-      @obs_iso_dir = @base_dir.join("kiwi", "iso")
-      @kiwi_autoyast_dir = @base_dir.join("kiwi", "definitions", "autoyast")
-      @autoinst_path = kiwi_autoyast_dir.join("autoinst.xml")
-      @definition_path = kiwi_autoyast_dir.join("definition.rb")
+      @work_dir = work_dir || AYTests.work_dir.join("veewee")
+      @files_dir = files_dir
+      @kiwi_autoyast_dir = @work_dir.join("definitions", "autoyast")
+      @obs_iso_dir = @work_dir.join("iso") # FIXME: deberían pasarme directamente esto
+      @autoinst_path = @work_dir.join("definitions", "autoyast", "autoinst.xml")
+      @definition_path = @work_dir.join("definitions", "autoyast", "definition.rb")
       # This file will be used by Veewee during upgrade.
-      @libvirt_definition_path = @base_dir.join("kiwi", "autoyast_description.xml")
+      @libvirt_definition_path = @work_dir.join("definitions", "autoyast", "autoyast_description.xml")
       @gui = gui
       @provider = provider
+    end
+
+    def prepare
+      FileUtils.mkdir_p(kiwi_autoyast_dir) unless kiwi_autoyast_dir.directory?
+      FileUtils.cp(base_dir.join("share", "veewee", "postinstall.sh"), kiwi_autoyast_dir)
     end
 
     # Run the installation using a given profile and an ISO
@@ -55,6 +65,7 @@ module AYTests
     # @see setup_definition
     # @see build
     def install(autoinst, iso_url)
+      prepare
       setup_iso(iso_url)
       setup_autoinst(autoinst)
       setup_definition(:install)
@@ -79,6 +90,7 @@ module AYTests
     # @see build
     # @see run_postinstall
     def upgrade(autoinst, iso_url)
+      prepare
       setup_iso(iso_url)
       setup_autoinst(autoinst)
       setup_definition(:upgrade)
@@ -103,7 +115,7 @@ module AYTests
     # @see export_from_veewee
     def import
       export_from_veewee
-      box_file = base_dir.join("kiwi").join("#{IMAGE_NAME}.box")
+      box_file = work_dir.join("#{IMAGE_NAME}.box")
       log.info "Importing #{veewee_provider} image into Vagrant"
       system "vagrant box add 'autoyast' #{box_file} --force"
     end
@@ -115,7 +127,7 @@ module AYTests
     # @return [Boolean] true if the image was successfully exported; false
     #   otherwise.
     def export_from_veewee
-      Dir.chdir(base_dir.join("kiwi")) do
+      Dir.chdir(work_dir) do
         log.info "Exporting #{veewee_provider} image into box file"
         system "veewee #{veewee_provider} export #{IMAGE_NAME} --force"
       end
@@ -172,11 +184,11 @@ module AYTests
     # @return [Boolean] true if the system was successfully built; return false
     #   otherwise.
     def build
-      Dir.chdir(base_dir.join("kiwi")) do
+      Dir.chdir(work_dir) do
         log.info "Creating #{veewee_provider} image"
         cmd = "veewee #{veewee_provider} build #{IMAGE_NAME} --force --auto"
         cmd << " --nogui" unless gui
-        system cmd
+        system({ "AYTESTS_BASE_DIR" => base_dir.to_s, "AYTESTS_FILES_DIR" => files_dir.to_s }, cmd)
       end
     end
 
@@ -203,7 +215,9 @@ module AYTests
     #
     # @param [String|Symbol] mode :install for installation or :upgrade for upgrade.
     def setup_definition(mode)
-      FileUtils.cp(kiwi_autoyast_dir.join("#{mode}_definition.rb"), definition_path)
+      source_definition = base_dir.join("share", "veewee", "#{mode}_definition.rb")
+      log.info "Using definition #{source_definition}"
+      FileUtils.cp(source_definition, definition_path)
     end
 
     # Set up AutoYaST profile

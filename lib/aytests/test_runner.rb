@@ -6,16 +6,19 @@ module AYTests
   class TestRunner
     include AYTests::Helpers
 
-    attr_reader :test_name, :test_file, :skip_build, :default_iso_path
+    attr_reader :test_name, :test_file, :skip_build, :default_iso_path,
+      :files_dir, :work_dir
 
     # Constructor
     #
     # @param [String] test_file Path to tests file
-    def initialize(test_file: , default_iso_path: , skip_build: false)
-      @test_file        = test_file
+    def initialize(test_file:, work_dir:, default_iso_path:, skip_build: false)
+      @test_file        = Pathname.new(test_file)
       @default_iso_path = default_iso_path
       @skip_build       = skip_build
-      @test_name        = File.basename(@test_file, ".rb")
+      @test_name        = @test_file.basename(".rb")
+      @files_dir        = File.join(File.dirname(@test_file), "files")
+      @work_dir         = work_dir
     end
 
     # Build a virtual machine and run the tests on it
@@ -26,7 +29,9 @@ module AYTests
     def run
       log.info "Running test #{test_name}"
       build unless skip_build
-      system "rspec #{test_file}"
+      Dir.chdir(test_file.dirname) do
+        system({ "AYTESTS_WORK_DIR" => work_dir.to_s }, "rspec #{test_file.basename}")
+      end
     end
 
     private
@@ -35,7 +40,7 @@ module AYTests
     #
     # @see AYTests::ImageBuilder
     def build
-      builder = AYTests::ImageBuilder.new(provider: AYTests.provider, gui: ENV["AYTESTS_HEADLESS"] != "true")
+      builder = AYTests::ImageBuilder.new(files_dir: files_dir, provider: AYTests.provider, gui: ENV["AYTESTS_HEADLESS"] != "true")
       builder.install(autoinst(:install), iso_url(:install))
       builder.upgrade(autoinst(:upgrade), iso_url(:upgrade)) if upgrade?
       builder.import
@@ -67,7 +72,7 @@ module AYTests
     #
     # @return [Boolean] `true` if the upgrade should be performed. Otherwise, `false`.
     def upgrade?
-      test_name.start_with?("upgrade_")
+      test_name.to_s.start_with?("upgrade_")
     end
 
     # Find tests path

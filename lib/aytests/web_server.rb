@@ -1,15 +1,11 @@
 require "webrick"
-require "pathname"
 
 module AYTests
   class WebServer
-    def initialize(base_dir:, name: "autoyast", port: 8888)
-      base_dir = Pathname.new(base_dir)
-      root = base_dir.join("kiwi", "definitions", name)
-      static = base_dir.join("files", "static")
+    def initialize(veewee_dir:, files_dir:, name: "autoyast", port: 8888)
       @server = WEBrick::HTTPServer.new(:Port => port)
-      @server.mount "/", WEBrick::HTTPServlet::FileHandler, root.to_s
-      @server.mount "/static", WEBrick::HTTPServlet::FileHandler, static.to_s
+      @server.mount "/", WEBrick::HTTPServlet::FileHandler, veewee_dir.to_s
+      @server.mount "/static", WEBrick::HTTPServlet::FileHandler, files_dir.to_s
     end
 
     def start

@@ -1,14 +1,17 @@
+require "fileutils"
+
 module AYTests
   class VagrantRunner
     VM_NAME = "autoyast_vm"
 
-    attr_reader :dir, :ssh_config
+    attr_reader :base_dir, :dir, :ssh_config
 
     # Constructor
     #
     # @param [Pathname] dir      Vagrantfile directory
     # @param [Symbol]   provider Vagrant provider to use (:libvirt or :virtualbox)
-    def initialize(dir, driver = :libvirt)
+    def initialize(base_dir:, dir:, driver: :libvirt)
+      @base_dir = base_dir
       @dir = dir
       @driver = driver
       @ssh_config = @dir.join("config.ssh")
@@ -19,6 +22,7 @@ module AYTests
     # @return [Boolean] true if the system started successfully; otherwise
     #   false is returned
     def start
+      setup
       Dir.chdir(dir) do
         system "vagrant up #{VM_NAME} --provider #{@driver}"
         system "vagrant ssh-config > #{@ssh_config}"
@@ -40,13 +44,13 @@ module AYTests
     #
     # Copy the script to the Vagrant system and execute it.
     #
-    # @param [String]  script Path to the script in the local system
-    # @param [Boolean] sudo   Determine if the command should be executed
+    # @param [String|Pathname]  script Path to the script in the local system
+    # @param [Boolean]          sudo   Determine if the command should be executed
     #   using +sudo+
     def run(script, sudo: false)
       with_conn do |conn|
         target = "/tmp/#{File.basename(script)}"
-        conn.scp_put VM_NAME, script, target, config: @ssh_config
+        conn.scp_put VM_NAME, script.to_s, target, config: @ssh_config
         conn.ssh VM_NAME, "/usr/bin/chmod +x #{target}"
         command = "/usr/bin/env #{target}"
         command.prepend("sudo ") if sudo
@@ -72,9 +76,10 @@ module AYTests
 
     # Clean-up the machine and the ssh configuration
     def cleanup
+      return false unless dir.directory?
       Dir.chdir(dir) do
-        system "vagrant destroy --force"
         FileUtils.rm_rf(@ssh_config)
+        system "vagrant destroy --force"
       end
     end
 
@@ -86,6 +91,12 @@ module AYTests
       result = yield conn
       conn.close
       result
+    end
+
+    # Set up the Vagrant environment
+    def setup
+      FileUtils.mkdir_p(dir)
+      FileUtils.cp(base_dir.join("share", "vagrant", "Vagrantfile"), dir)
     end
   end
 end

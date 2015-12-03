@@ -26,16 +26,18 @@ module AYTests
     # @param [Pathname] yast_url YaST repository URL
     # @param [Pathname] iso_url  Base ISO URL
     # @param [String]   version  Distribution version (+sles12+, +sles12-sp1+, etc.)
+    # @param [Pathname] work_dir Working directory. By default it uses AYTests.work_dir.
     # @param [Array<Hash>] extra_repos Extra repositories and packages to add to the
     #   ISO. The information for each repository consists in a Hash with +:server+
     #   and a +:packages+ keys.
-    def initialize(yast_url:, iso_url:, version:, base_dir: nil, extra_repos: [])
+    def initialize(yast_url:, iso_url:, version:, base_dir: nil, work_dir: nil, extra_repos: [])
       # Directories
       @base_dir           = base_dir || AYTests.base_dir
-      @cache_dir          = base_dir.join("cache")
-      @local_packages_dir = base_dir.join("rpms", version)
-      @boot_dir           = base_dir.join("boot_#{version}")
-      @obs_pkg_list_path  = base_dir.join("build_iso", "#{version}.obs_packages")
+      @work_dir           = work_dir || AYTests.work_dir
+      @cache_dir          = @work_dir.join("cache")
+      @local_packages_dir = @work_dir.join("rpms", version)
+      @boot_dir           = @base_dir.join("boot_#{version}")
+      @obs_pkg_list_path  = @base_dir.join("share", "build_iso", "#{version}.obs_packages")
 
       # URLs
       @yast_url = yast_url
@@ -138,7 +140,7 @@ module AYTests
     def build_iso(iso_path, output_path)
       log.info "Creating DUD"
       dud_path = cache_dir.join("#{version}.dud")
-      dud_dir = base_dir.join("build_iso", "dud")
+      dud_dir = base_dir.join("share", "build_iso", "dud")
       system format(MKDUD_CMD, dud_path: dud_path, dud_dir: dud_dir,
                     rpms_dir: cache_dir)
 
@@ -146,6 +148,7 @@ module AYTests
       system "sync"
 
       log.info "Creating new ISO image with the updated packages"
+      FileUtils.mkdir_p(output_path.dirname) unless output_path.dirname.directory?
       cmd = format(MKSUSECD_CMD, output_path: output_path, dud_path: dud_path,
                    iso_path: iso_path)
       cmd << " #{boot_dir}" if boot_dir.directory?
