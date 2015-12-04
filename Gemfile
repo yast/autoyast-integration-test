@@ -17,12 +17,5 @@
 
 source "https://rubygems.org"
 
-group :test do
-  gem "rspec", "~> 3.1.0"
-  gem "veewee"
-  gem "ruby-libvirt"
-  gem "net-ssh-simple", "~> 1.6.11"
-end
-
-gem "cheetah"
-gem "thor"
+gemspec
+gem "veewee"
