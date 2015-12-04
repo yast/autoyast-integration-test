@@ -10,10 +10,10 @@ module AYTests
     #
     # @param [Pathname] dir      Vagrantfile directory
     # @param [Symbol]   provider Vagrant provider to use (:libvirt or :virtualbox)
-    def initialize(vagrantfile, dir, driver = :libvirt)
+    def initialize(vagrantfile, dir, provider = :libvirt)
       @vagrantfile = vagrantfile
       @dir = dir
-      @driver = driver
+      @provider = provider
       @ssh_config = @dir.join("config.ssh")
     end
 
@@ -24,7 +24,7 @@ module AYTests
     def start
       setup
       Dir.chdir(dir) do
-        system "vagrant up #{VM_NAME} --provider #{@driver}"
+        system "vagrant up #{VM_NAME} --provider #{@provider}"
         system "vagrant ssh-config > #{@ssh_config}"
         system "vagrant ssh -c 'true'" # Wait until SSH is ready
       end

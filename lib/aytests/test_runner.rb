@@ -6,19 +6,27 @@ module AYTests
   class TestRunner
     include AYTests::Helpers
 
-    attr_reader :test_name, :test_file, :skip_build, :default_iso_path,
-      :files_dir, :work_dir
+    attr_reader :test_name, :files_dir, :test_file, :work_dir,
+      :default_iso_path, :skip_build, :provider, :headless
 
     # Constructor
     #
-    # @param [String] test_file Path to tests file
-    def initialize(test_file:, work_dir:, default_iso_path:, skip_build: false)
+    # @param [String] test_file        Path to tests file
+    # @param [String] work_dir         Work directory
+    # @param [String] default_iso_path Path to the default ISO (can be overriden through
+    #                                  *.{install,upgrade}_iso files)
+    # @param [True,False] skip_build   Do not build the virtual machine
+    # @param [String|Symbol] provider  Set the vagrant provider (:libvirt or :virtualbox)
+    # @param [True,False] headless     Enable headless mode if true
+    def initialize(test_file:, work_dir:, default_iso_path:, skip_build: false, provider: :libvirt, headless: false)
       @test_file        = Pathname.new(test_file)
       @default_iso_path = default_iso_path
       @skip_build       = skip_build
       @test_name        = @test_file.basename(".rb")
       @files_dir        = File.join(File.dirname(@test_file), "files")
       @work_dir         = work_dir
+      @provider         = provider.to_sym
+      @headless         = headless
     end
 
     # Build a virtual machine and run the tests on it
@@ -30,7 +38,9 @@ module AYTests
       log.info "Running test #{test_name}"
       build unless skip_build
       Dir.chdir(test_file.dirname) do
-        system({ "AYTESTS_WORK_DIR" => work_dir.to_s }, "rspec #{test_file.basename}")
+        system(
+          { "AYTESTS_WORK_DIR" => work_dir.to_s, "AYTESTS_PROVIDER" => provider.to_s },
+          "rspec #{test_file.basename}")
       end
     end
 
@@ -42,9 +52,10 @@ module AYTests
     def build
       builder = AYTests::ImageBuilder.new(
         sources_dir: AYTests.base_dir.join("share", "veewee"),
+        work_dir: work_dir,
         files_dir: files_dir,
-        provider: AYTests.provider,
-        gui: ENV["AYTESTS_HEADLESS"] != "true")
+        provider: provider,
+        headless: headless)
       builder.install(autoinst(:install), iso_url(:install))
       builder.upgrade(autoinst(:upgrade), iso_url(:upgrade)) if upgrade?
       builder.import
@@ -66,7 +77,7 @@ module AYTests
     # @return [String]      ISO URL for the given stage
     def iso_url(stage = :install)
       iso_path_file = tests_path.join("#{test_name}.#{stage}_iso")
-      iso_url = File.file?(iso_path_file) ? IO.binread(iso_path_file).chomp : default_iso_path
+      File.file?(iso_path_file) ? IO.binread(iso_path_file).chomp : default_iso_path
     end
 
     # Determine whether the upgrade should be done

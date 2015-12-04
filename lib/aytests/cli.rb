@@ -18,6 +18,8 @@ module AYTests
       builder.build
     end
 
+    option "headless", type: :boolean
+    option "provider", type: :string
     option "skip-build", type: :boolean
     option "work-dir", type: :string
     desc "test FILE", "Run integration tests"
@@ -32,7 +34,10 @@ module AYTests
             work_dir: AYTests.work_dir,
             test_file: Pathname.new(test_file),
             default_iso_path: AYTests.obs_iso_path,
-            skip_build: options["skip-build"] || false)
+            skip_build: options["skip-build"] || false,
+            provider: options["provider"] || ENV["AYTESTS_PROVIDER"] || :libvirt,
+            headless: options[:headless] || ENV["AYTESTS_HEADLESS"] == "true"
+          )
           runner.run
         else
           $stderr.puts "File #{test_file} does not exist"

@@ -13,7 +13,8 @@ RSpec.describe AYTests::ImageBuilder do
   let(:local_ip) { "192.168.122.232" }
 
   let(:default_args) do
-    { sources_dir: sources_dir, work_dir: work_dir, files_dir: files_dir, provider: provider }
+    { sources_dir: sources_dir, work_dir: work_dir, files_dir: files_dir,
+      provider: provider, headless: true }
   end
 
   subject(:builder) { AYTests::ImageBuilder.new(default_args) }

@@ -9,7 +9,7 @@ module AYTests
     include AYTests::Helpers
 
     attr_reader :sources_dir, :obs_iso_dir, :autoinst_path, :definition_path,
-      :veewee_autoyast_dir, :libvirt_definition_path, :provider, :gui, :work_dir,
+      :veewee_autoyast_dir, :libvirt_definition_path, :provider, :headless, :work_dir,
       :files_dir
 
     IMAGE_NAME = "autoyast"
@@ -27,13 +27,13 @@ module AYTests
     # @param [Pathname] sources_dir Set the directory where Veewee related
     #                               files live (templates for definition,
     #                               post-install script, etc.)
-    # @param [Pathname] work_dir Set the work directory. By default it
-    #   uses AYTests.work_dir
-    # @param [Symbol]   provider Provider to be used by Vagrant
-    #   (:libvirt or :virtualbox)
-    # @param [Symbol]   gui      Enable GUI (only relevant for virtualbox
-    #   provider)
-    def initialize(sources_dir: nil, work_dir: nil, files_dir: nil, provider: :libvirt, gui: false)
+    # @param [Pathname] work_dir    Set the work directory. By default it
+    #                               uses AYTests.work_dir
+    # @param [Symbol]   provider    Provider to be used by Vagrant
+    #                               (:libvirt or :virtualbox)
+    # @param [Symbol]   headless    Disable GUI (only relevant for virtualbox
+    #                               provider)
+    def initialize(sources_dir: nil, work_dir: nil, files_dir: nil, provider: :libvirt, headless: false)
       @sources_dir = sources_dir
       @work_dir = work_dir
       @files_dir = files_dir
@@ -43,7 +43,7 @@ module AYTests
       @definition_path = @work_dir.join("definitions", "autoyast", "definition.rb")
       # This file will be used by Veewee during upgrade.
       @libvirt_definition_path = @work_dir.join("definitions", "autoyast", "autoyast_description.xml")
-      @gui = gui
+      @headless = headless
       @provider = provider
     end
 
@@ -183,7 +183,7 @@ module AYTests
       Dir.chdir(work_dir) do
         log.info "Creating #{veewee_provider} image"
         cmd = "veewee #{veewee_provider} build #{IMAGE_NAME} --force --auto"
-        cmd << " --nogui" unless gui
+        cmd << " --nogui" if headless
         system({ "AYTESTS_FILES_DIR" => files_dir.to_s }, cmd)
       end
     end

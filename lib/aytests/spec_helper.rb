@@ -15,33 +15,32 @@
 # To contact SUSE about this file by physical or electronic mail,
 # you may find current contact information at www.suse.com
 
+require "aytests"
+require "aytests/test_helpers"
 
 RSpec.configure do |config|
-  require "aytests/test_helpers"
   config.include AYTests::TestHelpers
 
-  unless ENV["AYTESTS_LOCAL"] == "true"
-    require "aytests"
-    AYTests.work_dir = ENV["AYTESTS_WORK_DIR"]
+  AYTests.work_dir = ENV["AYTESTS_WORK_DIR"]
 
-    config.before(:all) do
-      $vm = AYTests::VagrantRunner.new(base_dir: AYTests.base_dir,
-        dir: AYTests.work_dir.join("vagrant"), driver: AYTests.provider)
-      # Start the previously create vagrant VM - autoyast_vm
-      start_vm($vm)
-    end
+  config.before(:all) do
+    # Start the previously create vagrant VM - autoyast_vm
+    $vm = AYTests::VagrantRunner.new(
+      vagrantfile: AYTests.base_dir.join("share", "vagrant", "Vagrantfile"),
+      dir: AYTests.work_dir.join("vagrant"),
+      driver: ENV["AYTESTS_PROVIDER"])
+    start_vm($vm)
+  end
 
-    config.after(:all) do
-      examples = RSpec.world.filtered_examples.values.flatten
-      # Copy the logs if some test fails.
-      copy_logs($vm) if examples.any?(&:exception)
-      shutdown_vm($vm)
-    end
+  config.after(:all) do
+    examples = RSpec.world.filtered_examples.values.flatten
+    # Copy the logs if some test fails.
+    copy_logs($vm) if examples.any?(&:exception)
+    shutdown_vm($vm)
   end
 end
 
 RSpec.shared_examples "test_scripts" do |list|
-  require "aytests"
   list_path = Pathname.pwd.join("#{list}.list")
 
   File.readlines(list_path).each do |line|
