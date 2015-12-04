@@ -7,8 +7,9 @@ module AYTests
 
     GROUPS = ["libvirt", "qemu", "kvm", "vboxusers"]
     POLKIT_RULES_PATH = "/etc/polkit-1/rules.d/99-libvirt.rules"
-    POLKIT_RULES_SAMPLE = File.join(File.dirname(__FILE__), "..", "..", "files", "99-libvirt.rules")
+    POLKIT_RULES_SAMPLE = File.join(File.dirname(__FILE__), "..", "..", "share", "files", "99-libvirt.rules")
     VAGRANT_LIBVIRT_VERSION = "0.0.32"
+    FOG_VERSION = "1.29"
 
     # Constructor
     #
@@ -27,6 +28,7 @@ module AYTests
     # * Install additional packages (also defined in +config/setup.yml+).
     # * Reload udev rules.
     # * Install libvirt Vagrant plugin.
+    # * Install Veewee as a Gem in the users' directory.
     # * Add user to virtualization groups.
     # * Disable PolicyKit authentication for libvirt.
     # * Allow access to libvirt for regular users.
@@ -40,6 +42,7 @@ module AYTests
       install_additional_packages
       reload_udev_rules
       install_vagrant_plugin(VAGRANT_LIBVIRT_VERSION)
+      install_veewee
 
       # Set up permissions
       add_user_to_groups
@@ -110,11 +113,30 @@ module AYTests
     #
     # @param [String] version Version needed.
     #
+    # @see vagrant_libvirt_installed?
     # Adapted from Pennyworth.
     def install_vagrant_plugin(version)
       return if vagrant_libvirt_installed?(version)
       log.info "Installing libvirt plugin for Vagrant"
       Cheetah.run "vagrant", "plugin", "install", "vagrant-libvirt", "--plugin-version", version
+    end
+
+    # Install Veewee as a Rubygem
+    #
+    # Installation is skipped if the gem is yet installed for the current user.
+    # It also sets the PATH variable in the $HOME/.profile directory.
+    #
+    # @see veewee_installed?
+    def install_veewee
+      return if veewee_installed?
+      log.info "Installing Veewee"
+      File.open(File.join(ENV["HOME"], ".profile"), "a") do |f|
+        f.puts "export PATH=#{File.join(Gem.user_dir, "bin")}:\$PATH"
+      end
+      install_gem("fog-core", version: FOG_VERSION, )
+      environment = {"NOKOGIRI_USE_SYSTEM_LIBRARIES" => "1"}
+      install_gem("fog", version: FOG_VERSION, environment: environment)
+      install_gem("veewee", environment: environment)
     end
 
     # Add user to virtualization groups
@@ -238,6 +260,18 @@ module AYTests
       end
     end
 
+    # Install a Gem in the users' directory
+    #
+    # @param [String] gem         Gem's name
+    # @param [String] version     Gem's version wanted
+    # @param [Hash]   environment Environment variables
+    # @return [True,False] true if it's installed; false otherwise.
+    def install_gem(gem, version: nil, environment: {})
+      cmd = "gem install --user-install --no-format-executable --no-ri --no-rdoc #{gem}"
+      cmd << " --version #{version}" unless version.nil?
+      system(environment, cmd)
+    end
+
     # Determine the system version through lsb_release
     #
     # Adapted from Pennyworth.
@@ -254,6 +288,16 @@ module AYTests
     def vagrant_libvirt_installed?(version)
       filter = "vagrant-libvirt .\*#{version}"
       Cheetah.run(%w(vagrant plugin list), ["grep", "-E", filter])
+      true
+    rescue
+      false
+    end
+
+    # Check whether Veewee is installed or not
+    #
+    # @return [True,False] true if it's installed; false otherwise.
+    def veewee_installed?
+      Cheetah.run(%w(gem specification veewee))
       true
     rescue
       false
