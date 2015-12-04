@@ -9,7 +9,7 @@ Vagrant.
   * Checking these images with RSpec tests.
   * Generating own installation ISO images with local built RPMs or the newest
     one from OBS.
-  * KVM (through libvirt) and VirtualBox are supported.
+  * QEMU/KVM (through libvirt) and VirtualBox are supported.
 
 ## Overview
 
@@ -17,16 +17,16 @@ Vagrant.
 
 ## Supported Scenarios
 
-These integration tests need to start virtual machines for their operation.
-If you want to use KVM, support for hardware virtualization is vitally important.
-Check it on your host system:
+These integration tests need to start virtual machines for their operation. If
+you want to use QEMU/KVM, support for hardware virtualization is vitally
+important. Check it on your host system:
 
     $ grep --only-matching '\(svm\|vmx\)' /proc/cpuinfo
 
 Alternatively, you can just use VirtualBox (no hardware virtualization support
 is needed).
 
-If you prefer, you can install the framework in a KVM machine. For that
+If you prefer, you can install the framework in a QEMU/KVM machine. For that
 scenario to work you must enable _nested virtualization_. For example, if
 you're using libvirt, you can achieve that setting `cpu mode` to `host-model`
 or `host-passthrough`. You can find more information in the [official
@@ -48,21 +48,16 @@ documentation](https://libvirt.org/formatdomain.html#elementsCPU).
 
         echo '<username> ALL=NOPASSWD: ALL' >> /etc/sudoers
 
-  3. Clone autoyast-integration-test repository and install needed gems.
-     The use of the `--path` option is recommended to avoid polluting your
-     system:
+  3. Install package rubygem-aytests and clone tests repository (tests are also
+     available in the package aytests-tests):
 
-        $ git clone https://github.com/yast/autoyast-integration-test
-        $ cd autoyast-integration-test
-        $ sudo zypper install rubygem-bundler
-        $ bundle config --local build.nokogiri --use-system-libraries
-        $ bundle install --without test --path vendor/bundle
+        $ zypper in rubygem-aytests
+        $ git clone https://github.com/yast/aytests-tests
 
-  4. The task `setup` will do a lot of work for you. After that, you need to install
-     the missing gems:
+  4. The task `setup` will do a lot of work for you. After that, you should logout
+     and login again (as the user will be added to some groups):
 
-        $ bin/aytests setup
-        $ bundle install --without ''
+        $ aytests setup
 
   5. If the host is running a firewall, you must permit connections from
      libvirt default network to host’s port 8888. For example, if you’re
@@ -89,13 +84,20 @@ This is the workflow used to run integration tests:
 Actually, the second step can be seen as two different steps (building the
 system and running the tests). But for now, we'll keep them tied.
 
+Since December 2015 AYTests uses a special directory to perform all the
+actions: downloading the ISO, building the virtual machine, etc.
+`$HOME/aytests-workspace` is used by default. You can change it via the
+`--work-dir` option.
+
+    $ aytests build_iso sles12-sp1 --work-dir $HOME/another-directory
+
 After this brief introduction, let's go deeper into each step.
 
 ### Generating an ISO
 
 Generating a new ISO to use in tests is as easy as typing:
 
-    $ bin/aytests build_iso sles12-sp1
+    $ aytests build_iso sles12-sp1
 
 where `sles12-sp1` could be any of the values defined in
 [config/definitions.yml](https://github.com/yast/autoyast-integration-test/blob/master/config/definitions.yml).
@@ -108,90 +110,81 @@ These are the steps that will be performed by this task:
   name) into the `iso` directory. You can find out the _original_ name in
   [config/definitions.yml](https://github.com/yast/autoyast-integration-test/blob/master/config/definitions.yml).
 * Latest YaST packages will also be downloaded from build system (IBS/OBS). If you
-  want to include your own packages, just drop them into `rpms/<definition>` directory
-  (e.g. `rpms/sles12-sp1`).
+  want to include your own packages, just drop them into `rpms/<definition>` under
+  *work directory* (e.g. `$HOME/aytests-workspace/rpms/sles12-sp1`).
 * Those packages will be included in a [Driver
   Update](https://en.opensuse.org/SDB:Linuxrc#p_dud) (DUD).
 * Finally, the DUD will be added to the ISO. The new ISO will be copied to
-  `kiwi/iso/obs.iso`.
+  `$HOME/aytests-workspace/iso/obs.iso`.
 
-If you want to use another ISO, just copy it to `kiwi/iso/obs.iso` and it will
-be used.
+If you want to use another ISO, just copy it to `iso/obs.iso` under the *work
+directory* and it will be used.
 
 ### Running the tests
 
 Once the ISO is available, the tests are ready to run. All tests are defined in the
 `test` directory. For example, to run `test/tftp.rb` test, just type:
 
-    $ bin/aytests test test/tftp.rb
+    $ aytests test test/tftp.rb
 
 If you want to run all the tests in `test` directory, just type:
 
-    $ bin/aytests test
+    $ aytests test test/*.rb
 
-By default, tests will run using libvirt/KVM as backend. But it's possible to select
-a different provider by setting the `AYTESTS_PROVIDER` environment variable. At this
-time, `libvirt` and `virtualbox` are supported:
+By default, tests will run using QEMU/KVM as backend. But it's possible to
+select a different provider via the `--provider` option or setting the
+`AYTESTS_PROVIDER` environment variable. At this time, `libvirt` and
+`virtualbox` are supported:
 
-    $ AYTESTS_PROVIDER="virtualbox" bin/aytests test test/tftp.rb
+    $ aytests test test/tftp.rb --provider virtualbox
+    $ AYTESTS_PROVIDER="virtualbox" aytests test test/tftp.rb
 
-Now, the nitty-gritty details. For every file in `test`, these steps will be
+Now, the nitty-gritty details. For every test file, these steps will be
 performed:
 
-* A new Vagrant box will be created using the ISO and the profile stored in
-  `test` (e.g. `test/tftp.xml`). [Veewee](https://github.com/jedi4ever/veewee)
-  will take care of this part.
+* A new Vagrant box will be created using the ISO and the profile named after
+  the test (e.g. `test/tftp.xml`).
+  [Veewee](https://github.com/jedi4ever/veewee) will take care of this part.
 * Using the generated Vagrant box, a new virtual machine will be created and
   the tests will run on that machine.
-* The virtual machine will be destroyed.
+* If any test failed, the YaST2 logs will be copied to `log` directory under
+  *work directory*.
+* Finally, the virtual machine will be destroyed.
 
 ### Re-running the tests
 
-Sometimes is useful to run only a given test but skipping the installation
-process, which is quite time consuming. To repeat the some test execution you
-can do:
+Sometimes is useful to run a given test but skipping the installation process,
+which is quite time consuming. To execute a test but skipping the installation:
 
-    $ bundle exec rspec <path/to/test.rb>
+    $ aytests test <path/to/test.rb> --skip-build
 
 For example:
 
-    $ bundle exec rspec test/tftp.rb
+    $ bundle exec rspec test/tftp.rb --skip-build
 
 ### Headless mode
 
-VirtualBox can run in headless mode if needed. To do that, just set the
-`AYTESTS_HEADLESS` environment variable to `true`.
+VirtualBox can run in headless mode if needed. To do that, just use the
+`--headless` option or set the `AYTESTS_HEADLESS` environment variable to
+`true`.
 
-    $ AYTESTS_HEADLESS="true" bin/aytests test
+    $ aytests test test/tftp.rb --headless
+    $ AYTESTS_HEADLESS="true" aytests test
 
-This setting is not relevant to libvirt/KVM which will run in *headless* mode
+This setting is not relevant to QEMU/KVM which will run in *headless* mode
 anyway.
-
-### Running on local system
-
-Sometimes could be useful to run the tests in the local system. To do that,
-the `AYTESTS_LOCAL` environment variable should be set to `true`.
-
-    $ AYTESTS_LOCAL="true" bundle exec rspec <path/to/test.rb>
-
-For example:
-
-    $ bundle exec rspec test/sles12.rb
-
-Take into account that `sudo` will be used to execute testing scripts.
 
 ## Cleaning-up
 
 Two tasks for cleaning-up stuff are available. To remove cache
-(`build_iso/cache`) and [Kiwi](https://doc.opensuse.org/projects/kiwi/doc/)
-state (`kiwi/import_state.yaml`) use:
+(`<work_dir>/cache`) and [Kiwi](https://doc.opensuse.org/projects/kiwi/doc/)
+state (`<work_dir>/veewee/import_state.yaml`) use:
 
-    $ bin/aytests clean
+    $ aytests clean
 
 If you also want to remove ISO images (downloaded and generated ones), logs and
-the Vagrant box file (`kiwi/autoyast.box`), just type:
-
-    $ bin/aytests clobber
+the Vagrant box file (`kiwi/autoyast.box`), is safe to remove just the *work
+directory*.
 
 ## Caveats
 
