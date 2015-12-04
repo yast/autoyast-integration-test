@@ -47,25 +47,36 @@ module AYTests
       installer.run
     end
 
-    desc "clean", "Clean cache and kiwi state file"
+    option "work-dir", type: :string
+    desc "clean", "Clean cache and Veewee files"
     def clean
-      FileUtils.rm_r(Dir["build_iso/cache", "kiwi/import_state.yaml"])
-    end
-
-    desc "clobber", "Remove ISO images, logs and Vagrant box file"
-    def clobber
-      FileUtils.rm_r(Dir["iso/*.iso", "kiwi/autoyast.box", "kiwi/iso/testing.iso", "log"])
+      bootstrap(options["work-dir"])
+      FileUtils.rm_rf([work_dir.join("cache"), work_dir.join("veewee")])
     end
 
     private
 
+    # Initialize AYTests
+    #
+    # @param [String|Pathname] work_dir Work directory ($HOME/aytests-workspace
+    #                                   by default)
     def bootstrap(work_dir = nil)
       AYTests.init(work_dir || Pathname.new(ENV["HOME"]).join("aytests-workspace"))
       AYTests::IsoRepo.init(AYTests.work_dir.join("iso"))
     end
 
+    # Return the AYTests base directory
+    #
+    # Just for convenience.
     def base_dir
       AYTests.base_dir
+    end
+
+    # Return the AYTests work directory
+    #
+    # Just for convenience.
+    def work_dir
+      AYTests.work_dir
     end
   end
 end

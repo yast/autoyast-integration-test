@@ -15,40 +15,62 @@
 # To contact SUSE about this file by physical or electronic mail,
 # you may find current contact information at www.suse.com
 
+require "yast/rake"
+require_relative "lib/aytests/tasks/compat.rb"
 
-def run_ay_tests(cmd)
-  $stderr.puts "rake interface is deprecated. Please, use ay-tests script "\
-    "directly. Anyway, the command will be run."
-  puts cmd
-  system cmd
+# remove tarball implementation and create gem for this gemfile
+Rake::Task[:tarball].clear
+# build the gem package
+desc "Build gem package, save RPM sources to package subdirectory"
+task :"tarball" do
+  version = File.read("VERSION").chomp
+  Dir["package/*.tar.bz2"].each do |f|
+    rm f
+  end
+
+  Dir["package/*.gem"].each do |g|
+    rm g
+  end
+
+  sh "gem build aytests.gemspec"
+  mv "aytests-#{version}.gem", "package"
 end
 
-def iso_repo
-  if `hostname --domain`.chomp == "suse.cz"
-    "http://fallback.suse.cz"
-  else
-    "http://dist.suse.de"
+# remove install implementation and install via gem
+Rake::Task[:install].clear
+desc "Install aytests gem package"
+task install: :tarball do
+  sh "sudo gem install --local package/aytests*.gem"
+end
+
+# this gem uses VERSION file, replace the standard yast implementation
+Rake::Task[:'version:bump'].clear
+
+namespace :version do
+  task :bump do
+    # update VERSION
+    version_parts = File.read("VERSION").strip.split(".")
+    version_parts[-1] = (version_parts.last.to_i + 1).to_s
+    new_version = version_parts.join(".")
+
+    puts "Updating to #{new_version}"
+    File.write("VERSION", new_version + "\n")
+
+    # update *.spec file
+    spec_file = "package/rubygem-aytests.spec"
+    spec = File.read(spec_file)
+    spec.gsub!(/^\s*Version:.*$/, "Version:        #{new_version}")
+    File.write(spec_file, spec)
   end
 end
 
-#
-# Compatibility tasks
-#
-task :test, :name do |name, args|
-  run_ay_tests("./bin/ay-tests test #{args[:name]}")
+Rake::Task[:'test:unit'].clear
+namespace :test do
+  task :unit do
+    system "rspec spec"
+  end
 end
 
-task :build_iso, :name do |name, args|
-  run_ay_tests("./bin/ay-tests build_iso #{args[:name]}")
-end
-
-# Cleaning tasks
-# Temporary files
-task :clean do
-  run_ay_tests("./bin/ay-tests clean")
-end
-
-# Final products
-task :clobber do
-  run_ay_tests("./bin/ay-tests clobber")
+Yast::Tasks.configuration do |conf|
+  conf.package_name = "rubygem-aytests"
 end
