@@ -10,9 +10,8 @@ module AYTests
   class MediaBuilder
     include AYTests::Helpers
 
-    attr_reader :base_dir, :cache_dir,
-      :local_packages_dir, :boot_dir, :iso_path, :obs_pkg_list_path, :yast_url,
-      :iso_url, :version
+    attr_reader :base_dir, :cache_dir, :local_packages_dir, :boot_dir,
+      :iso_path, :obs_pkg_list_path, :yast_url, :iso_url, :version, :output_path
 
     # --prefix=37 sets a directory prefix to avoid conflicts. Check mkdud README.
     MKDUD_CMD = "mkdud -c %<dud_path>s -d sle12 -i  instsys,repo --prefix=37 " \

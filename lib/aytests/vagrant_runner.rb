@@ -4,14 +4,14 @@ module AYTests
   class VagrantRunner
     VM_NAME = "autoyast_vm"
 
-    attr_reader :base_dir, :dir, :ssh_config
+    attr_reader :vagrantfile, :dir, :ssh_config
 
     # Constructor
     #
     # @param [Pathname] dir      Vagrantfile directory
     # @param [Symbol]   provider Vagrant provider to use (:libvirt or :virtualbox)
-    def initialize(base_dir:, dir:, driver: :libvirt)
-      @base_dir = base_dir
+    def initialize(vagrantfile, dir, driver = :libvirt)
+      @vagrantfile = vagrantfile
       @dir = dir
       @driver = driver
       @ssh_config = @dir.join("config.ssh")
@@ -35,6 +35,7 @@ module AYTests
     # @return [Boolean] true if the system stopped successfully; otherwise
     #   false is returned
     def stop
+      return false unless dir.directory?
       Dir.chdir(dir) do
         system "vagrant halt"
       end
@@ -96,7 +97,7 @@ module AYTests
     # Set up the Vagrant environment
     def setup
       FileUtils.mkdir_p(dir)
-      FileUtils.cp(base_dir.join("share", "vagrant", "Vagrantfile"), dir)
+      FileUtils.cp(vagrantfile, dir)
     end
   end
 end

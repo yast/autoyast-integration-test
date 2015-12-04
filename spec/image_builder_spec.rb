@@ -3,36 +3,24 @@ require "aytests/image_builder"
 require "aytests/iso_repo"
 
 RSpec.describe AYTests::ImageBuilder do
-  let(:base_dir) { Pathname.new(File.dirname(__FILE__)).join("..") }
-  let(:autoinst_path) { base_dir.join("autoinst.xml") }
+  let(:work_dir) { TEST_WORK_DIR }
+  let(:sources_dir) { Pathname.new(__FILE__).dirname.join("..", "share", "veewee") }
+  let(:files_dir) { TEST_WORK_DIR.join("files") }
+  let(:autoinst_path) { Pathname.new(__FILE__).dirname.join("files", "autoinst.xml") }
   let(:iso_url) { "http://dl.opensuse.org/leap-42.1.iso" }
-  let(:path_to_iso) { base_dir.join("iso", "leap-42.1.iso") }
+  let(:path_to_iso) { work_dir.join("iso", "leap-42.1.iso") }
   let(:provider) { :libvirt }
   let(:local_ip) { "192.168.122.232" }
 
-  subject(:builder) { AYTests::ImageBuilder.new(base_dir: base_dir, provider: provider) }
+  let(:default_args) do
+    { sources_dir: sources_dir, work_dir: work_dir, files_dir: files_dir, provider: provider }
+  end
+
+  subject(:builder) { AYTests::ImageBuilder.new(default_args) }
 
   describe ".new" do
-    context "when no base directory is given" do
-      it "takes the base directory from AYTests module" do
-        expect(AYTests).to receive(:base_dir).and_return(base_dir)
-        builder = AYTests::ImageBuilder.new
-        expect(builder.base_dir).to eq(base_dir)
-      end
-    end
-
-    context "when a base directory is given" do
-      it "is used as base directory" do
-        expect(AYTests).not_to receive(:base_dir)
-        builder = AYTests::ImageBuilder.new(base_dir: Pathname.new("/some-directory"))
-        expect(builder.base_dir).to eq(Pathname.new("/some-directory"))
-      end
-    end
-
     context "when no provider is given" do
-      subject(:builder) do
-        AYTests::ImageBuilder.new(base_dir: base_dir)
-      end
+      let(:default_args) { { sources_dir: sources_dir, work_dir: work_dir } }
 
       it "selects :libvirt" do
         expect(builder.provider).to eq(:libvirt)
@@ -40,9 +28,7 @@ RSpec.describe AYTests::ImageBuilder do
     end
 
     context "when a provider is given" do
-      subject(:builder) do
-        AYTests::ImageBuilder.new(base_dir: base_dir, provider: :virtualbox)
-      end
+      let(:default_args) { { sources_dir: sources_dir, work_dir: work_dir, provider: :virtualbox } }
 
       it "selects the given provider" do
         expect(builder.provider).to eq(:virtualbox)
@@ -50,37 +36,31 @@ RSpec.describe AYTests::ImageBuilder do
     end
   end
 
-  describe "#obs_iso_dir" do
-    it "returns base_dir + /kiwi/iso" do
-      expect(builder.obs_iso_dir).to eq(base_dir.join("kiwi", "iso"))
-    end
-  end
-
-  describe "#kiwi_autoyast_dir" do
-    it "returns base_dir + /kiwi/definitions/autoyast" do
-      expect(builder.kiwi_autoyast_dir)
-        .to eq(base_dir.join("kiwi", "definitions", "autoyast"))
+  describe "#veewee_autoyast_dir" do
+    it "returns work_dir + /definitions/autoyast" do
+      expect(builder.veewee_autoyast_dir)
+        .to eq(work_dir.join("definitions", "autoyast"))
     end
   end
 
   describe "#autoinst_path" do
-    it "returns base_dir + /kiwi/definitions/autoyast/autoinst.xml" do
+    it "returns work_dir + /definitions/autoyast/autoinst.xml" do
       expect(builder.autoinst_path)
-        .to eq(base_dir.join("kiwi", "definitions", "autoyast", "autoinst.xml"))
+        .to eq(work_dir.join("definitions", "autoyast", "autoinst.xml"))
     end
   end
 
   describe "#definition_path" do
-    it "returns base_dir + /kiwi/definitions/autoyast/definition.rb" do
+    it "returns work_dir + /definitions/autoyast/definition.rb" do
       expect(builder.definition_path)
-        .to eq(base_dir.join("kiwi", "definitions", "autoyast", "definition.rb"))
+        .to eq(work_dir.join("definitions", "autoyast", "definition.rb"))
     end
   end
 
   describe "#libvirt_definition_path" do
-    it "returns base_dir + /kiwi/autoyast_description.xml" do
+    it "returns work_dir + /definitions/autoyast/autoyast_description.xml" do
       expect(builder.libvirt_definition_path)
-        .to eq(base_dir.join("kiwi", "autoyast_description.xml"))
+        .to eq(work_dir.join("definitions", "autoyast", "autoyast_description.xml"))
     end
   end
 
@@ -94,19 +74,13 @@ RSpec.describe AYTests::ImageBuilder do
       expect(FileUtils).to receive(:ln_s)
         .with(path_to_iso, builder.obs_iso_dir.join("testing.iso"))
 
-      # Copy AutoYaST profile and Veewee definition
-      expect(FileUtils).to receive(:cp)
-        .with(builder.kiwi_autoyast_dir.join("install_definition.rb"), builder.definition_path)
-      expect(autoinst_path).to receive(:file?).and_return(true)
-      expect(FileUtils).to receive(:cp)
-        .with(autoinst_path, builder.autoinst_path)
-
       # Uses Veewee provider
       expect(builder).to receive(:veewee_provider).at_least(1).and_return(:kvm)
 
       # Build
       expect(builder).to receive(:system)
-        .with("veewee kvm build #{AYTests::ImageBuilder::IMAGE_NAME} --force --auto --nogui")
+        .with({"AYTESTS_FILES_DIR" => files_dir.to_s},
+               "veewee kvm build #{AYTests::ImageBuilder::IMAGE_NAME} --force --auto --nogui")
         .and_return(true)
 
       # Prepare the AutoYaST profile
@@ -116,7 +90,16 @@ RSpec.describe AYTests::ImageBuilder do
         .with("sed -e 's/%IP%/#{local_ip}/g' -i #{builder.autoinst_path}")
         .and_return(true)
 
+      #
+      # Perform the installation
+      #
       expect(builder.install(autoinst_path, iso_url)).to eq(true)
+
+      # Check that AutoYaST profile, Veewee definition and post-install script
+      # were available
+      expect(File).to be_file(builder.veewee_autoyast_dir.join("postinstall.sh"))
+      expect(File).to be_file(builder.definition_path)
+      expect(File).to be_file(builder.autoinst_path)
     end
   end
 
@@ -129,13 +112,6 @@ RSpec.describe AYTests::ImageBuilder do
         .with(builder.obs_iso_dir.join("testing.iso"), force: true)
       expect(FileUtils).to receive(:ln_s)
         .with(path_to_iso, builder.obs_iso_dir.join("testing.iso"))
-
-      # Copy AutoYaST profile and Veewee definition
-      expect(FileUtils).to receive(:cp)
-        .with(builder.kiwi_autoyast_dir.join("upgrade_definition.rb"), builder.definition_path)
-      expect(autoinst_path).to receive(:file?).and_return(true)
-      expect(FileUtils).to receive(:cp)
-        .with(autoinst_path, builder.autoinst_path)
 
       expect(builder).to receive(:change_boot_order)
       expect(builder).to receive(:backup_image)
@@ -152,12 +128,22 @@ RSpec.describe AYTests::ImageBuilder do
 
       # Build
       expect(builder).to receive(:system)
-        .with("veewee kvm build #{AYTests::ImageBuilder::IMAGE_NAME} --force --auto --nogui")
+        .with({"AYTESTS_FILES_DIR" => files_dir.to_s},
+               "veewee kvm build #{AYTests::ImageBuilder::IMAGE_NAME} --force --auto --nogui")
         .and_return(true)
 
       allow(builder).to receive(:sleep)
 
+      #
+      # Perform the upgrade
+      #
       expect(builder.upgrade(autoinst_path, iso_url)).to eq(true)
+
+      # Check that AutoYaST profile, Veewee definition and post-install script
+      # were available
+      expect(File).to be_file(builder.veewee_autoyast_dir.join("postinstall.sh"))
+      expect(File).to be_file(builder.definition_path)
+      expect(File).to be_file(builder.autoinst_path)
     end
   end
 
@@ -178,6 +164,10 @@ RSpec.describe AYTests::ImageBuilder do
   end
 
   describe "#export_from_veewee" do
+    before(:each) do
+      FileUtils.mkdir_p(TEST_WORK_DIR)
+    end
+
     it "relies on Veewee and returns true if it was successful" do
       expect(builder).to receive(:system).with(/veewee kvm export/).and_return(true)
       expect(builder.export_from_veewee).to eq(true)

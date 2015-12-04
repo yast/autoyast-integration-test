@@ -3,10 +3,16 @@ require "aytests/vagrant_runner"
 
 RSpec.describe AYTests::VagrantRunner do
   VM_NAME = AYTests::VagrantRunner::VM_NAME
+  let(:vagrantfile) { Pathname.new(__FILE__).dirname.join("..", "share", "vagrant", "Vagrantfile") }
+  let(:dir) { TEST_WORK_DIR.join("vagrant") }
   let(:provider) { :libvirt }
-  subject(:runner) { AYTests::VagrantRunner.new(Pathname.pwd, provider) }
+  subject(:runner) { AYTests::VagrantRunner.new(vagrantfile, dir, provider) }
 
   describe "#start" do
+    before(:each) do
+      allow(FileUtils).to receive(:cp).with(vagrantfile, dir).and_call_original
+    end
+
     context "when provider is :libvirt" do
       it "starts the machine using :libvirt provider and generates the ssh configuration" do
         expect(runner).to receive(:system).with("vagrant up autoyast_vm --provider libvirt")
@@ -39,12 +45,17 @@ RSpec.describe AYTests::VagrantRunner do
 
   describe "#stop" do
     it "stops the machine" do
+      FileUtils.mkdir_p(dir)
       expect(runner).to receive(:system).with("vagrant halt")
       runner.stop
     end
   end
 
   describe "#cleanup" do
+    before do
+      FileUtils.mkdir_p(dir)
+    end
+
     it "cleans up the machine and the SSH config" do
       expect(runner).to receive(:system).with("vagrant destroy --force")
       expect(FileUtils).to receive(:rm_rf).with(runner.ssh_config)

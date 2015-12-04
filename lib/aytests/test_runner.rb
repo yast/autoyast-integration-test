@@ -40,7 +40,11 @@ module AYTests
     #
     # @see AYTests::ImageBuilder
     def build
-      builder = AYTests::ImageBuilder.new(files_dir: files_dir, provider: AYTests.provider, gui: ENV["AYTESTS_HEADLESS"] != "true")
+      builder = AYTests::ImageBuilder.new(
+        sources_dir: AYTests.base_dir.join("share", "veewee"),
+        files_dir: files_dir,
+        provider: AYTests.provider,
+        gui: ENV["AYTESTS_HEADLESS"] != "true")
       builder.install(autoinst(:install), iso_url(:install))
       builder.upgrade(autoinst(:upgrade), iso_url(:upgrade)) if upgrade?
       builder.import

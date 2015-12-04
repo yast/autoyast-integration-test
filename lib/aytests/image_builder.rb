@@ -3,13 +3,13 @@ require "socket"
 
 module AYTests
   class ImageBuilder
-    # Build a libvirt-kvm image using Veewee
+    # Build a libvirt-kvm or a VirtualBox image using Veewee
     # https://github.com/jedi4ever/veewee
 
     include AYTests::Helpers
 
-    attr_reader :base_dir, :obs_iso_dir, :autoinst_path, :definition_path,
-      :kiwi_autoyast_dir, :libvirt_definition_path, :provider, :gui, :work_dir,
+    attr_reader :sources_dir, :obs_iso_dir, :autoinst_path, :definition_path,
+      :veewee_autoyast_dir, :libvirt_definition_path, :provider, :gui, :work_dir,
       :files_dir
 
     IMAGE_NAME = "autoyast"
@@ -24,31 +24,27 @@ module AYTests
 
     # Constructor
     #
-    # @param [Pathname] base_dir Set the base directory. By default it
-    #   uses AYTests.base_dir
+    # @param [Pathname] sources_dir Set the directory where Veewee related
+    #                               files live (templates for definition,
+    #                               post-install script, etc.)
     # @param [Pathname] work_dir Set the work directory. By default it
     #   uses AYTests.work_dir
     # @param [Symbol]   provider Provider to be used by Vagrant
     #   (:libvirt or :virtualbox)
     # @param [Symbol]   gui      Enable GUI (only relevant for virtualbox
     #   provider)
-    def initialize(base_dir: nil, work_dir: nil, files_dir: nil, provider: :libvirt, gui: false)
-      @base_dir = base_dir || AYTests.base_dir
-      @work_dir = work_dir || AYTests.work_dir.join("veewee")
+    def initialize(sources_dir: nil, work_dir: nil, files_dir: nil, provider: :libvirt, gui: false)
+      @sources_dir = sources_dir
+      @work_dir = work_dir
       @files_dir = files_dir
-      @kiwi_autoyast_dir = @work_dir.join("definitions", "autoyast")
-      @obs_iso_dir = @work_dir.join("iso") # FIXME: deberían pasarme directamente esto
+      @veewee_autoyast_dir = @work_dir.join("definitions", "autoyast")
+      @obs_iso_dir = @work_dir.join("iso")
       @autoinst_path = @work_dir.join("definitions", "autoyast", "autoinst.xml")
       @definition_path = @work_dir.join("definitions", "autoyast", "definition.rb")
       # This file will be used by Veewee during upgrade.
       @libvirt_definition_path = @work_dir.join("definitions", "autoyast", "autoyast_description.xml")
       @gui = gui
       @provider = provider
-    end
-
-    def prepare
-      FileUtils.mkdir_p(kiwi_autoyast_dir) unless kiwi_autoyast_dir.directory?
-      FileUtils.cp(base_dir.join("share", "veewee", "postinstall.sh"), kiwi_autoyast_dir)
     end
 
     # Run the installation using a given profile and an ISO
@@ -188,7 +184,7 @@ module AYTests
         log.info "Creating #{veewee_provider} image"
         cmd = "veewee #{veewee_provider} build #{IMAGE_NAME} --force --auto"
         cmd << " --nogui" unless gui
-        system({ "AYTESTS_BASE_DIR" => base_dir.to_s, "AYTESTS_FILES_DIR" => files_dir.to_s }, cmd)
+        system({ "AYTESTS_FILES_DIR" => files_dir.to_s }, cmd)
       end
     end
 
@@ -211,11 +207,11 @@ module AYTests
     # Set up the definition
     #
     # It copies the Veewee definition depending on the mode. Definitions
-    # will live in kiwi/definitions/autoyast under base directory.
+    # will live in #sources_dir directory, usually `share/veewee`.
     #
     # @param [String|Symbol] mode :install for installation or :upgrade for upgrade.
     def setup_definition(mode)
-      source_definition = base_dir.join("share", "veewee", "#{mode}_definition.rb")
+      source_definition = sources_dir.join("#{mode}_definition.rb")
       log.info "Using definition #{source_definition}"
       FileUtils.cp(source_definition, definition_path)
     end
@@ -319,6 +315,14 @@ module AYTests
       data = mac_string.match(/.+="\w+,tcp,,(\d+),,22"/)
       port = data[1].to_i
       { address: SSH_ADDRESS, port: port }
+    end
+
+    # Prepare Veewee directory
+    #
+    # Create Veewee directory and copy post install script.
+    def prepare
+      FileUtils.mkdir_p(veewee_autoyast_dir) unless veewee_autoyast_dir.directory?
+      FileUtils.cp(sources_dir.join("postinstall.sh"), veewee_autoyast_dir)
     end
   end
 end
