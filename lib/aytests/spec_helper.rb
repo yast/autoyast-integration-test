@@ -26,9 +26,9 @@ RSpec.configure do |config|
   config.before(:all) do
     # Start the previously create vagrant VM - autoyast_vm
     $vm = AYTests::VagrantRunner.new(
-      vagrantfile: AYTests.base_dir.join("share", "vagrant", "Vagrantfile"),
-      dir: AYTests.work_dir.join("vagrant"),
-      driver: ENV["AYTESTS_PROVIDER"])
+      AYTests.base_dir.join("share", "vagrant", "Vagrantfile"),
+      AYTests.work_dir.join("vagrant"),
+      ENV["AYTESTS_PROVIDER"])
     start_vm($vm)
   end
 
