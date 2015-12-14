@@ -43,7 +43,7 @@ Veewee::Definition.declare({
       Thread.new do
         AYTests::WebServer.new(
           veewee_dir: Pathname.pwd.join("definitions", "autoyast"),
-          files_dir: File.join(ENV["AYTESTS_FILES_DIR"], "files"),
+          files_dir: ENV["AYTESTS_FILES_DIR"],
           name: definition.box.name).start
       end
     end,

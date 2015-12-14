@@ -19,11 +19,11 @@ module AYTests
     # @param [String|Symbol] provider  Set the vagrant provider (:libvirt or :virtualbox)
     # @param [True,False] headless     Enable headless mode if true
     def initialize(test_file:, work_dir:, default_iso_path:, skip_build: false, provider: :libvirt, headless: false)
-      @test_file        = Pathname.new(test_file)
+      @test_file        = Pathname.new(test_file).expand_path
       @default_iso_path = default_iso_path
       @skip_build       = skip_build
       @test_name        = @test_file.basename(".rb")
-      @files_dir        = File.join(File.dirname(@test_file), "files")
+      @files_dir        = @test_file.dirname.join("files")
       @work_dir         = work_dir
       @provider         = provider.to_sym
       @headless         = headless
