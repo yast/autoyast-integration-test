@@ -35,7 +35,7 @@ RSpec.configure do |config|
   config.after(:all) do
     examples = RSpec.world.filtered_examples.values.flatten
     # Copy the logs if some test fails.
-    copy_logs($vm) if examples.any?(&:exception)
+    copy_logs($vm, AYTests.work_dir.join("log")) if examples.any?(&:exception)
     shutdown_vm($vm)
   end
 end

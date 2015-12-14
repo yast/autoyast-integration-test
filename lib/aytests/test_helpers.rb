@@ -77,7 +77,7 @@ module AYTests
     #
     # @see AYTests::VagrantRunner#download_logs
     def copy_logs(runner, dest = "log")
-      FileUtils.mkdir(dest) unless Dir.exists?(dest)
+      FileUtils.mkdir(dest) unless dest.directory?
       runner.download_logs(dest)
     end
 
