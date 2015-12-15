@@ -15,95 +15,62 @@
 # To contact SUSE about this file by physical or electronic mail,
 # you may find current contact information at www.suse.com
 
-# Default environment variables
-ENV["VAGRANT_LOG"] ||= "warn"         # Set Vagrant log level to 'warn'
-ENV["AYTESTS_PROVIDER"] ||= "libvirt" # Set libvirt as the default provider
+require "yast/rake"
+require_relative "lib/aytests/tasks/compat.rb"
 
-require "bundler/setup"
-Bundler.require(:default)
+# remove tarball implementation and create gem for this gemfile
+Rake::Task[:tarball].clear
+# build the gem package
+desc "Build gem package, save RPM sources to package subdirectory"
+task :"tarball" do
+  version = File.read("VERSION").chomp
+  Dir["package/*.tar.bz2"].each do |f|
+    rm f
+  end
 
-require "rake/clean"
-require "yaml"
+  Dir["package/*.gem"].each do |g|
+    rm g
+  end
 
-def iso_repo
-  if `hostname --domain`.chomp == "suse.cz"
-    "http://fallback.suse.cz"
-  else
-    "http://dist.suse.de"
+  sh "gem build aytests.gemspec"
+  mv "aytests-#{version}.gem", "package"
+end
+
+# remove install implementation and install via gem
+Rake::Task[:install].clear
+desc "Install aytests gem package"
+task install: :tarball do
+  sh "sudo gem install --local package/aytests*.gem"
+end
+
+# this gem uses VERSION file, replace the standard yast implementation
+Rake::Task[:'version:bump'].clear
+
+namespace :version do
+  task :bump do
+    # update VERSION
+    version_parts = File.read("VERSION").strip.split(".")
+    version_parts[-1] = (version_parts.last.to_i + 1).to_s
+    new_version = version_parts.join(".")
+
+    puts "Updating to #{new_version}"
+    File.write("VERSION", new_version + "\n")
+
+    # update *.spec file
+    spec_file = "package/rubygem-aytests.spec"
+    spec = File.read(spec_file)
+    spec.gsub!(/^\s*Version:.*$/, "Version:        #{new_version}")
+    File.write(spec_file, spec)
   end
 end
 
-base_dir = Pathname.new(File.dirname(__FILE__))
-Dir[base_dir.join("lib", "tasks", "*")].each { |t| require_relative t }
-
-task :bootstrap do
-  $LOAD_PATH.unshift File.join(File.dirname(__FILE__), "lib")
-  require "ay_tests"
-  AYTests.base_dir = base_dir
-  AYTests::IsoRepo.init(AYTests.base_dir.join("iso"))
-end
-
-desc "Running autoyast integration tests"
-task :test, [:name] => :bootstrap do |name, args|
-  if args[:name]
-    tests = Array(args[:name])
-  else
-    tests = Dir.glob(AYTests.tests_path.join("*.rb")).reject { |f| File.basename(f) == "spec_helper.rb" }
-  end
-
-  tests.sort.each do |test_file|
-    test_name = File.basename(test_file, ".rb")
-    puts "********** Running test #{test_name} **********"
-
-    autoinst = AYTests.tests_path.join("#{test_name}.xml")
-    autoinst = AYTests.tests_path.join("#{test_name}.install_xml") unless autoinst.file?
-
-    # Set download iso path. This path will be taken for download, if the iso has not already been
-    # downloaded.
-    iso_path_file = AYTests.tests_path.join("#{test_name}.install_iso")
-    iso_url = File.file?(iso_path_file) ? IO.binread(iso_path_file).chomp : AYTests.obs_iso_path
-
-    builder = AYTests::ImageBuilder.new(provider: AYTests.provider, gui: ENV["AYTESTS_HEADLESS"] != "true")
-    builder.install(autoinst, iso_url)
-
-    if test_name.start_with?("upgrade_")
-      # Set download iso path. This path will be taken for download, if the iso has not already been
-      # downloaded.
-      iso_path_file = AYTests.tests_path.join("#{test_name}.upgrade_iso")
-      iso_url = File.file?(iso_path_file) ? IO.binread(iso_path_file).chomp : AYTests.obs_iso_path
-
-      # Set autoinst.xml
-      autoinst = AYTests.tests_path.join("#{test_name}.upgrade_xml")
-      builder.upgrade(autoinst, iso_url)
-    end
-
-    builder.import
-    builder.cleanup
-
-    if File.exist?(test_file)
-      puts "\n****** Running test on created system ******\n"
-      exit 1 unless system "rspec #{test_file}"
-    else
-      puts "\n****** Running *NO* tests on created system ******\n"
-    end
+Rake::Task[:'test:unit'].clear
+namespace :test do
+  task :unit do
+    system "rspec spec"
   end
 end
 
-desc "Building boot image <name>- reset with name \"reset\""
-task :build_iso, [:name] => :bootstrap do |name, args|
-  unless args[:name]
-    puts "ERROR: name is needed"
-    exit 1
-  end
-
-  base_dir = Pathname.new(File.dirname(__FILE__))
-  config = YAML.load_file(base_dir.join("config", "definitions.yml")).fetch(args[:name].to_sym)
-  builder = AYTests::MediaBuilder.new(config.merge(base_dir: base_dir, version: args[:name]))
-  builder.build
+Yast::Tasks.configuration do |conf|
+  conf.package_name = "rubygem-aytests"
 end
-
-# Cleaning tasks
-# Temporary files
-CLEAN.include("build_iso/cache", "kiwi/import_state.yaml")
-# Final products
-CLOBBER.include("iso/*.iso", "kiwi/autoyast.box", "kiwi/iso/testing.iso", "log")

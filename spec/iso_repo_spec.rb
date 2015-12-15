@@ -1,11 +1,37 @@
 require "spec_helper"
-require "ay_tests/iso_repo"
+require "aytests/iso_repo"
 
 RSpec.describe AYTests::IsoRepo do
   let(:iso_dir) { Pathname.new("/tmp") }
   let(:iso_url) { "http://dl.opensuse.org/leap-42.1.iso" }
 
   subject(:iso_repo) { AYTests::IsoRepo.new(iso_dir) }
+
+  describe ".init" do
+    let(:directory) { double("directory", :directory? => exist?)}
+
+    context "when directory exists" do
+      let(:exist?) { true }
+
+      it "returns a new IsoRepo instance" do
+        expect(FileUtils).to_not receive(:mkdir_p)
+        repo = described_class.init(directory)
+        expect(repo).to be_kind_of(described_class)
+        expect(repo.dir).to eq(directory)
+      end
+    end
+
+    context "when directory does not exists" do
+      let(:exist?) { true }
+
+      it "creates the directory and returns a new IsoRepo instance" do
+        expect(FileUtils).to_not receive(:mkdir_p).with(directory)
+        repo = described_class.init(directory)
+        expect(repo).to be_kind_of(described_class)
+        expect(repo.dir).to eq(directory)
+      end
+    end
+  end
 
   describe "#get" do
     let(:iso_path) { double("iso_dir", exist?: exist?) }
