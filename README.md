@@ -34,13 +34,7 @@ documentation](https://libvirt.org/formatdomain.html#elementsCPU).
 
 ## Installation
 
-  1. Install packages [mkdud](https://software.opensuse.org/package/mkdud?search_term=mkdud)
-     and [mksusecd](https://software.opensuse.org/package/mksusecd?search_term=mksusecd)
-     from OBS.
-
-        $ sudo zypper install ./mkdud-*.rpm ./mksusecd-*.rpm
-
-  2. Unless you run tests as 'root', configure `sudo` in order to run the `mksusecd`,
+  1. Unless you run tests as 'root', configure `sudo` in order to run the `mksusecd`,
      `systemctl start libvirtd` and `zypper in` commands as root.
 
      This will grant access to execute every command for user <username> as root without
@@ -48,10 +42,18 @@ documentation](https://libvirt.org/formatdomain.html#elementsCPU).
 
         echo '<username> ALL=NOPASSWD: ALL' >> /etc/sudoers
 
-  3. Install package rubygem-aytests and clone tests repository (tests are also
-     available in the package aytests-tests):
+  2. Add [YaST:Head](http://download.opensuse.org/repositories/YaST:/Head/openSUSE_42.1/YaST:Head.repo)
+     and [devel:languages:ruby:extensions](https://build.opensuse.org/project/show/devel:languages:ruby:extensions)
+     repositories. For example, if you're running openSUSE Leap 42.1:
 
-        $ zypper in rubygem-aytests
+        $ sudo zypper ar -f -r http://download.opensuse.org/repositories/YaST:/Head/openSUSE_42.1/YaST:Head.repo
+        $ sudo zypper ar -f -r http://download.opensuse.org/repositories/devel:/languages:/ruby:/extensions/openSUSE_Leap_42.1/devel:languages:ruby:extensions.repo
+
+  3. Install package ruby2.1-rubygem-aytests (or ruby2.2-rubygem-aytests) and
+     clone tests repository (tests are also available in the package
+     aytests-tests):
+
+        $ zypper in ruby2.1-rubygem-aytests
         $ git clone https://github.com/yast/aytests-tests
 
   4. The task `setup` will do a lot of work for you. After that, you should logout
