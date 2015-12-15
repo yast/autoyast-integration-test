@@ -9,4 +9,4 @@ common: &common
 :sles12-sp1:
   <<: *common
   :yast_url: "http://download.suse.de/ibs/Devel:/YaST:/SLE-12-SP1/SLE-12-SP1/"
-  :iso_url: "http://dist.suse.de/install/SLE-12-SP1-Server-GMC2/SLE-12-SP1-Server-DVD-x86_64-GMC2-DVD1.iso"
+  :iso_url: "http://dist.suse.de/install/SLE-12-SP1-Server-GM/SLE-12-SP1-Server-DVD-x86_64-GM-DVD1.iso"
