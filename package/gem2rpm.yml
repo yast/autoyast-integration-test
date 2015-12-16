@@ -1,0 +1,5 @@
+:summary: This is a custom summary
+:main:
+  :preamble: |-
+    Requires: mksusecd
+    Requires: mkdud

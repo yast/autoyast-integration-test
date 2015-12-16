@@ -29,6 +29,8 @@ Source:         http://rubygems.org/gems/%{mod_full_name}.gem
 Summary:        AutoYaST integration tests framework
 License:        GPL-3.0
 Group:          Development/Languages/Ruby
+
+# These dependencies are included in the package/gem2rpm.yml file.
 Requires:       mksusecd
 Requires:       mkdud
 
