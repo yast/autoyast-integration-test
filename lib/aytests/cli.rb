@@ -22,13 +22,15 @@ module AYTests
     option "provider", type: :string
     option "skip-build", type: :boolean
     option "work-dir", type: :string
-    desc "test FILE", "Run integration tests"
-    def test(file = nil)
+    desc "test FILES", "Run integration tests"
+    def test(*files)
       bootstrap(options["work-dir"])
-      tests = file ? Array(file) :
-        Dir.glob(AYTests.tests_path.join("*.rb")).reject { |f| File.basename(f) == "spec_helper.rb" }
+      if files.empty?
+        help("test")
+        exit 1
+      end
 
-      tests.sort.each do |test_file|
+      files.each do |test_file|
         if File.exist?(test_file)
           runner = AYTests::TestRunner.new(
             work_dir: AYTests.work_dir,

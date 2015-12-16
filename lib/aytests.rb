@@ -62,13 +62,6 @@ module AYTests
     work_dir.join("veewee", "iso", "obs.iso")
   end
 
-  # Return the path to the integration tests
-  #
-  # @return [Pathname] Path to the integration tests
-  def self.tests_path
-    base_dir.join("test")
-  end
-
   # Return the provider to be used by Vagrant
   #
   # If it was not set by using AYTests.provider= method, it will be
