@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Thu Dec 17 22:38:58 UTC 2015 - igonzalezsosa@suse.com
+
+- Post-installation script (postinstall.sh) will move
+  /etc/udev/rules.d/70-persistent-net.rules to
+  /etc/udev/rules.d/70-persistent-net.rules.old instead of removing
+  it.
+
+-------------------------------------------------------------------
 Mon Dec 14 17:02:35 UTC 2015 - igonzalezsosa@suse.com
 
 - Initial packaging
