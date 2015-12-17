@@ -339,7 +339,8 @@ module AYTests
     def build_environment(linuxrc_file)
       environment = {
         "AYTESTS_FILES_DIR" => files_dir.to_s,
-        "AYTESTS_WEBSERVER_PORT" => WEBSERVER_PORT
+        "AYTESTS_PROVIDER" => provider.to_s,
+        "AYTESTS_WEBSERVER_PORT" => WEBSERVER_PORT,
       }
       environment["AYTESTS_LINUXRC"] = File.read(linuxrc_file).chomp if linuxrc_file.exist?
       environment

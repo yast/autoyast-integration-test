@@ -80,8 +80,8 @@ RSpec.describe AYTests::ImageBuilder do
 
       # Build
       expect(builder).to receive(:system)
-        .with({"AYTESTS_FILES_DIR" => files_dir.to_s, "AYTESTS_WEBSERVER_PORT" => "8888",
-               "AYTESTS_LINUXRC" => "vnc=1"},
+        .with({"AYTESTS_FILES_DIR" => files_dir.to_s, "AYTESTS_LINUXRC" => "vnc=1",
+               "AYTESTS_PROVIDER" => provider.to_s, "AYTESTS_WEBSERVER_PORT" => "8888"},
                "veewee kvm build #{AYTests::ImageBuilder::IMAGE_NAME} --force --auto --nogui")
         .and_return(true)
 
@@ -131,7 +131,8 @@ RSpec.describe AYTests::ImageBuilder do
 
       # Build
       expect(builder).to receive(:system)
-        .with({"AYTESTS_FILES_DIR" => files_dir.to_s, "AYTESTS_WEBSERVER_PORT" => "8888"},
+        .with({"AYTESTS_FILES_DIR" => files_dir.to_s, "AYTESTS_PROVIDER" => provider.to_s,
+               "AYTESTS_WEBSERVER_PORT" => "8888"},
                "veewee kvm build #{AYTests::ImageBuilder::IMAGE_NAME} --force --auto --nogui")
         .and_return(true)
 
