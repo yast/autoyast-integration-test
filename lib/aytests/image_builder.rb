@@ -184,7 +184,7 @@ module AYTests
         log.info "Creating #{veewee_provider} image"
         cmd = "veewee #{veewee_provider} build #{IMAGE_NAME} --force --auto"
         cmd << " --nogui" if headless
-        system({ "AYTESTS_FILES_DIR" => files_dir.to_s }, cmd)
+        system({ "AYTESTS_FILES_DIR" => files_dir.to_s, "AYTESTS_PROVIDER" => provider.to_s }, cmd)
       end
     end
 
@@ -224,10 +224,6 @@ module AYTests
     def setup_autoinst(autoinst)
       raise "ERROR: #{autoinst} not found" unless autoinst.file?
       FileUtils.cp(autoinst, autoinst_path)
-      system "sed -e 's/%IP%/#{local_ip}/g' -i #{autoinst_path}"
-      if provider == :virtualbox
-        system "sed -e 's/\\/dev\\/vd/\\/dev\\/sd/g' -i #{autoinst_path}"
-      end
     end
 
     # Change boot order for libvirt definition
@@ -268,23 +264,6 @@ module AYTests
         FileUtils.mv vm_dir, "#{vm_dir}.sav"
         system "sync"
       end
-    end
-
-    # Determine the host IP
-    #
-    # @return [String] Host IP address.
-    #
-    # Taken from Veewee to make sure that the IP matches.
-    def local_ip
-      # turn off reverse DNS resolution temporarily
-      orig, Socket.do_not_reverse_lookup = Socket.do_not_reverse_lookup, true
-
-      UDPSocket.open do |s|
-        s.connect '64.233.187.99', 1 # google
-        s.addr.last
-      end
-    ensure
-      Socket.do_not_reverse_lookup = orig
     end
 
     def vm_ip(name)

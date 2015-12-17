@@ -1,4 +1,14 @@
 -------------------------------------------------------------------
+Thu Dec 17 17:03:56 UTC 2015 - igonzalezsosa@suse.com
+
+- Add support for replacing %MAC% placeholder in the AutoYAST
+  profile.
+- Post-installation script (postinstall.sh) will move
+  /etc/udev/rules.d/70-persistent-net.rules to
+  /etc/udev/rules.d/70-persistent-net.rules.old instead of removing
+  it.
+
+-------------------------------------------------------------------
 Mon Dec 14 17:02:35 UTC 2015 - igonzalezsosa@suse.com
 
 - Initial packaging

@@ -45,6 +45,14 @@ Veewee::Definition.declare({
           files_dir: ENV["AYTESTS_FILES_DIR"],
           name: definition.box.name).start
       end
+    end,
+
+    :after_create => Proc.new do
+      require "aytests/profile_builder"
+      autoinst_path = Pathname.pwd.join("definitions", "autoyast", "autoinst.xml")
+      profile = AYTests::ProfileBuilder.new(
+        "autoyast", autoinst_path, ENV["AYTESTS_PROVIDER"].to_sym).build
+      File.open(autoinst_path, "w") { |f| f.puts profile }
     end
   }
 })

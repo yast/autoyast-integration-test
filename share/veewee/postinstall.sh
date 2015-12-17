@@ -27,9 +27,10 @@ echo -e "\nspeed-up remote logins ..."
 echo -e "\n# added by veewee/postinstall.sh" >> /etc/ssh/sshd_config
 echo -e "UseDNS no\n" >> /etc/ssh/sshd_config
 
-# avoid mac address configured into system, this results in getting
-# eth1 instead of eth0 in virtualized environments sometimes
-rm -f /etc/udev/rules.d/70-persistent-net.rules
+# Avoid mac address configured into system, this results in getting
+# eth1 instead of eth0 in virtualized environments sometimes.
+# Anyway it won't be removed so we can check those rules.
+mv /etc/udev/rules.d/70-persistent-net.rules{,.old}
 
 # Make sure that everything's written to disk, otherwise we sometimes get
 # empty files in the image
