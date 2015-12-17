@@ -1,15 +1,39 @@
 <?xml version="1.0"?>
 <!DOCTYPE profile>
 <profile xmlns="http://www.suse.com/1.0/yast2ns" xmlns:config="http://www.suse.com/1.0/configns">
+  <add-on>
+    <add_on_products config:type="list">
+      <listentry>
+        <media_url><![CDATA[http://%IP%:8888/static/repos/sles12]]></media_url>
+        <product>custom</product>
+        <product_dir>/</product_dir>
+        <name>Customized</name>
+      </listentry>
+    </add_on_products>
+  </add-on>
+  <bootloader>
+    <device_map config:type="list">
+      <device_map_entry>
+        <firmware>hd0</firmware>
+        <linux>/dev/vda</linux>
+      </device_map_entry>
+    </device_map>
+  </bootloader>
   <general>
     <mode>
       <confirm config:type="boolean">false</confirm>
       <second_stage config:type="boolean">false</second_stage>
     </mode>
   </general>
-
   <networking>
     <keep_install_network config:type="boolean">true</keep_install_network>
+    <net-udev config:type="list">
+      <rule>
+        <name>backbone</name>
+        <rule>ATTR{address}</rule>
+        <value>12:34:56:78:90:ab</value>
+      </rule>
+    </net-udev>
   </networking>
 
   <software>
