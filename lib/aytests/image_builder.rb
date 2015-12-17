@@ -184,7 +184,7 @@ module AYTests
         log.info "Creating #{veewee_provider} image"
         cmd = "veewee #{veewee_provider} build #{IMAGE_NAME} --force --auto"
         cmd << " --nogui" if headless
-        system({ "AYTESTS_FILES_DIR" => files_dir.to_s }, cmd)
+        system({ "AYTESTS_FILES_DIR" => files_dir.to_s, "AYTESTS_PROVIDER" => provider.to_s }, cmd)
       end
     end
 

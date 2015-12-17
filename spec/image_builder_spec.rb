@@ -80,7 +80,7 @@ RSpec.describe AYTests::ImageBuilder do
 
       # Build
       expect(builder).to receive(:system)
-        .with({"AYTESTS_FILES_DIR" => files_dir.to_s},
+        .with({"AYTESTS_FILES_DIR" => files_dir.to_s, "AYTESTS_PROVIDER" => provider.to_s},
                "veewee kvm build #{AYTests::ImageBuilder::IMAGE_NAME} --force --auto --nogui")
         .and_return(true)
 
@@ -115,7 +115,7 @@ RSpec.describe AYTests::ImageBuilder do
 
       # Build
       expect(builder).to receive(:system)
-        .with({"AYTESTS_FILES_DIR" => files_dir.to_s},
+        .with({"AYTESTS_FILES_DIR" => files_dir.to_s, "AYTESTS_PROVIDER" => provider.to_s},
                "veewee kvm build #{AYTests::ImageBuilder::IMAGE_NAME} --force --auto --nogui")
         .and_return(true)
 
