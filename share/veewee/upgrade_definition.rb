@@ -20,7 +20,8 @@ Veewee::Definition.declare({
     ' insecure=1',
     ' autoupgrade=1',
     ' netsetup=dhcp',
-    ' autoyast=http://%IP%:8888/autoinst.xml',
+    " autoyast=http://%IP%:#{ENV["AYTESTS_WEBSERVER_PORT"]}/autoinst.xml",
+    " #{ENV["AYTESTS_LINUXRC"]}",
     '<Enter>'
    ],
   :ssh_login_timeout => "10000",

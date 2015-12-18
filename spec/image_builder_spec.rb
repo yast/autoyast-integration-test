@@ -80,16 +80,14 @@ RSpec.describe AYTests::ImageBuilder do
 
       # Build
       expect(builder).to receive(:system)
-        .with({"AYTESTS_FILES_DIR" => files_dir.to_s},
+        .with({"AYTESTS_FILES_DIR" => files_dir.to_s, "AYTESTS_WEBSERVER_PORT" => "8888",
+               "AYTESTS_LINUXRC" => "vnc=1"},
                "veewee kvm build #{AYTests::ImageBuilder::IMAGE_NAME} --force --auto --nogui")
         .and_return(true)
 
       # Prepare the AutoYaST profile
       expect(builder).to receive(:local_ip)
         .and_return(local_ip)
-      expect(builder).to receive(:system)
-        .with("sed -e 's/%IP%/#{local_ip}/g' -i #{builder.autoinst_path}")
-        .and_return(true)
 
       #
       # Perform the installation
@@ -101,6 +99,13 @@ RSpec.describe AYTests::ImageBuilder do
       expect(File).to be_file(builder.veewee_autoyast_dir.join("postinstall.sh"))
       expect(File).to be_file(builder.definition_path)
       expect(File).to be_file(builder.autoinst_path)
+      autoinst_content = File.read(builder.autoinst_path)
+
+      # Check if variables were replaced
+      expect(autoinst_content)
+        .to include("http://#{local_ip}:#{AYTests::ImageBuilder::WEBSERVER_PORT}/repos/sles12")
+      expect(autoinst_content)
+        .to_not include("REPO1_URL")
     end
   end
 
@@ -120,16 +125,13 @@ RSpec.describe AYTests::ImageBuilder do
       # Prepare the AutoYaST profile
       expect(builder).to receive(:local_ip)
         .and_return(local_ip)
-      expect(builder).to receive(:system)
-        .with("sed -e 's/%IP%/#{local_ip}/g' -i #{builder.autoinst_path}")
-        .and_return(true)
 
       # Run post-install script
       expect(builder).to receive(:run_postinstall)
 
       # Build
       expect(builder).to receive(:system)
-        .with({"AYTESTS_FILES_DIR" => files_dir.to_s},
+        .with({"AYTESTS_FILES_DIR" => files_dir.to_s, "AYTESTS_WEBSERVER_PORT" => "8888"},
                "veewee kvm build #{AYTests::ImageBuilder::IMAGE_NAME} --force --auto --nogui")
         .and_return(true)
 
@@ -145,6 +147,12 @@ RSpec.describe AYTests::ImageBuilder do
       expect(File).to be_file(builder.veewee_autoyast_dir.join("postinstall.sh"))
       expect(File).to be_file(builder.definition_path)
       expect(File).to be_file(builder.autoinst_path)
+      # Check if variables were replaced
+      autoinst_content = File.read(builder.autoinst_path)
+      expect(autoinst_content)
+        .to include("http://#{local_ip}:#{AYTests::ImageBuilder::WEBSERVER_PORT}/repos/sles12")
+      expect(autoinst_content)
+        .to_not include("REPO1_URL")
     end
   end
 
