@@ -22,6 +22,7 @@ module AYTests
     SSH_ADDRESS = "127.0.0.1"
     SSH_PORT = "22"
     WEBSERVER_PORT = "8888"
+    MAC_ADDRESS = "02:00:00:12:34:56"
 
     # Constructor
     #
@@ -342,6 +343,7 @@ module AYTests
         "AYTESTS_FILES_DIR" => files_dir.to_s,
         "AYTESTS_PROVIDER" => provider.to_s,
         "AYTESTS_WEBSERVER_PORT" => WEBSERVER_PORT,
+        "AYTESTS_MAC_ADDRESS" => MAC_ADDRESS
       }
       linuxrc_file = autoinst.sub_ext(".linuxrc")
       environment["AYTESTS_LINUXRC"] = File.read(linuxrc_file).chomp if linuxrc_file.exist?
