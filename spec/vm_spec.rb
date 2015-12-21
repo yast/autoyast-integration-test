@@ -55,4 +55,15 @@ RSpec.describe AYTests::VM do
       subject.boot_order = [:hd, :cdrom]
     end
   end
+
+  describe "#update" do
+    let(:values) { { mac: "00:00:00:12:34:56", boot_order: [:hd, :cdrom] } }
+
+    it "updates values and saves the machine" do
+      expect(subject).to receive(:mac=).with(values[:mac])
+      expect(subject).to receive(:boot_order=).with(values[:boot_order])
+      expect(driver).to receive(:save)
+      subject.update(values)
+    end
+  end
 end

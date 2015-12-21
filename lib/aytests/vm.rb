@@ -20,5 +20,18 @@ module AYTests
       @name = name
       @driver = AYTests.const_get(driver_class).new(name)
     end
+
+    # Update virtual machine attributes and saves the new definition
+    #
+    # This is just a convenience method to save some keystrokes.
+    #
+    # @param [Hash] attrs Attributes and values to save
+    # @see #save
+    def update(attrs)
+      attrs.each do |meth, value|
+        send("#{meth}=", value)
+      end
+      @driver.save
+    end
   end
 end
