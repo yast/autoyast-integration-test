@@ -66,7 +66,7 @@ module AYTests
       setup_iso(iso_url)
       setup_autoinst(autoinst)
       setup_definition(:install)
-      build(build_environment(autoinst))
+      build(autoinst)
     end
 
     # Run the installation using a given profile and an ISO
@@ -93,7 +93,7 @@ module AYTests
       setup_definition(:upgrade)
       change_boot_order
       backup_image
-      build(build_environment(autoinst))
+      build(autoinst)
       # During upgrade, Veewee will fail because SSH is disabled by PAM during
       # booting. So Veewee will get a "Authentication Failure" and it will give
       # up. At this time, we'll wait some time so installation process can finish
@@ -178,15 +178,15 @@ module AYTests
 
     # Build a Vagrant image using Veewee
     #
-    # @param [Hash] environment Environment variables for Veewee
+    # @param  [Pathname] autoinst Path to AutoYaST profile
     # @return [Boolean] true if the system was successfully built; return false
     #   otherwise.
-    def build(environment)
+    def build(autoinst)
       Dir.chdir(work_dir) do
         log.info "Creating #{veewee_provider} image"
         cmd = "veewee #{veewee_provider} build #{IMAGE_NAME} --force --auto"
         cmd << " --nogui" if headless
-        system(environment, cmd)
+        system(build_environment(autoinst), cmd)
       end
     end
 
