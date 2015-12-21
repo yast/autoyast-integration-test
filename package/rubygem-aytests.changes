@@ -3,6 +3,7 @@ Fri Dec 18 12:20:48 UTC 2015 - igonzalezsosa@suse.com
 
 - Add support for specifying additional arguments to Linuxrc.
 - Add support for using variables in AutoYaST profiles.
+- Version 1.0.1
 
 -------------------------------------------------------------------
 Thu Dec 17 22:38:58 UTC 2015 - igonzalezsosa@suse.com
