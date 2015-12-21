@@ -8,6 +8,21 @@
     </mode>
   </general>
 
+  <add-on>
+    <add_on_products config:type="list">
+      <listentry>
+        <media_url><![CDATA[{{REPO1_URL}}]]></media_url>
+        <product>custom</product>
+        <product_dir>/</product_dir>
+        <name>Customized</name>
+        <signature-handling>
+          <accept_unknown_gpg_key config:type="boolean">true</accept_unknown_gpg_key>
+          <accept_unsigned_file config:type="boolean">true</accept_unsigned_file>
+        </signature-handling>
+      </listentry>
+    </add_on_products>
+  </add-on>
+
   <networking>
     <keep_install_network config:type="boolean">true</keep_install_network>
   </networking>

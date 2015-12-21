@@ -21,6 +21,7 @@ module AYTests
     SSH_PASSWORD = "nots3cr3t"
     SSH_ADDRESS = "127.0.0.1"
     SSH_PORT = "22"
+    WEBSERVER_PORT = "8888"
 
     # Constructor
     #
@@ -65,7 +66,7 @@ module AYTests
       setup_iso(iso_url)
       setup_autoinst(autoinst)
       setup_definition(:install)
-      build
+      build(autoinst)
     end
 
     # Run the installation using a given profile and an ISO
@@ -92,7 +93,7 @@ module AYTests
       setup_definition(:upgrade)
       change_boot_order
       backup_image
-      build
+      build(autoinst)
       # During upgrade, Veewee will fail because SSH is disabled by PAM during
       # booting. So Veewee will get a "Authentication Failure" and it will give
       # up. At this time, we'll wait some time so installation process can finish
@@ -177,14 +178,15 @@ module AYTests
 
     # Build a Vagrant image using Veewee
     #
+    # @param  [Pathname] autoinst Path to AutoYaST profile
     # @return [Boolean] true if the system was successfully built; return false
     #   otherwise.
-    def build
+    def build(autoinst)
       Dir.chdir(work_dir) do
         log.info "Creating #{veewee_provider} image"
         cmd = "veewee #{veewee_provider} build #{IMAGE_NAME} --force --auto"
         cmd << " --nogui" if headless
-        system({ "AYTESTS_FILES_DIR" => files_dir.to_s }, cmd)
+        system(build_environment(autoinst), cmd)
       end
     end
 
@@ -223,11 +225,10 @@ module AYTests
     # @param [String|Pathname] autoinst AutoYaST profile path.
     def setup_autoinst(autoinst)
       raise "ERROR: #{autoinst} not found" unless autoinst.file?
-      FileUtils.cp(autoinst, autoinst_path)
-      system "sed -e 's/%IP%/#{local_ip}/g' -i #{autoinst_path}"
-      if provider == :virtualbox
-        system "sed -e 's/\\/dev\\/vd/\\/dev\\/sd/g' -i #{autoinst_path}"
-      end
+      content = File.read(autoinst)
+      autoinst_vars(autoinst.sub_ext(".vars")).each { |k, v| content.gsub!("{{#{k}}}", v) }
+      content.gsub!("/dev/vd", "/dev/sd") if provider == :virtualbox
+      File.open(autoinst_path, "w") { |f| f.puts content }
     end
 
     # Change boot order for libvirt definition
@@ -324,5 +325,51 @@ module AYTests
       FileUtils.mkdir_p(veewee_autoyast_dir) unless veewee_autoyast_dir.directory?
       FileUtils.cp(sources_dir.join("postinstall.sh"), veewee_autoyast_dir)
     end
+
+    # Build an environment for Veewee
+    #
+    # Set some environment variables:
+    #
+    # * AYTESTS_FILES_DIR: files to be served through HTTP.
+    # * AYTESTS_WEBSERVER_PORT: files webserver port (WEBSERVER_PORT).
+    # * AYTESTS_LINUXRC: additional parameters for Linuxrc. They're taken
+    #   from a file called after the profile but with `.linuxrc` extension.
+    #
+    # @param  [Pathname] autoinst Path to AutoYaST profile
+    # @return [Hash] Variables to be used as environment for Veewee
+    def build_environment(autoinst)
+      environment = {
+        "AYTESTS_FILES_DIR" => files_dir.to_s,
+        "AYTESTS_PROVIDER" => provider.to_s,
+        "AYTESTS_WEBSERVER_PORT" => WEBSERVER_PORT,
+      }
+      linuxrc_file = autoinst.sub_ext(".linuxrc")
+      environment["AYTESTS_LINUXRC"] = File.read(linuxrc_file).chomp if linuxrc_file.exist?
+      environment
+    end
+
+    # Build a variables hash to be replaced in the profile
+    #
+    # The following placeholders can be used:
+    #
+    # * {{IP}} will be replaced for #local_ip value.
+    # * {{PORT}} will be replaced for WEBSERVER_PORT
+    #
+    # @param [Pathname] vars_file File containing variables definitions.
+    # @return [Hash] Variables to be replace placeholders in the profile
+    #
+    # @see #local_ip
+    def autoinst_vars(vars_file)
+      return {} unless vars_file.exist?
+      content = File.read(vars_file).
+        gsub("{{IP}}", local_ip).
+        gsub("{{PORT}}", WEBSERVER_PORT)
+      content.split("\n").reduce({}) do |hsh, line|
+        key, value = line.split("=")
+        hsh[key] = value
+        hsh
+      end
+    end
+
   end
 end
