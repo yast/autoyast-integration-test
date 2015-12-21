@@ -33,6 +33,7 @@ Group:          Development/Languages/Ruby
 # These dependencies are included in the package/gem2rpm.yml file.
 Requires:       mksusecd
 Requires:       mkdud
+Requires:       virt-install
 
 %description
 This gem contains the framework needed to run AutoYaST integration tests.
