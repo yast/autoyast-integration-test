@@ -66,7 +66,7 @@ module AYTests
       setup_iso(iso_url)
       setup_autoinst(autoinst)
       setup_definition(:install)
-      build(build_environment(autoinst.sub_ext(".linuxrc")))
+      build(build_environment(autoinst))
     end
 
     # Run the installation using a given profile and an ISO
@@ -93,7 +93,7 @@ module AYTests
       setup_definition(:upgrade)
       change_boot_order
       backup_image
-      build(build_environment(autoinst_path.sub_ext(".linuxrc")))
+      build(build_environment(autoinst))
       # During upgrade, Veewee will fail because SSH is disabled by PAM during
       # booting. So Veewee will get a "Authentication Failure" and it will give
       # up. At this time, we'll wait some time so installation process can finish
@@ -332,16 +332,18 @@ module AYTests
     #
     # * AYTESTS_FILES_DIR: files to be served through HTTP.
     # * AYTESTS_WEBSERVER_PORT: files webserver port (WEBSERVER_PORT).
-    # * AYTESTS_LINUXRC: additional parameters for Linuxrc.
+    # * AYTESTS_LINUXRC: additional parameters for Linuxrc. They're taken
+    #   from a file called after the profile but with `.linuxrc` extension.
     #
-    # @param [Pathname] linuxrc_file File containing Linuxrc parameters
+    # @param  [Pathname] autoinst Path to AutoYaST profile
     # @return [Hash] Variables to be used as environment for Veewee
-    def build_environment(linuxrc_file)
+    def build_environment(autoinst)
       environment = {
         "AYTESTS_FILES_DIR" => files_dir.to_s,
         "AYTESTS_PROVIDER" => provider.to_s,
         "AYTESTS_WEBSERVER_PORT" => WEBSERVER_PORT,
       }
+      linuxrc_file = autoinst.sub_ext(".linuxrc")
       environment["AYTESTS_LINUXRC"] = File.read(linuxrc_file).chomp if linuxrc_file.exist?
       environment
     end
