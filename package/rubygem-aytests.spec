@@ -16,7 +16,7 @@
 #
 
 Name:           rubygem-aytests
-Version:        1.0.1
+Version:        1.0.2
 Release:        0
 %define mod_name aytests
 %define mod_full_name %{mod_name}-%{version}
@@ -33,6 +33,7 @@ Group:          Development/Languages/Ruby
 # These dependencies are included in the package/gem2rpm.yml file.
 Requires:       mksusecd
 Requires:       mkdud
+Requires:       virt-install
 
 %description
 This gem contains the framework needed to run AutoYaST integration tests.

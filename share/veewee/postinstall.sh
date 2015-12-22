@@ -32,6 +32,16 @@ echo -e "UseDNS no\n" >> /etc/ssh/sshd_config
 # Anyway it won't be removed so we can check those rules.
 mv /etc/udev/rules.d/70-persistent-net.rules{,.aytests}
 
+# If eth0 is not configured, Vagrant will fail. So we need to make
+# sure that it's configured. This hack is useful when network
+# interface was renamed.
+if [[ ! -f /etc/sysconfig/network/ifcfg-eth0 ]]; then
+  cat > /etc/sysconfig/network/ifcfg-eth0 <<EOF
+  BOOTPROTO='dhcp'
+  STARTMODE='auto'
+EOF
+fi
+
 # Make sure that everything's written to disk, otherwise we sometimes get
 # empty files in the image
 sync
