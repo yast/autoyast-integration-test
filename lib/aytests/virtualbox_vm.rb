@@ -1,9 +1,8 @@
 module AYTests
+  # Implements communication with VirtualBox virtual machines.
+  #
+  # @see AYTests::VM
   class VirtualboxVM
-    # Implements communication with VirtualBox virtual machines.
-    #
-    # @see AYTests::VM
-
     # By default, Libvirt devices names are used, so this driver needs to map
     # them to VirtualBox terminology.
     DEVICES_MAP = {

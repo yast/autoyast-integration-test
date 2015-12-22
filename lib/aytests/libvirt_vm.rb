@@ -3,10 +3,10 @@ require "rexml/xpath"
 require "cheetah"
 
 module AYTests
+  # Implements communication with Libvirt virtual machines.
+  #
+  # @see AYTests::VM
   class LibvirtVM
-    # Implements communication with Libvirt virtual machines.
-    #
-    # @see AYTests::VM
     attr_reader :name
     attr_writer :boot_order, :mac
 

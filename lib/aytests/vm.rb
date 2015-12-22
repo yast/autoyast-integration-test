@@ -1,10 +1,10 @@
 require "forwardable"
 
 module AYTests
+  # This class allows to query and modify virtual machines attributes.
+  # The communication with the virtual machines is implemented in
+  # separated classes (LibvirtVM and VirtualboxVM).
   class VM
-    # This class allows to query and modify virtual machines attributes.
-    # The communication with the virtual machines is implemented in
-    # separated classes (LibvirtVM and VirtualboxVM).
     extend Forwardable
 
     def_delegators :@driver, :mac, :mac=, :boot_order, :boot_order=
