@@ -3,6 +3,8 @@ module AYTests
   #
   # @see AYTests::VM
   class VirtualboxVM
+    require "cheetah"
+
     # By default, Libvirt devices names are used, so this driver needs to map
     # them to VirtualBox terminology.
     DEVICES_MAP = {
@@ -53,7 +55,8 @@ module AYTests
     #
     # It relies on `VBoxManage` to update the definition.
     def save
-      Cheetah.run(["VBoxManage", "modifyvm", name, "--macaddress1", @mac] + boot_order_to_options)
+      # VBoxManage requires MAC addresses without ":". It reports invalid MAC otherwise
+      Cheetah.run(["VBoxManage", "modifyvm", name, "--macaddress1", mac.delete(":")] + boot_order_to_options)
       read_definition
     end
 
