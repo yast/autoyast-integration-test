@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon Jan 11 12:55:49 UTC 2016 - mfilka@suse.com
+
+- fixed MAC formatting when passed as parameter to virtualbox
+  during machine creation
+- 1.0.3
+
+-------------------------------------------------------------------
 Mon Dec 21 23:41:42 UTC 2015 - igonzalezsosa@suse.com
 
 - Force Veewee to use always the same MAC address.
