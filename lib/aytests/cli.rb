@@ -55,7 +55,7 @@ module AYTests
           results[test_file] = runner.run ? :passed : :failed
         else
           results[test_file] = :missing
-          $stderr.puts "File #{test_file} does not exist"
+          AYTests.logger.error "File #{test_file} does not exist"
         end
       end
       show_results(results)
