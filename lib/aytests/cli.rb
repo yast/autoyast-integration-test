@@ -9,6 +9,16 @@ require "aytests/installer"
 
 module AYTests
   class CLI < Thor
+    TEST_PASSED_ERRCODE = 0
+    TEST_DOES_NOT_EXIST_ERRCODE = 1
+    TEST_FAILED_ERRCODE = 2
+
+    TESTS_COLORS = {
+      failed: :red,
+      missing: :yellow,
+      passed: :green
+    }
+
     option "work-dir", type: :string
     desc "build_iso NAME", "Build boot image <name>"
     def build_iso(name)
@@ -27,9 +37,10 @@ module AYTests
       bootstrap(options["work-dir"])
       if files.empty?
         help("test")
-        exit 1
+        exit TEST_DOES_NOT_EXIST_ERRCODE
       end
 
+      results = {}
       files.each do |test_file|
         if File.exist?(test_file)
           runner = AYTests::TestRunner.new(
@@ -40,11 +51,16 @@ module AYTests
             provider: options["provider"] || ENV["AYTESTS_PROVIDER"] || :libvirt,
             headless: options[:headless] || ENV["AYTESTS_HEADLESS"] == "true"
           )
-          runner.run
+          # When a test fails, a non-zero return code will be returned
+          results[test_file] = runner.run ? :passed : :failed
         else
-          $stderr.puts "File #{test_file} does not exist"
+          results[test_file] = :missing
+          AYTests.logger.error "File #{test_file} does not exist"
         end
       end
+      show_results(results)
+      status = results.values.all? { |r| r == :passed } ? TEST_PASSED_ERRCODE : TEST_FAILED_ERRCODE
+      exit(status)
     end
 
     desc "setup", "Set up the environment for the current user"
@@ -84,6 +100,14 @@ module AYTests
     # Just for convenience.
     def work_dir
       AYTests.work_dir
+    end
+
+    # Print tests results
+    def show_results(results)
+      say "Tests results:"
+      results.each do |test, result|
+        say_status result, test, TESTS_COLORS[result]
+      end
     end
   end
 end
