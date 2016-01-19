@@ -16,7 +16,7 @@
 #
 
 Name:           rubygem-aytests
-Version:        1.0.4
+Version:        1.0.5
 Release:        0
 %define mod_name aytests
 %define mod_full_name %{mod_name}-%{version}
