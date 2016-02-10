@@ -27,6 +27,7 @@ module AYTests
     SSH_PORT = "22"
     WEBSERVER_PORT = "8888"
     MAC_ADDRESS = "02:00:00:12:34:56"
+    POSTINSTALL_SCRIPT="/home/vagrant/postinstall.sh"
 
     # Constructor
     #
@@ -173,7 +174,7 @@ module AYTests
       Net::SSH::Simple.sync do
         log.info "Running post-install script"
         data = vm_ip(IMAGE_NAME)
-        ssh data[:address], "sudo env postinstall.sh",
+        ssh data[:address], "sudo env #{POSTINSTALL_SCRIPT}",
           { port: data[:port], user: SSH_USER, password: SSH_PASSWORD,
             paranoid: false }
       end
