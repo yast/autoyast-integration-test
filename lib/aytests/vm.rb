@@ -7,7 +7,8 @@ module AYTests
   class VM
     extend Forwardable
 
-    def_delegators :@driver, :mac, :mac=, :boot_order, :boot_order=
+    def_delegators :@driver, :mac, :mac=, :boot_order, :boot_order=, :stop,
+      :backup, :restore!, :running?
 
     attr_reader :driver, :name
 

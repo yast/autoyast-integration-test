@@ -120,7 +120,6 @@ RSpec.describe AYTests::ImageBuilder do
       expect(FileUtils).to receive(:ln_s)
         .with(path_to_iso, builder.obs_iso_dir.join("testing.iso"))
 
-      expect(builder).to receive(:change_boot_order)
       expect(builder).to receive(:backup_image)
 
       # Prepare the AutoYaST profile

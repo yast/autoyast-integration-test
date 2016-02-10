@@ -1,5 +1,8 @@
 require "uri"
 require "socket"
+require "aytests/vm"
+require "aytests/libvirt_vm"
+require "aytests/virtualbox_vm"
 
 module AYTests
   class ImageBuilder
@@ -13,6 +16,7 @@ module AYTests
       :files_dir
 
     IMAGE_NAME = "autoyast"
+    BACKUP_IMAGE_NAME = "autoyast_sav"
     ISO_FILE_NAME = "testing.iso"
     IMAGE_BOX_NAME = "autoyast_vagrant_box_image_0.img"
     SLEEP_TIME_AFTER_UPGRADE = 150
@@ -92,7 +96,6 @@ module AYTests
       setup_iso(iso_url)
       setup_autoinst(autoinst)
       setup_definition(:upgrade)
-      change_boot_order
       backup_image
       build(autoinst)
       # During upgrade, Veewee will fail because SSH is disabled by PAM during
@@ -252,24 +255,11 @@ module AYTests
     # Backup image
     #
     # The image will be destroyed by Veewee when starting the upgrade. So we need to
-    # backup it and restore in Veewee's +after_create+ hook.
+    # backup it and restore in Veewee's +after_create+ hook. Note: doing this in the
+    # +before_create+ hook won't work as the machine is destroyed previously.
     def backup_image
-      case provider
-      when :libvirt
-        system "sudo virt-clone -o #{IMAGE_NAME} -n #{IMAGE_NAME}_sav --file /var/lib/libvirt/images/#{IMAGE_NAME}_sav.qcow2"
-      when :virtualbox
-        # Shutdown the system
-        system "VBoxManage controlvm #{IMAGE_NAME} acpipowerbutton"
-        sleep SLEEP_TIME_AFTER_SHUTDOWN
-        system "VBoxManage controlvm #{IMAGE_NAME} poweroff"
-
-        # Copy the virtual machine (this is the only way of having an identical system)
-        vm_config = `VBoxManage showvminfo #{IMAGE_NAME} | grep "Config file" | cut -f2 -d:`.strip
-        vm_dir = File.dirname(vm_config)
-        system "VBoxManage unregistervm #{IMAGE_NAME}"
-        FileUtils.mv vm_dir, "#{vm_dir}.sav"
-        system "sync"
-      end
+      vm = VM.new(IMAGE_NAME, provider)
+      vm.backup(BACKUP_IMAGE_NAME)
     end
 
     # Determine the host IP
@@ -340,10 +330,12 @@ module AYTests
     # @return [Hash] Variables to be used as environment for Veewee
     def build_environment(autoinst)
       environment = {
+        "AYTESTS_BACKUP_IMAGE_NAME" => BACKUP_IMAGE_NAME,
         "AYTESTS_FILES_DIR" => files_dir.to_s,
+        "AYTESTS_IMAGE_NAME" => IMAGE_NAME,
+        "AYTESTS_MAC_ADDRESS" => MAC_ADDRESS,
         "AYTESTS_PROVIDER" => provider.to_s,
-        "AYTESTS_WEBSERVER_PORT" => WEBSERVER_PORT,
-        "AYTESTS_MAC_ADDRESS" => MAC_ADDRESS
+        "AYTESTS_WEBSERVER_PORT" => WEBSERVER_PORT
       }
       linuxrc_file = autoinst.sub_ext(".linuxrc")
       environment["AYTESTS_LINUXRC"] = File.read(linuxrc_file).chomp if linuxrc_file.exist?
