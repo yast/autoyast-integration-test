@@ -174,7 +174,8 @@ module AYTests
         log.info "Running post-install script"
         data = vm_ip(IMAGE_NAME)
         ssh data[:address], "sudo env postinstall.sh",
-          { port: data[:port], user: SSH_USER, password: SSH_PASSWORD }
+          { port: data[:port], user: SSH_USER, password: SSH_PASSWORD,
+            paranoid: false }
       end
     end
 
