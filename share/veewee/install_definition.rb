@@ -50,7 +50,7 @@ Veewee::Definition.declare({
     :after_create => Proc.new do
       require "aytests/vm"
       require "aytests/#{ENV["AYTESTS_PROVIDER"]}_vm"
-      vm = AYTests::VM.new("autoyast", ENV["AYTESTS_PROVIDER"].to_sym)
+      vm = AYTests::VM.new(ENV["AYTESTS_IMAGE_NAME"], ENV["AYTESTS_PROVIDER"].to_sym)
       vm.update(mac: ENV["AYTESTS_MAC_ADDRESS"], boot_order: [:cdrom, :hd])
     end
   }

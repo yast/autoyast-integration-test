@@ -10,6 +10,9 @@ module AYTests
     attr_reader :name
     attr_writer :boot_order, :mac
 
+    RUNNING_STATE = "running"
+    SLEEP_TIME_AFTER_SHUTDOWN = 15
+
     # Constructor
     #
     # @param [String] name Virtual machine name
@@ -46,7 +49,63 @@ module AYTests
       read_definition
     end
 
+    # Backup the virtual machine
+    #
+    # If the machine is running, it will be switched off before creating the
+    # backup.
+    #
+    # @param [String] backup_name A name for the backup.
+    #
+    # @see restore!
+    def backup(backup_name)
+      shutdown if running?
+      copy(name, backup_name)
+    end
+
+    # Restore a backup into the current machine
+    #
+    # @param [String] backup_name Name of the backup to be restored.
+    def restore!(backup_name)
+      copy(backup_name, name)
+      self.class.new(backup_name).destroy!
+      read_definition
+    end
+
+    # Destroy the virtual machine
+    def destroy!
+      Cheetah.run(["sudo", "virsh", "undefine", name, "--remove-all-storage"])
+    end
+
+    # Shutdown the virtual machine
+    #
+    # If after SLEEP_TIME_AFTER_SHUTDOWN seconds the machine isn't stopped,
+    # then it will powered off.
+    def shutdown
+      Cheetah.run(["sudo", "virsh", "shutdown", name])
+      sleep SLEEP_TIME_AFTER_SHUTDOWN
+      Cheetah.run(["sudo", "virsh", "destroy", name]) if running?
+    end
+
+    # Determine whether the machine is running or not
+    #
+    # @return [Boolean] true if it's running; otherwise, it returns false.
+    def running?
+      state = Cheetah.run(["sudo", "virsh", "domstate", name], stdout: :capture).strip
+      state == RUNNING_STATE
+    end
+
     private
+
+    # Copy a virtual machine into another one
+    #
+    # It relies in virt-clone to do the job. If the target machine exists, it
+    # will be overwritten.
+    #
+    # @param [String] source Name of the original machine.
+    # @param [String] target Name of the cloned machine.
+    def copy(source, target)
+      Cheetah.run(["sudo", "virt-clone", "-o", source, "-n", target, "--auto-clone", "--replace"])
+    end
 
     # Read the virtual machine's definition
     #

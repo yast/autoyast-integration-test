@@ -1,10 +1,10 @@
+require "cheetah"
+
 module AYTests
   # Implements communication with VirtualBox virtual machines.
   #
   # @see AYTests::VM
   class VirtualboxVM
-    require "cheetah"
-
     # By default, Libvirt devices names are used, so this driver needs to map
     # them to VirtualBox terminology.
     DEVICES_MAP = {
@@ -14,6 +14,8 @@ module AYTests
        fd: :floppy,
        none: nil
     }
+    RUNNING_STATE = "running"
+    SLEEP_TIME_AFTER_SHUTDOWN = 15
 
     attr_reader :name
     attr_writer :boot_order, :mac
@@ -50,7 +52,6 @@ module AYTests
       @mac || @definition["macaddress1"].unpack("a2"*6).join(":")
     end
 
-
     # Save changes to the virtual machine
     #
     # It relies on `VBoxManage` to update the definition.
@@ -60,7 +61,80 @@ module AYTests
       read_definition
     end
 
+    # Backup the virtual machine
+    #
+    # If the machine is running, it will be switched off before creating the
+    # backup. Copying the files is the only way of having an identical system
+    # in VirtualBox.
+    #
+    # @param [String] backup_name Backup name.
+    #
+    # @see restore
+    def backup(backup_name)
+      shutdown if running?
+      Cheetah.run(["VBoxManage", "unregistervm", name])
+      FileUtils.mv(vm_directory, vm_directory.join("..", backup_name))
+      system "sync"
+    end
+
+    # Restore a backup into the current machine
+    #
+    # @param [String] backup_name Name of the backup to be restored.
+    #
+    # @see backup
+    def restore!(backup_name)
+      Cheetah.run(["VBoxManage", "unregistervm", name, "--delete"])
+      FileUtils.mv(vm_directory.join("..", backup_name), vm_directory)
+      Cheetah.run(["VBoxManage", "registervm", config_file.to_s])
+      system "sync"
+      read_definition
+    end
+
+    # Destroy the virtual machine
+    def destroy!
+      system "VBoxManage unregistervm #{name} --delete"
+    end
+
+    # Shutdown the machine
+    #
+    # It simulates pushing the ACPI power button and, after
+    # SLEEP_TIME_AFTER_SHUTDOWN seconds, try to power it off
+    # if it still running.
+    def shutdown
+      Cheetah.run(["VBoxManage", "controlvm", name, "acpipowerbutton"])
+      sleep SLEEP_TIME_AFTER_SHUTDOWN
+      Cheetah.run(["VBoxManage", "controlvm", name, "poweroff"]) if running?
+    end
+
+    # Determine whether the machine is running or not
+    #
+    # @return [Boolean] true if it's running; otherwise, it returns false.
+    def running?
+      vmstate = Cheetah.run(["VBoxManage", "showvminfo", "--machinereadable", name],
+                            ["grep", "VMState"], stdout: :capture)
+      match = /VMState="(\w+)"/.match(vmstate)
+      match[1] == RUNNING_STATE
+    end
+
     private
+
+    # Determine the virtual machine's configuration file
+    #
+    # This path is stored as CfgFile in the virtual machine's definition.
+    #
+    # @return [Pathname] Configuration file's path
+    def config_file
+      Pathname.new(@definition["CfgFile"])
+    end
+
+    # Determine the virtual machine's directory
+    #
+    # @return [Pathname] Virtual machine's directory
+    #
+    # @see config_file
+    def vm_directory
+      config_file ? config_file.dirname : nil
+    end
 
     # Convert boot_order to command line options for VBoxManage
     #

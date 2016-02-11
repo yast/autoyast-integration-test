@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Feb  8 14:25:13 UTC 2016 - igonzalezsosa@suse.com
+
+- Fix upgrade scenario.
+- 1.0.6
+
+-------------------------------------------------------------------
 Mon Jan 18 16:49:07 UTC 2016 - igonzalezsosa@suse.com
 
 - Add yast2-schema to the lists of packages to include in the
