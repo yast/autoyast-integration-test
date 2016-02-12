@@ -80,9 +80,11 @@ RSpec.describe AYTests::ImageBuilder do
 
       # Build
       expect(builder).to receive(:system)
-        .with({"AYTESTS_FILES_DIR" => files_dir.to_s, "AYTESTS_LINUXRC" => "vnc=1",
+        .with({"AYTESTS_IMAGE_NAME" => "autoyast",
+               "AYTESTS_BACKUP_IMAGE_NAME" => "autoyast_sav",
+               "AYTESTS_FILES_DIR" => files_dir.to_s,
                "AYTESTS_MAC_ADDRESS" => "02:00:00:12:34:56", "AYTESTS_PROVIDER" => provider.to_s,
-               "AYTESTS_WEBSERVER_PORT" => "8888"},
+               "AYTESTS_LINUXRC" => "autoyast=http://%IP%:8888/autoinst.xml vnc=1"},
                "veewee kvm build #{AYTests::ImageBuilder::IMAGE_NAME} --force --auto --nogui")
         .and_return(true)
 
@@ -131,9 +133,11 @@ RSpec.describe AYTests::ImageBuilder do
 
       # Build
       expect(builder).to receive(:system)
-        .with({"AYTESTS_FILES_DIR" => files_dir.to_s, "AYTESTS_LINUXRC" => "vnc=1",
+        .with({"AYTESTS_IMAGE_NAME" => "autoyast",
+               "AYTESTS_BACKUP_IMAGE_NAME" => "autoyast_sav",
+               "AYTESTS_FILES_DIR" => files_dir.to_s,
                "AYTESTS_MAC_ADDRESS" => "02:00:00:12:34:56", "AYTESTS_PROVIDER" => provider.to_s,
-               "AYTESTS_WEBSERVER_PORT" => "8888"},
+               "AYTESTS_LINUXRC" => "autoyast=http://%IP%:8888/autoinst.xml vnc=1"},
                "veewee kvm build #{AYTests::ImageBuilder::IMAGE_NAME} --force --auto --nogui")
         .and_return(true)
 

@@ -28,6 +28,9 @@ module AYTests
     WEBSERVER_PORT = "8888"
     MAC_ADDRESS = "02:00:00:12:34:56"
     POSTINSTALL_SCRIPT="/home/vagrant/postinstall.sh"
+    DEFAULT_LINUXRC_ARGS = {
+      "autoyast" => "http://%IP%:{{PORT}}/autoinst.xml"
+    }
 
     # Constructor
     #
@@ -230,11 +233,14 @@ module AYTests
     #
     # @param [String|Pathname] autoinst AutoYaST profile path.
     def setup_autoinst(autoinst)
-      raise "ERROR: #{autoinst} not found" unless autoinst.file?
-      content = File.read(autoinst)
-      autoinst_vars(autoinst.sub_ext(".vars")).each { |k, v| content.gsub!("{{#{k}}}", v) }
-      content.gsub!("/dev/vd", "/dev/sd") if provider == :virtualbox
-      File.open(autoinst_path, "w") { |f| f.puts content }
+      if autoinst.file?
+        content = File.read(autoinst)
+        autoinst_vars(autoinst.sub_ext(".vars")).each { |k, v| content.gsub!("{{#{k}}}", v) }
+        content.gsub!("/dev/vd", "/dev/sd") if provider == :virtualbox
+        File.open(autoinst_path, "w") { |f| f.puts content }
+      else
+        log.info "No profile found. No problem, it should be available at /static"
+      end
     end
 
     # Change boot order for libvirt definition
@@ -336,11 +342,9 @@ module AYTests
         "AYTESTS_FILES_DIR" => files_dir.to_s,
         "AYTESTS_IMAGE_NAME" => IMAGE_NAME,
         "AYTESTS_MAC_ADDRESS" => MAC_ADDRESS,
-        "AYTESTS_PROVIDER" => provider.to_s,
-        "AYTESTS_WEBSERVER_PORT" => WEBSERVER_PORT
+        "AYTESTS_PROVIDER" => provider.to_s
       }
-      linuxrc_file = autoinst.sub_ext(".linuxrc")
-      environment["AYTESTS_LINUXRC"] = File.read(linuxrc_file).chomp if linuxrc_file.exist?
+      environment["AYTESTS_LINUXRC"] = linuxrc_options(autoinst.sub_ext(".linuxrc"))
       environment
     end
 
@@ -367,5 +371,45 @@ module AYTests
       end
     end
 
+    # Build arguments for Linuxrc
+    #
+    # * Read arguments from .linuxrc file.
+    # * Merge arguments with default ones.
+    # * Replaces {{PORT}} for WEBSERVER_PORT variable.
+    #
+    # @param  [Pathname] linuxrc_file Path to Linuxrc options file
+    # @return [String]   Linuxrc options to be used during installation
+    def linuxrc_options(linuxrc_file)
+      options = DEFAULT_LINUXRC_ARGS.merge(custom_linuxrc_options(linuxrc_file))
+      options_string = linuxrc_options_to_s(options)
+      options_string.gsub(/{{\w+}}/, "{{PORT}}" => WEBSERVER_PORT)
+    end
+
+    # Retrieve Linuxrc options from the given file
+    #
+    # @param  [Pathname] linuxrc_file Path to Linuxrc options file
+    # @return [Hash]     Linuxrc options
+    def custom_linuxrc_options(linuxrc_file)
+      if linuxrc_file.file?
+        content = File.read(linuxrc_file).chomp
+        content.split.each_with_object({}) do |o, opts|
+          key, val = o.split("=")
+          opts[key] = val
+        end
+      else
+        {}
+      end
+    end
+
+    # Convert a hash contaning Linuxrc options to a string
+    #
+    # @param  [Hash]   options Linuxrc options
+    # @return [String] Linuxrc options to be used during installation
+    def linuxrc_options_to_s(options)
+      parts = options.map do |key, val|
+        val.nil? ? key : "#{key}=#{val}"
+      end
+      parts.join(" ")
+    end
   end
 end

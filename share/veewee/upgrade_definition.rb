@@ -20,7 +20,6 @@ Veewee::Definition.declare({
     ' insecure=1',
     ' autoupgrade=1',
     ' netsetup=dhcp',
-    " autoyast=http://%IP%:#{ENV["AYTESTS_WEBSERVER_PORT"]}/autoinst.xml",
     " #{ENV["AYTESTS_LINUXRC"]}",
     '<Enter>'
    ],
