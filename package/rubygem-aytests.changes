@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Feb 22 15:39:28 CET 2016 - schubi@suse.de
+
+- Fixed package dependencies for sles12-sp2 build.
+- 1.0.9
+
+-------------------------------------------------------------------
 Mon Feb 22 14:09:51 CET 2016 - schubi@suse.de
 
 - Sles12-sp2 build added.
