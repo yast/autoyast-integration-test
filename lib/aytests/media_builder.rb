@@ -35,8 +35,8 @@ module AYTests
       @work_dir           = work_dir || AYTests.work_dir
       @cache_dir          = @work_dir.join("cache")
       @local_packages_dir = @work_dir.join("rpms", version)
-      @boot_dir           = @base_dir.join("boot_#{version}")
       @obs_pkg_list_path  = @base_dir.join("share", "build_iso", "#{version}.obs_packages")
+      @boot_dir           = @base_dir.join("share", "build_iso", "boot_#{version}")
 
       # URLs
       @yast_url = yast_url
@@ -151,6 +151,7 @@ module AYTests
       cmd = format(MKSUSECD_CMD, output_path: output_path, dud_path: dud_path,
                    iso_path: iso_path)
       cmd << " #{boot_dir}" if boot_dir.directory?
+      log.info "Command: #{cmd}"
       system cmd
     end
   end
