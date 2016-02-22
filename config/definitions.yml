@@ -10,3 +10,11 @@ common: &common
   <<: *common
   :yast_url: "http://download.suse.de/ibs/Devel:/YaST:/SLE-12-SP1/SLE-12-SP1/"
   :iso_url: "http://dist.suse.de/install/SLE-12-SP1-Server-GM/SLE-12-SP1-Server-DVD-x86_64-GM-DVD1.iso"
+:sles12-sp2:
+  :yast_url: "http://download.suse.de/ibs/Devel:/YaST:/Head/SLE-12-SP1/"
+  :iso_url: "http://dist.suse.de/install/SLE-12-SP1-Server-GM/SLE-12-SP1-Server-DVD-x86_64-GM-DVD1.iso"
+  :extra_repos:
+    - :server: "http://download.suse.de/ibs/SUSE:/SLE-12-SP1:/GA/standard/"
+      :packages: ["grub2-2.02~beta2", "grub2-i386-pc-2.02~beta2", "libzypp", "libsolv-tools", "zypper"]
+    - :server: "http://download.suse.de/ibs/SUSE:/SLE-12:/GA/standard/"
+      :packages: ["ruby2.1-rubygem-abstract_method"]
