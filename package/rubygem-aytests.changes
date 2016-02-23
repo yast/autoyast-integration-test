@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Tue Feb 23 17:14:04 CET 2016 - schubi@suse.de
+
+- Adapted YaST package selection.
+- Documentation updated
+- 1.0.10
+
+-------------------------------------------------------------------
 Mon Feb 22 15:39:28 CET 2016 - schubi@suse.de
 
 - Fixed package dependencies for sles12-sp2 build.
