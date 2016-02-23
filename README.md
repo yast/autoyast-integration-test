@@ -125,27 +125,27 @@ directory* and it will be used.
 ### Running the tests
 
 Once the ISO is available, the tests are ready to run. All tests are defined in the
-`test` directory. For example, to run `test/tftp.rb` test, just type:
+`test` directory. For example, to run `aytests/tftp.rb` test, just type:
 
-    $ aytests test test/tftp.rb
+    $ aytests test aytests/tftp.rb
 
 If you want to run all the tests in `test` directory, just type:
 
-    $ aytests test test/*.rb
+    $ aytests test aytests/*.rb
 
 By default, tests will run using QEMU/KVM as backend. But it's possible to
 select a different provider via the `--provider` option or setting the
 `AYTESTS_PROVIDER` environment variable. At this time, `libvirt` and
 `virtualbox` are supported:
 
-    $ aytests test test/tftp.rb --provider virtualbox
-    $ AYTESTS_PROVIDER="virtualbox" aytests test test/tftp.rb
+    $ aytests test aytests/tftp.rb --provider virtualbox
+    $ AYTESTS_PROVIDER="virtualbox" aytests test aytests/tftp.rb
 
 Now, the nitty-gritty details. For every test file, these steps will be
 performed:
 
 * A new Vagrant box will be created using the ISO and the profile named after
-  the test (e.g. `test/tftp.xml`).
+  the test (e.g. `aytests/tftp.xml`).
   [Veewee](https://github.com/jedi4ever/veewee) will take care of this part.
 * Using the generated Vagrant box, a new virtual machine will be created and
   the tests will run on that machine.
@@ -162,7 +162,7 @@ which is quite time consuming. To execute a test but skipping the installation:
 
 For example:
 
-    $ bundle exec rspec test/tftp.rb --skip-build
+    $ bundle exec rspec aytests/tftp.rb --skip-build
 
 ### Headless mode
 
@@ -170,7 +170,7 @@ VirtualBox can run in headless mode if needed. To do that, just use the
 `--headless` option or set the `AYTESTS_HEADLESS` environment variable to
 `true`.
 
-    $ aytests test test/tftp.rb --headless
+    $ aytests test astests/tftp.rb --headless
     $ AYTESTS_HEADLESS="true" aytests test
 
 This setting is not relevant to QEMU/KVM which will run in *headless* mode
