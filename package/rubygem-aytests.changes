@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Mar 23 15:20:23 CET 2016 - schubi@suse.de
+
+- Added yast2-mail to yast packages list.
+- 1.0.11
+
+-------------------------------------------------------------------
 Tue Feb 23 17:14:04 CET 2016 - schubi@suse.de
 
 - Adapted YaST package selection.
