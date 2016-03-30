@@ -57,6 +57,30 @@ module AYTests
       @provider = provider
     end
 
+    # Due an aborted run there could be old stuff which should be
+    # removed before starting a new run.
+    #
+    def cleanup_environment
+      return unless provider == :libvirt
+      pool_lines = Cheetah.run(["sudo", "virsh", "pool-list"], stdout: :capture).lines.drop(2)
+      pools = pool_lines.collect { |l| l.split.first }.compact
+      pools.each do |pool|
+        vol_lines = Cheetah.run(["sudo", "virsh", "vol-list", pool], stdout: :capture).lines.drop(2)
+        vol_lines.each do |v_string|
+          name, pathname = v_string.split.compact
+          if pathname
+            regexp = Regexp.new("^#{IMAGE_NAME}-\\d+.qcow2")
+            if !File.exist?(pathname) || name.match(regexp)
+              # Either the file does not exists anymore or there are cloned instances
+              # which have not been removed correctly by previous run.
+              log.info "CLEANUP: Removing unneeded file #{pathname} in pool #{pool}"
+              Cheetah.run(["sudo", "virsh", "vol-delete", pathname])
+            end
+          end
+        end
+      end
+    end
+
     # Run the installation using a given profile and an ISO
     #
     # @param [Pathname]            autoinst Path to the AutoYaST profile to use.
