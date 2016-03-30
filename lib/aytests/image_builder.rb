@@ -61,23 +61,20 @@ module AYTests
     # removed before starting a new run.
     #
     def cleanup_environment
-      if provider == :libvirt
-        pool_lines = Cheetah.run(["sudo", "virsh", "pool-list"], stdout: :capture).lines.drop(2)
-        pool = pool_lines.collect { |line| line.split.first }.compact
-        pool.each do |p|
-          vol_lines = Cheetah.run(["sudo", "virsh", "vol-list", p], stdout: :capture).lines.drop(2)
-          vol_lines.each do |v_string|
-            v = v_string.split.compact
-            if v.size >= 2
-              name = v[0]
-              pathname = v[1]
-              regexp = Regexp.new( "^#{IMAGE_NAME}-\\d+.qcow2" )
-              if !File.exist?( pathname ) || name.match( regexp )
-                # Either the file does not exists anymore or there are cloned instances
-                # which have not been removed correctly by previous run.
-                log.info "CLEANUP: Removing unneeded file #{pathname} in pool #{p}"
-                Cheetah.run(["sudo", "virsh", "vol-delete", pathname])
-              end
+      return unless provider == :libvirt
+      pool_lines = Cheetah.run(["sudo", "virsh", "pool-list"], stdout: :capture).lines.drop(2)
+      pools = pool_lines.collect { |l| l.split.first }.compact
+      pools.each do |pool|
+        vol_lines = Cheetah.run(["sudo", "virsh", "vol-list", pool], stdout: :capture).lines.drop(2)
+        vol_lines.each do |v_string|
+          name, pathname = v_string.split.compact
+          if pathname
+            regexp = Regexp.new("^#{IMAGE_NAME}-\\d+.qcow2")
+            if !File.exist?(pathname) || name.match(regexp)
+              # Either the file does not exists anymore or there are cloned instances
+              # which have not been removed correctly by previous run.
+              log.info "CLEANUP: Removing unneeded file #{pathname} in pool #{pool}"
+              Cheetah.run(["sudo", "virsh", "vol-delete", pathname])
             end
           end
         end
