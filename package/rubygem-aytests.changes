@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Mar 30 14:01:29 CEST 2016 - schubi@suse.de
+
+- Removing not needed stuff before start the next test run.
+- 1.0.12
+
+-------------------------------------------------------------------
 Wed Mar 23 15:20:23 CET 2016 - schubi@suse.de
 
 - Added yast2-mail to yast packages list.
