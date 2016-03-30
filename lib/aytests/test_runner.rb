@@ -56,6 +56,7 @@ module AYTests
         files_dir: files_dir,
         provider: provider,
         headless: headless)
+      builder.cleanup_environment
       builder.install(autoinst(:install), iso_url(:install))
       builder.upgrade(autoinst(:upgrade), iso_url(:upgrade)) if upgrade?
       builder.import
