@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Apr 13 14:33:27 CEST 2016 - schubi@suse.de
+
+- Added missing packages for sles12-sp2.
+- 1.0.14
+
+-------------------------------------------------------------------
 Wed Apr 13 09:54:46 CEST 2016 - schubi@suse.de
 
 - Switched to libstorage7 for sles12-sp2.
