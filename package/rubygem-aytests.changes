@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Apr 13 09:54:46 CEST 2016 - schubi@suse.de
+
+- Switched to libstorage7 for sles12-sp2.
+- 1.0.13
+
+-------------------------------------------------------------------
 Wed Mar 30 14:01:29 CEST 2016 - schubi@suse.de
 
 - Removing not needed stuff before start the next test run.
