@@ -1,3 +1,5 @@
+require "uri"
+
 module AYTests
   # Responsible for providing access to ISO images.
   # If the image is not available in the repository directory,
@@ -35,11 +37,20 @@ module AYTests
     # @param [String] uri URI
     # @return [Pathname]  Path to the local ISO.
     def get(uri)
-      iso_path = @dir.join(File.basename(uri))
-      if iso_path.exist?
-        iso_path
-      elsif download_to(uri, iso_path)
-        iso_path
+      iso_path = File.join(@dir, URI(uri).host, URI(uri).path)
+      iso_dir = File.dirname(iso_path)
+      if uri.include?("*") || uri.include?("?")
+        # We have wildcards in the uri. So we have to remove
+        # old ISOs before because the name could have been changed
+        # meanwhile.
+        Dir.entries(iso_dir).each do |filename|
+          path = File.join(iso_dir, filename)
+          File.delete(path) unless File.directory?(path)
+        end
+      end
+      if download_to(uri)
+        # Returning the first found ISO in this directory
+        Dir.entries(iso_dir).first
       else
         false
       end
@@ -49,8 +60,11 @@ module AYTests
     #
     # @return [true, false] true if the ISO was downloaded successfully;
     #                       false otherwise.
-    def download_to(uri, iso_path)
-      system("wget --no-clobber --progress=dot:giga -O #{iso_path} #{uri}")
+    def download_to(uri)
+      Dir.chdir(@dir) do
+        system("wget -r -l1 --no-clobber --progress=dot:giga"\
+          " -A \'#{File.basename(uri)}\' #{File.dirname(uri)}")
+      end
     end
   end
 end
