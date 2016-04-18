@@ -12,17 +12,4 @@ common: &common
   :iso_url: "http://dist.suse.de/install/SLE-12-SP1-Server-GM/SLE-12-SP1-Server-DVD-x86_64-GM-DVD1.iso"
 :sles12-sp2:
   :yast_url: "http://download.suse.de/ibs/Devel:/YaST:/Head/SLE-12-SP1/"
-  :iso_url: "http://dist.suse.de/install/SLE-12-SP1-Server-GM/SLE-12-SP1-Server-DVD-x86_64-GM-DVD1.iso"
-  :extra_repos:
-    - :server: "http://download.suse.de/ibs/SUSE:/SLE-12-SP1:/GA/standard/"
-      :packages: ["grub2-2.02~beta2", "grub2-i386-pc-2.02~beta2", "libzypp", "libsolv-tools", "zypper"]
-    - :server: "http://download.suse.de/ibs/SUSE:/SLE-12:/GA/standard/"
-      :packages: ["ruby2.1-rubygem-abstract_method", "libaugeas0" ]
-    - :server: "http://download.suse.de/ibs/SUSE:/SLE-12-SP2:/GA/standard/"
-      :packages: ["ruby2.1-rubygem-cheetah"]
-    - :server: "http://download.suse.de/ibs/Devel:/YaST:/Head/SLE-12-SP1/"
-      :packages: ["ruby2.1-rubygem-cfa", "ruby2.1-rubygem-cfa_grub2" ]
-    - :server: "http://download.suse.de/ibs/SUSE:/SLE-12-SP1:/GA/standard/"
-      :packages: ["ruby2.1-rubygem-ruby-augeas"]
-    - :server: "http://download.suse.de/ibs/SUSE:/SLE-12:/Update/standard/"
-      :packages: ["augeas-lenses"]
+  :iso_url: "http://dist.suse.de/install/SLE-12-SP2-UNTESTED/SLE-12-SP2-Server-DVD-x86_64-Build*-Media1.iso"
