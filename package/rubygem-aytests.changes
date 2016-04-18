@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Mon Apr 18 13:28:45 CEST 2016 - schubi@suse.de
+
+- Using wildcards in the ISO Url.
+- Cleanup sles12-sp2 tests. Now they are building on the latest
+  branch.
+- 1.0.15
+
+-------------------------------------------------------------------
 Wed Apr 13 14:33:27 CEST 2016 - schubi@suse.de
 
 - Added missing packages for sles12-sp2.
