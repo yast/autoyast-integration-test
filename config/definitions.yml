@@ -12,4 +12,5 @@ common: &common
   :iso_url: "http://dist.suse.de/install/SLE-12-SP1-Server-GM/SLE-12-SP1-Server-DVD-x86_64-GM-DVD1.iso"
 :sles12-sp2:
   :yast_url: "http://download.suse.de/ibs/Devel:/YaST:/Head/SLE-12-SP2-GA/"
+# This ISO is used by OpenQA too
   :iso_url: "http://download.suse.de/ibs/SUSE:/SLE-12-SP2:/GA:/Staging:/D/images/iso/Test-Server-DVD-x86_64-Build*-Media.iso"
