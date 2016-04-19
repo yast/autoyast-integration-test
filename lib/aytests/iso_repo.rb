@@ -50,7 +50,8 @@ module AYTests
       end
       if download_to(uri)
         # Returning the first found ISO in this directory
-        Dir.entries(iso_dir).first
+        filename = Dir.entries(iso_dir).delete_if{ |f| File.directory?(f) || !f.end_with?(".iso") }.first
+        File.join( iso_dir, filename)
       else
         false
       end
