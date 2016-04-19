@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Apr 19 15:42:52 CEST 2016 - schubi@suse.de
+
+- Fixed ISO source path.
+- 1.0.16
+
+-------------------------------------------------------------------
 Mon Apr 18 13:28:45 CEST 2016 - schubi@suse.de
 
 - Using wildcards in the ISO Url.
