@@ -39,7 +39,7 @@ module AYTests
     def get(uri)
       iso_path = File.join(@dir, URI(uri).host, URI(uri).path)
       iso_dir = File.dirname(iso_path)
-      if uri.include?("*") || uri.include?("?")
+      if File.exist?(iso_dir) && (uri.include?("*") || uri.include?("?"))
         # We have wildcards in the uri. So we have to remove
         # old ISOs before because the name could have been changed
         # meanwhile.
