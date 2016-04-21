@@ -76,8 +76,10 @@ module AYTests
               log.info "CLEANUP: Removing unneeded file #{pathname} in pool #{pool}"
               begin
                 Cheetah.run(["sudo", "virsh", "vol-delete", pathname])
-              rescue
-                log.error "FAILED; please check manually: \"sudo virsh vol-delete #{pathname}\""
+              rescue Cheetah::ExecutionFailed => e
+                log.error e.message
+                log.error e.stderr
+                log.error "FAILED; please check manually"
               end
             end
           end
