@@ -74,7 +74,11 @@ module AYTests
               # Either the file does not exists anymore or there are cloned instances
               # which have not been removed correctly by previous run.
               log.info "CLEANUP: Removing unneeded file #{pathname} in pool #{pool}"
-              Cheetah.run(["sudo", "virsh", "vol-delete", pathname])
+              begin
+                Cheetah.run(["sudo", "virsh", "vol-delete", pathname])
+              rescue
+                log.error "FAILED; please check manually: \"sudo virsh vol-delete #{pathname}\""
+              end
             end
           end
         end
