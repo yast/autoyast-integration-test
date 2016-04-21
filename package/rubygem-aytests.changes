@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Apr 21 13:15:05 CEST 2016 - schubi@suse.de
+
+- Fixed ISO path for update.
+- 1.0.18
+
+-------------------------------------------------------------------
 Thu Apr 21 09:40:04 CEST 2016 - schubi@suse.de
 
 - Checking error while deleting a non existing volume from pool.
