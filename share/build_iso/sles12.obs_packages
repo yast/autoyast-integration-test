@@ -56,4 +56,4 @@ yast2-xml
 yast2-ycp-ui-bindings
 yast2-ca-management
 yast2-mail
-ruby2.1-rubygem-suse-connect
+SUSEConnect
