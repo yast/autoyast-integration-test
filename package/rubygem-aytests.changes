@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Jun  9 15:38:13 CEST 2016 - schubi@suse.de
+
+- Updated vagrant RPM installation URL.
+- 1.0.20
+
+-------------------------------------------------------------------
 Tue May  3 11:09:55 CEST 2016 - schubi@suse.de
 
 - renaming rubygem-suse-connect --> SUSEConnect
