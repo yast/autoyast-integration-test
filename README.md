@@ -231,7 +231,7 @@ related) kernel module and load `vboxdrv` and friends.
 
 ### Leap 42.1
 
-Libvirt (1.2.* on Leap 42.1) has problems while deleting volumens from the `default` pool:
+Libvirt (1.2.* on Leap 42.1) has problems while deleting volumes from the `default` pool:
 
     # sudo virsh vol-delete autoyast_vagrant_box_image_0.img default
     # error: Failed to delete vol autoyast_vagrant_box_image_0.img
