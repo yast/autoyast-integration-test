@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Wed Jun 15 16:18:26 CEST 2016 - schubi@suse.de
+
+- Updated README for Leap 41.1
+
+-------------------------------------------------------------------
 Thu Jun  9 15:38:13 CEST 2016 - schubi@suse.de
 
 - Updated vagrant RPM installation URL.
