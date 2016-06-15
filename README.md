@@ -229,6 +229,23 @@ related) kernel module and load `vboxdrv` and friends.
     # rmmod kvm
     # rcvboxdrv start
 
+### Leap 42.1
+
+Libvirt (1.2.* on Leap 42.1) has problems while deleting volumes from the `default` pool:
+
+    # sudo virsh vol-delete autoyast_vagrant_box_image_0.img default
+    # error: Failed to delete vol autoyast_vagrant_box_image_0.img
+    # error: cannot unlink file '/var/lib/libvirt/images/autoyast_vagrant_box_image_0.img': Success
+
+libvirt-1.3.5-15.9.x86_64 solves this problem.
+
+After installation of the RPM please run:
+
+    # systemctl start virtlogd.socket
+
+in order to initialize the socket communication.
+
+
 ## Jenkins
 
 These AutoYaST integration tests are running on a SUSE Jenkins node:
