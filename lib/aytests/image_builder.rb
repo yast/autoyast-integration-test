@@ -31,6 +31,7 @@ module AYTests
     DEFAULT_LINUXRC_ARGS = {
       "autoyast" => "http://%IP%:{{PORT}}/autoinst.xml"
     }
+    CLONE_IMAGE_PATH = "/var/lib/libvirt/images/#{IMAGE_NAME}-1.qcow2"
 
     # Constructor
     #
@@ -164,6 +165,13 @@ module AYTests
     def export_from_veewee
       Dir.chdir(work_dir) do
         log.info "Exporting #{veewee_provider} image into box file"
+        # veewee changes the owner of this file to root.
+        # So the call "qemu-img convert" has no access anymore.
+        # --> Access has to be set manually.
+        if File.file? CLONE_IMAGE_PATH
+          log.info "Giving write permissions to #{CLONE_IMAGE_PATH}"
+          system "chmod 666 #{CLONE_IMAGE_PATH}"
+        end
         system "veewee #{veewee_provider} export #{IMAGE_NAME} --force"
       end
     end
