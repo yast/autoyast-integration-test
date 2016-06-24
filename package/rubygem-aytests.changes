@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu Jun 23 13:06:51 CEST 2016 - schubi@suse.de
+
+- Set correct permissions for file
+ /var/lib/libvirt/images/autoyast-1.qcow2
+- 1.0.22
+
+-------------------------------------------------------------------
 Wed Jun 15 16:18:26 CEST 2016 - schubi@suse.de
 
 - Updated README for Leap 42.1
