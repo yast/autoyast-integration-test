@@ -170,7 +170,7 @@ module AYTests
         # --> Access has to be set manually.
         if File.file? CLONE_IMAGE_PATH
           log.info "Giving write permissions to #{CLONE_IMAGE_PATH}"
-          system "chmod 666 #{CLONE_IMAGE_PATH}"
+          FileUtils.chmod( 0666, CLONE_IMAGE_PATH)
         end
         system "veewee #{veewee_provider} export #{IMAGE_NAME} --force"
       end
