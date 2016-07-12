@@ -14,3 +14,13 @@ common: &common
   :yast_url: "http://download.suse.de/ibs/Devel:/YaST:/Head/SLE-12-SP2-GA/"
 # This ISO is used by OpenQA too
   :iso_url: "http://download.suse.de/ibs/SUSE:/SLE-12-SP2:/GA:/Staging:/D/images/iso/Test-Server-DVD-x86_64-Build*-Media.iso"
+:sles12-sp2:
+  :yast_url: "http://download.suse.de/ibs/Devel:/YaST:/Head/SLE-12-SP2-GA/"
+# This ISO is used by OpenQA too
+  :iso_url: "http://download.suse.de/ibs/SUSE:/SLE-12-SP2:/GA:/Staging:/D/images/iso/Test-Server-DVD-x86_64-Build*-Media.iso"
+:leap42-storage-ng:
+  :yast_url: "http://download.opensuse.org/repositories/YaST:/Head/openSUSE_42.1/"
+  :iso_url: "http://dist.suse.de/install/openSUSE-Leap-42.1-GM/openSUSE-Leap-42.1-DVD-x86_64.iso"
+  :extra_repos:
+    - :server: "http://download.opensuse.org/repositories/YaST:/storage-ng/openSUSE_Leap_42.1/"
+      :packages: ["yast2-storage-ng", "libstorage-ng-python", " libstorage-ng-ruby", "libstorage-ng1"]
