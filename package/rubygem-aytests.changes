@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Tue Aug  2 08:03:59 UTC 2016 - igonzalezsosa@suse.com
+
+- Add a fake registration server to test basic registration and
+  self-update scenarios
+- 1.0.23
+
+-------------------------------------------------------------------
 Thu Jun 23 13:06:51 CEST 2016 - schubi@suse.de
 
 - Set correct permissions for file

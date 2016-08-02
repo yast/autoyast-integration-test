@@ -38,12 +38,23 @@ Veewee::Definition.declare({
     # doesn't work reliably with autoyast due to some timing issues.
     :before_create => Proc.new do
       require "aytests/web_server"
+      require "aytests/registration_server"
       require "pathname"
       Thread.new do
         AYTests::WebServer.new(
           veewee_dir: Pathname.pwd.join("definitions", "autoyast"),
           files_dir: ENV["AYTESTS_FILES_DIR"],
-          name: definition.box.name).start
+          name: definition.box.name
+        ).start
+      end
+
+      Thread.new do
+        certs_dir = Pathname.new(ENV["AYTESTS_SOURCES_DIR"]).join("ssl")
+        AYTests::RegistrationServer.new(
+          ca_crt_path: certs_dir.join("rootCA.pem"),
+          ca_key_path: certs_dir.join("rootCA.key"),
+          address: ENV["AYTESTS_IP_ADDRESS"]
+        ).start
       end
     end,
     :after_create => Proc.new do
