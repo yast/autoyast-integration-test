@@ -46,7 +46,7 @@ module AYTests
       cert, key, ca = certs_factory.generate(address)
       @server = WEBrick::HTTPServer.new(:BindAddress => address, :Port => port,
         :SSLEnable => true, :SSLCertificate => cert, :SSLPrivateKey => key,
-        :SSLClientCA => [ca])
+        :SSLClientCA => [ca], :SSLCACertificateFile => ca_crt_path.to_s)
       mount_endpoints
       @server
     end
