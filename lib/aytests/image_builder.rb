@@ -314,12 +314,13 @@ module AYTests
     #
     # Taken from Veewee to make sure that the IP matches.
     def local_ip
+      return @local_ip if @local_ip
       # turn off reverse DNS resolution temporarily
       orig, Socket.do_not_reverse_lookup = Socket.do_not_reverse_lookup, true
 
       UDPSocket.open do |s|
         s.connect '64.233.187.99', 1 # google
-        s.addr.last
+        @local_ip = s.addr.last
       end
     ensure
       Socket.do_not_reverse_lookup = orig
@@ -378,7 +379,9 @@ module AYTests
       environment = {
         "AYTESTS_BACKUP_IMAGE_NAME" => BACKUP_IMAGE_NAME,
         "AYTESTS_FILES_DIR" => files_dir.to_s,
+        "AYTESTS_SOURCES_DIR" => sources_dir.to_s,
         "AYTESTS_IMAGE_NAME" => IMAGE_NAME,
+        "AYTESTS_IP_ADDRESS" => local_ip,
         "AYTESTS_MAC_ADDRESS" => MAC_ADDRESS,
         "AYTESTS_PROVIDER" => provider.to_s
       }

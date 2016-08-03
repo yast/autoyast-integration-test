@@ -46,6 +46,15 @@ Veewee::Definition.declare({
           files_dir: ENV["AYTESTS_FILES_DIR"],
           name: definition.box.name).start
       end
+
+      Thread.new do
+        certs_dir = Pathname.new(ENV["AYTESTS_SOURCES_DIR"]).join("ssl")
+        AYTests::RegistrationServer.new(
+          ca_crt_path: certs_dir.join("rootCA.pem"),
+          ca_key_path: certs_dir.join("rootCA.key"),
+          address: ENV["AYTESTS_IP_ADDRESS"]
+        ).start
+      end
     end,
     :after_create => Proc.new do
       # Restoring old autoyast image which has to be updated.
