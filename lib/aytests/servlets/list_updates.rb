@@ -15,15 +15,15 @@ module AYTests
       }.freeze
 
       # @return [URI] Updates URL
-      attr_reader :update_url
+      attr_reader :updates_url
 
       # Constructor
       #
       # @param server     [WEBrick::HTTPServer] Server to attach the servlet
-      # @param update_url [URI] Updates URL
-      def initialize(server, update_url)
+      # @param updates_url [URI] Updates URL
+      def initialize(server, updates_url)
         super(server)
-        @update_url = update_url
+        @updates_url = updates_url
       end
 
       # Handle get requests
@@ -39,7 +39,7 @@ module AYTests
       #
       # @return [Array] Array of update repositories
       def updates
-        [PRODUCT.merge("url" => update_url.to_s)]
+        [PRODUCT.merge("url" => updates_url.to_s)]
       end
     end
   end

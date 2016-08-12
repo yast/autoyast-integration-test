@@ -9,11 +9,13 @@ RSpec.describe AYTests::RegistrationServer do
   let(:port) { 9000 }
   let(:http_server) { double("http_server") }
   let(:certs_factory) { double("certs factory") }
+  let(:updates_url) { "https://updates.suse.com/sles12" }
 
   subject(:server) do
     AYTests::RegistrationServer.new(
       ca_crt_path: ca_crt_path,
       ca_key_path: ca_key_path,
+      updates_url: updates_url,
       address:     address,
       port:        port
     )

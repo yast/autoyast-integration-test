@@ -51,10 +51,14 @@ Veewee::Definition.declare({
 
       Thread.new do
         certs_dir = Pathname.new(ENV["AYTESTS_SOURCES_DIR"]).join("ssl")
+        updates_url = URI("http://#{ENV["AYTESTS_IP_ADDRESS"]}:#{ENV["AYTESTS_WEBSERVER_PORT"]}" \
+          "/static/repos/sles12")
+
         AYTests::RegistrationServer.new(
           ca_crt_path: certs_dir.join("rootCA.pem"),
           ca_key_path: certs_dir.join("rootCA.key"),
-          address: ENV["AYTESTS_IP_ADDRESS"]
+          address: ENV["AYTESTS_IP_ADDRESS"],
+          updates_url: updates_url
         ).start
       end
     end,

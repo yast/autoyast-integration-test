@@ -368,8 +368,14 @@ module AYTests
     #
     # Set some environment variables:
     #
+    # * AYTESTS_BACKUP_IMAGE_NAME: image name for virtual machine's backup.
     # * AYTESTS_FILES_DIR: files to be served through HTTP.
+    # * AYTESTS_SOURCES_DIR: directory where Veewee related files live.
+    # * AYTESTS_IMAGE_NAME: image name for the virtual machine's disk.
+    # * AYTESTS_IP_ADDRESS: local IP.
+    # * AYTESTS_MAC_ADDRESS: MAC address.
     # * AYTESTS_WEBSERVER_PORT: files webserver port (WEBSERVER_PORT).
+    # * AYTESTS_PROVIDER: virtual machine's provider (virtualbox or libvirt).
     # * AYTESTS_LINUXRC: additional parameters for Linuxrc. They're taken
     #   from a file called after the profile but with `.linuxrc` extension.
     #
@@ -383,7 +389,8 @@ module AYTests
         "AYTESTS_IMAGE_NAME" => IMAGE_NAME,
         "AYTESTS_IP_ADDRESS" => local_ip,
         "AYTESTS_MAC_ADDRESS" => MAC_ADDRESS,
-        "AYTESTS_PROVIDER" => provider.to_s
+        "AYTESTS_PROVIDER" => provider.to_s,
+        "AYTESTS_WEBSERVER_PORT" => WEBSERVER_PORT
       }
       environment["AYTESTS_LINUXRC"] = linuxrc_options(autoinst.sub_ext(".linuxrc"))
       environment
