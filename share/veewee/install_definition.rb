@@ -19,6 +19,7 @@ Veewee::Definition.declare({
     ' textmode=1',
     ' insecure=1',
     ' netsetup=dhcp',
+    ' self_update=0',
     " #{ENV["AYTESTS_LINUXRC"]}",
     '<Enter>'
    ],
