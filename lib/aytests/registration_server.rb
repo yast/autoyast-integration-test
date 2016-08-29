@@ -1,7 +1,6 @@
 require "webrick"
 require "webrick/https"
 require "json"
-require "uri"
 require "aytests/certs_factory"
 require "aytests/servlets/list_updates"
 
@@ -22,19 +21,24 @@ module AYTests
     attr_reader :address
     # @return [Integer]  Port in which the server should address
     attr_reader :port
+    # @return [URI]      Installer updates URL
+    #                    See https://github.com/yast/yast-installation/blob/master/doc/SELF_UPDATE.md
+    attr_reader :updates_url
 
     # Constructor
     #
     # @param ca_cert_ path [Pathname] Path to CA certificate
     # @param ca_key_path   [Pathname] Path to CA key
+    # @param updates_url   [URI]      Installer updates URL
     # @param address       [String]   IP address in which the server should listen.
     #                                 Used as name certificate's CN.
     # @param port          [Integer]  Port in which the server should listen
-    def initialize(ca_crt_path:, ca_key_path:, address: "127.0.0.1", port: 8889)
+    def initialize(ca_crt_path:, ca_key_path:, updates_url:, address: "127.0.0.1", port: 8889)
       @ca_crt_path = ca_crt_path
       @ca_key_path = ca_key_path
       @address     = address
       @port        = port
+      @updates_url = updates_url
     end
 
     # Start the WEBrick server
@@ -81,8 +85,7 @@ module AYTests
     #
     # @see Servlets::ListUpdates
     def mount_endpoints
-      server.mount("/connect/repositories/installer", Servlets::ListUpdates,
-        URI("https://#{address}/static/repos/sles12"))
+      server.mount("/connect/repositories/installer", Servlets::ListUpdates, updates_url)
     end
   end
 end

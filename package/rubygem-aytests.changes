@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon Aug 29 08:08:13 UTC 2016 - igonzalezsosa@suse.com
+
+- Installer updates repository uses HTTP instead of HTTPS.
+- Enable self-update tests.
+- 1.0.25
+
+-------------------------------------------------------------------
 Tue Aug 16 09:27:41 CEST 2016 - schubi@suse.de
 
 - Disable self-update until it has been refactored.

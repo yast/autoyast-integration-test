@@ -20,7 +20,6 @@ Veewee::Definition.declare({
     ' insecure=1',
     ' autoupgrade=1',
     ' netsetup=dhcp',
-    ' self_update=0',
     " #{ENV["AYTESTS_LINUXRC"]}",
     '<Enter>'
    ],
@@ -41,6 +40,7 @@ Veewee::Definition.declare({
     :before_create => Proc.new do
       require "aytests/web_server"
       require "pathname"
+      require "uri"
       Thread.new do
         AYTests::WebServer.new(
           veewee_dir: Pathname.pwd.join("definitions", "autoyast"),
@@ -50,10 +50,14 @@ Veewee::Definition.declare({
 
       Thread.new do
         certs_dir = Pathname.new(ENV["AYTESTS_SOURCES_DIR"]).join("ssl")
+        updates_url = URI("http://#{ENV["AYTESTS_IP_ADDRESS"]}:#{ENV["AYTESTS_WEBSERVER_PORT"]}" \
+          "/static/repos/sles12")
+
         AYTests::RegistrationServer.new(
           ca_crt_path: certs_dir.join("rootCA.pem"),
           ca_key_path: certs_dir.join("rootCA.key"),
-          address: ENV["AYTESTS_IP_ADDRESS"]
+          address: ENV["AYTESTS_IP_ADDRESS"],
+          updates_url: updates_url
         ).start
       end
     end,
