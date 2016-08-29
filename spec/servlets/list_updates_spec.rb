@@ -8,7 +8,7 @@ RSpec.describe AYTests::Servlets::ListUpdates do
   let(:response) { double("response").as_null_object }
   let(:request) { double("request") }
   let(:server) { double("server").as_null_object }
-  let(:updates_url) { "https://updates.suse.com/sles12" }
+  let(:updates_url) { URI("https://updates.suse.com/sles12") }
 
   describe "#do_GET" do
     it "sets response code to 200" do

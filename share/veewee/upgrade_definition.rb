@@ -40,6 +40,7 @@ Veewee::Definition.declare({
     :before_create => Proc.new do
       require "aytests/web_server"
       require "pathname"
+      require "uri"
       Thread.new do
         AYTests::WebServer.new(
           veewee_dir: Pathname.pwd.join("definitions", "autoyast"),
