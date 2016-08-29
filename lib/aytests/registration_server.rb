@@ -1,7 +1,6 @@
 require "webrick"
 require "webrick/https"
 require "json"
-require "uri"
 require "aytests/certs_factory"
 require "aytests/servlets/list_updates"
 
@@ -23,6 +22,7 @@ module AYTests
     # @return [Integer]  Port in which the server should address
     attr_reader :port
     # @return [URI]      Installer updates URL
+    #                    See https://github.com/yast/yast-installation/blob/master/doc/SELF_UPDATE.md
     attr_reader :updates_url
 
     # Constructor
@@ -85,7 +85,7 @@ module AYTests
     #
     # @see Servlets::ListUpdates
     def mount_endpoints
-      server.mount("/connect/repositories/installer", Servlets::ListUpdates, URI(updates_url))
+      server.mount("/connect/repositories/installer", Servlets::ListUpdates, updates_url)
     end
   end
 end

@@ -9,7 +9,7 @@ RSpec.describe AYTests::RegistrationServer do
   let(:port) { 9000 }
   let(:http_server) { double("http_server") }
   let(:certs_factory) { double("certs factory") }
-  let(:updates_url) { "https://updates.suse.com/sles12" }
+  let(:updates_url) { URI("http://updates.suse.com/sles12") }
 
   subject(:server) do
     AYTests::RegistrationServer.new(
