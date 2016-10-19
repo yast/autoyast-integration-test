@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Wed Oct 19 09:28:36 UTC 2016 - igonzalezsosa@suse.com
+
+- Use Devel:/YaST:/SLE-12-SP2/SLE_12_SP2 repository
+  instead of Devel:/YaST:/Head/SLE-12-SP2-GA
+- 1.0.26
+
+-------------------------------------------------------------------
 Mon Aug 29 08:08:13 UTC 2016 - igonzalezsosa@suse.com
 
 - Installer updates repository uses HTTP instead of HTTPS.
