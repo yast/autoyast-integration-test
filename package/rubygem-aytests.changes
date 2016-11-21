@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon Nov 21 17:21:16 UTC 2016 - igonzalezsosa@suse.com
+
+- Add hwinfo to the lists of packages to include in SLE 12 SP2
+  because yast2-network needs an updated version
+- 1.0.27
+
+-------------------------------------------------------------------
 Wed Oct 19 09:28:36 UTC 2016 - igonzalezsosa@suse.com
 
 - Use Devel:/YaST:/SLE-12-SP2/SLE_12_SP2 repository
