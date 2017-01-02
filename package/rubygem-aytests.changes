@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Jan  2 11:12:07 CET 2017 - schubi@suse.de
+
+- Added latest hwinfo to sles12-sp2
+- 1.0.29
+
+-------------------------------------------------------------------
 Fri Dec 30 17:25:38 CET 2016 - schubi@suse.de
 
 - Added libsnapper4 to sles12-sp2
