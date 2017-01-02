@@ -14,3 +14,6 @@ common: &common
   :yast_url: "http://download.suse.de/ibs/Devel:/YaST:/SLE-12-SP2/SLE_12_SP2/"
 # This ISO is used by OpenQA too
   :iso_url: "http://download.suse.de/ibs/SUSE:/SLE-12-SP2:/GA:/Staging:/D/images/iso/Test-Server-DVD-x86_64-Build*-Media.iso"
+  :extra_repos:
+    - :server: "http://download.suse.de/ibs/Devel:/YaST:/Head/SLE-12-SP2-GA/"
+      :packages: ["libsnapper4"]
