@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Jan 27 14:26:01 CET 2017 - schubi@suse.de
+
+- Do not set hostname via DHCP. Set in linuxrc.
+- 1.0.30
+
+-------------------------------------------------------------------
 Mon Jan  2 11:12:07 CET 2017 - schubi@suse.de
 
 - Added latest hwinfo to sles12-sp2
