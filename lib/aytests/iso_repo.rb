@@ -35,28 +35,18 @@ module AYTests
     # If the ISO is not downloaded yet, tries to download it.
     #
     # @param [String] uri URI
-    # @return [Pathname]  Path to the local ISO.
+    # @return [Pathname] Path to the local ISO.
     def get(uri)
       iso_path = File.join(@dir, URI(uri).host, URI(uri).path)
       iso_dir = File.dirname(iso_path)
-      if File.exist?(iso_dir) && (uri.include?("*") || uri.include?("?"))
-        # We have wildcards in the uri. So we have to remove
-        # old ISOs before because the name could have been changed
-        # meanwhile.
-        Dir.entries(iso_dir).each do |filename|
-          path = File.join(iso_dir, filename)
-          File.delete(path) unless File.directory?(path)
-        end
-      end
-      if download_to(uri)
-        # Returning the first found ISO in this directory
-        filename = Dir.entries(iso_dir).find do |f| 
-          File.file?(File.join(iso_dir, f)) && f.end_with?(".iso")
-        end
-        File.join( iso_dir, filename)
-      else
-        false
-      end
+      return false unless download_to(uri)
+
+      iso_files = Dir.glob(File.join(iso_dir, "*"))
+      # Get the newest file and...
+      filename = iso_files.sort_by { |f| File.mtime(f) }.reverse.first
+      # ... remove the rest of files
+      (iso_files - [filename]).each { |f| File.delete(f) } unless iso_files.empty?
+      filename
     end
 
     # Download an ISO
