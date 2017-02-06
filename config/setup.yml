@@ -2,6 +2,7 @@ packages:
   common:
     - curl
     - gcc
+    - gcc-c++
     - libvirt          # Needed to run virtual machines
     - libvirt-devel    # Needed to compile libvirt Vagrant plugin
     - libxml2-devel    # Needed by libvirt plugin from Vagrant
