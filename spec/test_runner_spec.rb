@@ -27,6 +27,7 @@ RSpec.describe AYTests::TestRunner do
 
     context "with default configuration" do
       it "builds a new VM and returns test results" do
+        expect(builder).to receive(:cleanup_environment)
         expect(builder).to receive(:install)
         expect(runner).to receive(:system)
           .with({"AYTESTS_WORK_DIR" => TEST_WORK_DIR.to_s, "AYTESTS_PROVIDER" => provider.to_s},
@@ -39,6 +40,7 @@ RSpec.describe AYTests::TestRunner do
 
     context "when test fail" do
       it "returns false" do
+        expect(builder).to receive(:cleanup_environment)
         expect(builder).to receive(:install)
         expect(runner).to receive(:system)
           .with({"AYTESTS_WORK_DIR" => TEST_WORK_DIR.to_s, "AYTESTS_PROVIDER" => provider.to_s},
@@ -53,6 +55,7 @@ RSpec.describe AYTests::TestRunner do
       let(:test_file) { Pathname.new(__FILE__).dirname.join("files", "upgrade_sles12.rb") }
 
       it "builds a new VM running also the upgrade stage and returns tests results" do
+        expect(builder).to receive(:cleanup_environment)
         expect(builder).to receive(:install)
         expect(builder).to receive(:upgrade)
         expect(runner).to receive(:system)
@@ -68,6 +71,7 @@ RSpec.describe AYTests::TestRunner do
       let(:skip_build) { true }
 
       it "does not create a VM and returns tests results" do
+        expect(builder).to_not receive(:cleanup_environment)
         expect(AYTests::ImageBuilder).to_not receive(:new)
         expect(runner).to receive(:system)
           .with({"AYTESTS_WORK_DIR" => TEST_WORK_DIR.to_s, "AYTESTS_PROVIDER" => provider.to_s},

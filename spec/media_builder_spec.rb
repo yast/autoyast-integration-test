@@ -5,13 +5,16 @@ RSpec.describe AYTests::MediaBuilder do
   let(:work_dir) { Pathname.new("/home/autoyast/aytests") }
   let(:yast_url) { Pathname.new("http://build.suse.de/yast") }
   let(:iso_url) { Pathname.new("http://dl.suse.de/sles12.iso") }
+  let(:dud_dist) { "sle12" }
+  let(:dud_method) { "instsys,repo" }
   let(:version) { "sles12" }
   let(:output_path) { Pathname.pwd.join("spec/workspace/testing.iso") }
 
   subject(:builder) do
     AYTests::MediaBuilder.new(
       base_dir: base_dir, work_dir: work_dir, yast_url: yast_url,
-      iso_url: iso_url, version: version)
+      iso_url: iso_url, version: version, dud_dist: dud_dist,
+      dud_method: dud_method)
   end
 
   describe "#build" do
@@ -42,8 +45,8 @@ RSpec.describe AYTests::MediaBuilder do
   end
 
   describe "#boot_path" do
-    it "returns base_dir + boot_VERSION" do
-      expect(subject.boot_dir).to eq(Pathname.new("#{base_dir}/boot_#{version}"))
+    it "returns base_dir + share + boot_iso + boot_VERSION" do
+      expect(subject.boot_dir).to eq(Pathname.new("#{base_dir}/share/build_iso/boot_#{version}"))
     end
   end
 
