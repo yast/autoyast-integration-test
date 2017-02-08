@@ -5,6 +5,7 @@ Tue Feb  7 14:39:38 UTC 2017 - igonzalezsosa@suse.com
 - Do not remove downloaded ISO files until it's replaced by
   a new one
 - Reduce post-install and SSH login timeouts
+- Install latest Vagrant version (1.9.1)
 - 1.0.31
 
 -------------------------------------------------------------------
