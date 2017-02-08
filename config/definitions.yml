@@ -3,15 +3,19 @@ sle12_common: &sle12_common
   :extra_repos:
     - :server: "http://download.suse.de/ibs/SUSE:/SLE-12-SP1:/GA/standard/"
       :packages: ["grub2-2.02~beta2", "grub2-i386-pc-2.02~beta2", "libzypp", "libsolv-tools", "zypper"]
+
 :sles12:
   <<: *sle12_common
   :yast_url: "http://download.suse.de/ibs/Devel:/YaST:/Head/SLE-12-SP1/"
   :iso_url: "http://dist.suse.de/install/SLE-12-Server-GM/SLE-12-Server-DVD-x86_64-GM-DVD1.iso"
+
 :sles12-sp1:
   <<: *sle12_common
   :yast_url: "http://download.suse.de/ibs/Devel:/YaST:/SLE-12-SP1/SLE-12-SP1/"
   :iso_url: "http://dist.suse.de/install/SLE-12-SP1-Server-GM/SLE-12-SP1-Server-DVD-x86_64-GM-DVD1.iso"
+
 :sles12-sp2:
+  <<: *sle12_common
   :yast_url: "http://download.suse.de/ibs/Devel:/YaST:/SLE-12-SP2/SLE_12_SP2/"
 # This ISO is used by OpenQA too
   :iso_url: "http://download.suse.de/ibs/SUSE:/SLE-12-SP2:/GA:/Staging:/D/images/iso/Test-Server-DVD-x86_64-Build*-Media.iso"
@@ -20,6 +24,7 @@ sle12_common: &sle12_common
       :packages: ["libsnapper4"]
     - :server: "http://download.suse.de/ibs/SUSE:/SLE-12-SP2:/Update/standard/"
       :packages: ["hwinfo"]
+
 :caasp1.0:
   :dud_dist: "caasp1.0"
   :dud_method: "instsys"
