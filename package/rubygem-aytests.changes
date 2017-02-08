@@ -1,4 +1,14 @@
 -------------------------------------------------------------------
+Tue Feb  7 14:39:38 UTC 2017 - igonzalezsosa@suse.com
+
+- Add support for CaaSP 1.0
+- Do not remove downloaded ISO files until it's replaced by
+  a new one
+- Reduce post-install and SSH login timeouts
+- Install latest Vagrant version (1.9.1)
+- 1.0.31
+
+-------------------------------------------------------------------
 Fri Jan 27 14:26:01 CET 2017 - schubi@suse.de
 
 - Do not set hostname via DHCP. Set in linuxrc.

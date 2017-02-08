@@ -23,7 +23,7 @@ Veewee::Definition.declare({
     " #{ENV["AYTESTS_LINUXRC"]}",
     '<Enter>'
    ],
-  :ssh_login_timeout => "10000",
+  :ssh_login_timeout => "3600",
   :ssh_user => "vagrant",
   :ssh_password => "nots3cr3t",
   :ssh_key => "",
@@ -32,7 +32,7 @@ Veewee::Definition.declare({
   :sudo_cmd => "echo '%p'|sudo -S sh '%f'",
   :shutdown_cmd => "shutdown -P now",
   :postinstall_files => [ "postinstall.sh" ],
-  :postinstall_timeout => "10000",
+  :postinstall_timeout => "3600",
   :hooks => {
     # Before starting the build we spawn a webrick webserver which serves the
     # autoyast profile to the installer. veewee's built in webserver solution

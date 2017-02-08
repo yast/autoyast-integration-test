@@ -2,6 +2,7 @@ packages:
   common:
     - curl
     - gcc
+    - gcc-c++
     - libvirt          # Needed to run virtual machines
     - libvirt-devel    # Needed to compile libvirt Vagrant plugin
     - libxml2-devel    # Needed by libvirt plugin from Vagrant
@@ -16,4 +17,4 @@ packages:
   "13.2":
      - qemu-kvm             # Needed to run VMs
   remote:
-    vagrant: https://releases.hashicorp.com/vagrant/1.7.4/vagrant_1.7.4_x86_64.rpm
+    vagrant: https://releases.hashicorp.com/vagrant/1.9.1/vagrant_1.9.1_x86_64.rpm

@@ -11,10 +11,11 @@ module AYTests
     include AYTests::Helpers
 
     attr_reader :base_dir, :cache_dir, :local_packages_dir, :boot_dir,
-      :iso_path, :obs_pkg_list_path, :yast_url, :iso_url, :version, :output_path
+      :iso_path, :obs_pkg_list_path, :yast_url, :iso_url, :version, :output_path,
+      :dud_dist, :dud_method
 
     # --prefix=37 sets a directory prefix to avoid conflicts. Check mkdud README.
-    MKDUD_CMD = "mkdud -c %<dud_path>s -d sle12 -i  instsys,repo --prefix=37 " \
+    MKDUD_CMD = "mkdud -c %<dud_path>s -d %<dud_dist>s -i  %<dud_method>s --prefix=37 " \
       "--format=tar.gz $(find %<rpms_dir>s -name \"\*\.rpm\") %<dud_dir>s"
     MKSUSECD_CMD = "sudo mksusecd -c %<output_path>s --initrd=%<dud_path>s %<iso_path>s"
 
@@ -22,14 +23,16 @@ module AYTests
     #
     # @param [Pathname] base_dir Set the base directory. By default it uses
     #   AYTests.base_dir.
-    # @param [Pathname] yast_url YaST repository URL
+    # @param [String,Array<String>] yast_url YaST repositories URL
     # @param [Pathname] iso_url  Base ISO URL
     # @param [String]   version  Distribution version (+sles12+, +sles12-sp1+, etc.)
+    # @param [String]   dud_dist Distribution type for +mkdud+ (+sle12+, +caasp1.0+, etc.)
+    # @param [String]   dud_method Driver update disk mode (see +method+ option in +mkdud+)
     # @param [Pathname] work_dir Working directory. By default it uses AYTests.work_dir.
     # @param [Array<Hash>] extra_repos Extra repositories and packages to add to the
     #   ISO. The information for each repository consists in a Hash with +:server+
     #   and a +:packages+ keys.
-    def initialize(yast_url:, iso_url:, version:, base_dir: nil, work_dir: nil, extra_repos: [])
+    def initialize(yast_url:, iso_url:, version:, dud_dist:, dud_method: nil, base_dir: nil, work_dir: nil, extra_repos: [])
       # Directories
       @base_dir           = base_dir || AYTests.base_dir
       @work_dir           = work_dir || AYTests.work_dir
@@ -39,12 +42,14 @@ module AYTests
       @boot_dir           = @base_dir.join("share", "build_iso", "boot_#{version}")
 
       # URLs
-      @yast_url = yast_url
+      @yast_url = Array(yast_url)
       @iso_url  = iso_url
 
       # Misc data
       @version     = version
-      @extra_repos = extra_repos
+      @extra_repos = extra_repos || []
+      @dud_dist    = dud_dist
+      @dud_method  = dud_method || "instsys,repo"
     end
 
     # Build a new ISO using packages from OBS
@@ -96,10 +101,12 @@ module AYTests
     # it will download those packages as well.
     def fetch_obs_packages
       log.info "Fetching all required packages"
-      system "zypper --root #{cache_dir} ar --no-gpgcheck #{yast_url} download-packages"
+      yast_url.each_with_index do |url, index|
+        system "zypper --root #{cache_dir} ar --no-gpgcheck -p #{index+1} #{url} download-packages-#{index}"
+      end
       system "xargs -a #{obs_pkg_list_path} zypper --root #{cache_dir} --pkg-cache-dir=#{cache_dir} download"
 
-      log.info "Fetching latest grub2 and libzypp packages"
+      log.info "Fetching packages from extra repositories"
       @extra_repos.each do |repo|
         system "zypper --root #{cache_dir} rr download-packages"
         system "zypper --root #{cache_dir} ar --no-gpgcheck #{repo[:server]} download-packages"
@@ -139,9 +146,11 @@ module AYTests
     def build_iso(iso_path, output_path)
       log.info "Creating DUD"
       dud_path = cache_dir.join("#{version}.dud")
-      dud_dir = base_dir.join("share", "build_iso", "dud")
-      system format(MKDUD_CMD, dud_path: dud_path, dud_dir: dud_dir,
-                    rpms_dir: cache_dir)
+      dud_dir = base_dir.join("share", "build_iso", "dud", version)
+      cmd = format(MKDUD_CMD, dud_path: dud_path, dud_dist: dud_dist,
+        dud_method: dud_method, dud_dir: dud_dir, rpms_dir: cache_dir)
+      log.info "Command: #{cmd}"
+      system cmd
 
       log.info "Syncing to disk"
       system "sync"

@@ -1,11 +1,17 @@
 require "spec_helper"
 require "aytests/iso_repo"
+require "tmpdir"
+require "fileutils"
 
 RSpec.describe AYTests::IsoRepo do
-  let(:iso_dir) { Pathname.new("/tmp") }
+  let(:repo_dir) { Dir.mktmpdir }
   let(:iso_url) { "http://dl.opensuse.org/leap-42.1.iso" }
 
-  subject(:iso_repo) { AYTests::IsoRepo.new(iso_dir) }
+  subject(:iso_repo) { AYTests::IsoRepo.new(repo_dir) }
+
+  after(:each) do
+    FileUtils.rm_rf(repo_dir) if Dir.exist?(repo_dir)
+  end
 
   describe ".init" do
     let(:directory) { double("directory", :directory? => exist?)}
@@ -34,38 +40,27 @@ RSpec.describe AYTests::IsoRepo do
   end
 
   describe "#get" do
-    let(:iso_path) { double("iso_dir", exist?: exist?) }
+    let(:iso_dir) { File.join(repo_dir, "dl.opensuse.org") }
 
     before do
-      allow(iso_dir).to receive(:join).and_return(iso_path)
+      FileUtils.mkdir_p(iso_dir)
+      FileUtils.touch(File.join(iso_dir, "build0001.iso"))
     end
 
-    context "when file exists" do
-      let(:exist?) { true }
-      let(:iso_path) { double("iso_dir", exist?: true) }
-
-      it "does not download anything and returns the path" do
-        expect(iso_repo).to_not receive(:download_to)
-        expect(iso_repo.get(iso_url)).to eq(iso_path)
-      end
+    it "tries to download the ISO without overwriting any existing file" do
+      expect(iso_repo).to receive(:system)
+        .with(%r{wget .+no-clobber.+'leap-42.1.iso' http://dl.opensuse.org})
+        .and_return(true)
+      expect(iso_repo.get(iso_url)).to eq(File.join(iso_dir, "build0001.iso"))
     end
 
-    context "when file does not exist" do
-      let(:exist?) { false }
-
-      it "downloads the file and returns the path" do
-        expect(iso_repo).to receive(:download_to)
-          .with(iso_url, iso_path).and_return(true)
-        expect(iso_repo.get(iso_url)).to eq(iso_path)
-      end
-    end
-
-    context "when file does not exist and could not be downloaded" do
+    context "when file could not be downloaded" do
       let(:exist?) { false }
 
       it "returns false" do
-        allow(iso_repo).to receive(:download_to)
-          .with(iso_url, iso_path).and_return(false)
+        expect(iso_repo).to receive(:system)
+          .with(/wget/)
+          .and_return(false)
         expect(iso_repo.get(iso_url)).to eq(false)
       end
     end
