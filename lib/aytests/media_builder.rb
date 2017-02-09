@@ -106,11 +106,13 @@ module AYTests
       end
       system "xargs -a #{obs_pkg_list_path} zypper --root #{cache_dir} --pkg-cache-dir=#{cache_dir} download"
 
+      yast_url.size.times { |i| system "zypper --root #{cache_dir} rr download-packages-#{index}" }
+
       log.info "Fetching packages from extra repositories"
       @extra_repos.each do |repo|
-        system "zypper --root #{cache_dir} rr download-packages"
-        system "zypper --root #{cache_dir} ar --no-gpgcheck #{repo[:server]} download-packages"
+        system "zypper --root #{cache_dir} ar --no-gpgcheck #{repo[:server]} download-extra-packages"
         system "zypper --root #{cache_dir} --pkg-cache-dir=#{cache_dir} download #{repo[:packages].join(" ")}"
+        system "zypper --root #{cache_dir} rr download-extra-packages"
       end
     end
 
