@@ -45,6 +45,7 @@ RSpec.describe AYTests::IsoRepo do
     before do
       FileUtils.mkdir_p(iso_dir)
       FileUtils.touch(File.join(iso_dir, "build0001.iso"))
+      FileUtils.mkdir_p(File.join(iso_dir, "empty"))
     end
 
     it "tries to download the ISO without overwriting any existing file" do
