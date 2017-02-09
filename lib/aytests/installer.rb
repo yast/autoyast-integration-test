@@ -8,7 +8,7 @@ module AYTests
     GROUPS = ["libvirt", "qemu", "kvm", "vboxusers"]
     POLKIT_RULES_PATH = "/etc/polkit-1/rules.d/99-libvirt.rules"
     POLKIT_RULES_SAMPLE = File.join(File.dirname(__FILE__), "..", "..", "share", "files", "99-libvirt.rules")
-    VAGRANT_LIBVIRT_VERSION = "0.0.32"
+    VAGRANT_LIBVIRT_VERSION = "0.0.37"
     FOG_VERSION = "1.29"
 
     # Constructor
