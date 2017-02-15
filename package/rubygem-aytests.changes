@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu Feb  9 21:24:13 UTC 2017 - igonzalezsosa@suse.com
+
+- Fix ISO detection path when more files/directories are present
+  in the same directory
+- 1.0.33
+
+-------------------------------------------------------------------
 Thu Feb  9 10:43:30 UTC 2017 - igonzalezsosa@suse.com
 
 - Replace symlinks by real files in the dud/ directory to avoid

@@ -41,7 +41,9 @@ module AYTests
       iso_dir = File.dirname(iso_path)
       return false unless download_to(uri)
 
-      iso_files = Dir.glob(File.join(iso_dir, "*"))
+      extname = File.extname(iso_path)
+      iso_files = Dir.glob(File.join(iso_dir, "*#{extname}"))
+        .select { |f| File.file?(f) }
       # Get the newest file and...
       filename = iso_files.sort_by { |f| File.mtime(f) }.reverse.first
       # ... remove the rest of files
