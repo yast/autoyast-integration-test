@@ -149,6 +149,9 @@ module AYTests
       log.info "Creating DUD"
       dud_path = cache_dir.join("#{version}.dud")
       dud_dir = base_dir.join("share", "build_iso", "dud", version)
+      # Must have root access
+      system("sudo mkdir -p #{dud_dir}") unless File.directory?(dud_dir)
+
       cmd = format(MKDUD_CMD, dud_path: dud_path, dud_dist: dud_dist,
         dud_method: dud_method, dud_dir: dud_dir, rpms_dir: cache_dir)
       log.info "Command: #{cmd}"

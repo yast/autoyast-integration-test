@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Feb 16 16:41:30 CET 2017 - schubi@suse.de
+
+- Creating share/build_iso/dud/xxxx directory if it does not exist.
+- 1.0.35
+
+-------------------------------------------------------------------
 Thu Feb 16 10:15:30 CET 2017 - schubi@suse.de
 
 - fixed undefined variable
