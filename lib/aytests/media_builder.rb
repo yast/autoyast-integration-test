@@ -106,7 +106,7 @@ module AYTests
       end
       system "xargs -a #{obs_pkg_list_path} zypper --root #{cache_dir} --pkg-cache-dir=#{cache_dir} download"
 
-      yast_url.size.times { |i| system "zypper --root #{cache_dir} rr download-packages-#{index}" }
+      yast_url.size.times { |i| system "zypper --root #{cache_dir} rr download-packages-#{i}" }
 
       log.info "Fetching packages from extra repositories"
       @extra_repos.each do |repo|

@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Feb 16 10:15:30 CET 2017 - schubi@suse.de
+
+- fixed undefined variable
+- 1.0.34
+
+-------------------------------------------------------------------
 Thu Feb  9 21:24:13 UTC 2017 - igonzalezsosa@suse.com
 
 - Fix ISO detection path when more files/directories are present
