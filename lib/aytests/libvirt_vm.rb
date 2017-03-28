@@ -94,7 +94,17 @@ module AYTests
       state == RUNNING_STATE
     end
 
-    private
+    # Take a screenshot of the virtual machine
+    #
+    # @param [String,Pathname] File path to save the screenshot
+    def screenshot(path)
+      Cheetah.run(["sudo", "virsh", "screenshot", name, "--file", path.to_s])
+      true
+    rescue Cheetah::ExecutionFailed
+      false
+    end
+
+  private
 
     # Copy a virtual machine into another one
     #

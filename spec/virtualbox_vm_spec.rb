@@ -157,4 +157,34 @@ RSpec.describe AYTests::VirtualboxVM do
       end
     end
   end
+
+  describe "#screenshot" do
+    let(:path) { "/tmp/screenshot.png" }
+
+    it "uses VBoxManage to create a screenshot of the running system" do
+      expect(Cheetah).to receive(:run)
+        .with(["VBoxManage", "controlvm", subject.name, "screenshotpng", path])
+      subject.screenshot(path)
+    end
+
+    context "when screenshot was successfully saved" do
+      it "returns true" do
+        allow(Cheetah).to receive(:run)
+          .with(array_including("screenshotpng"))
+        expect(subject.screenshot(path)).to eq(true)
+      end
+    end
+
+    context "when screenshot was not successfully saved" do
+      before do
+        allow(Cheetah).to receive(:run)
+          .with(array_including("screenshotpng"))
+          .and_raise(Cheetah::ExecutionFailed.new(["VBoxManage"], 1, nil, nil))
+      end
+
+      it "returns false" do
+        expect(subject.screenshot(path)).to eq(false)
+      end
+    end
+  end
 end

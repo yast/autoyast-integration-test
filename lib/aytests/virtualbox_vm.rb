@@ -116,7 +116,18 @@ module AYTests
       match[1] == RUNNING_STATE
     end
 
-    private
+    # Take a screenshot of the virtual machine
+    #
+    # @param [String,Pathname] File path to save the screenshot
+    def screenshot(path)
+      Cheetah.run(["VBoxManage", "controlvm", name, "screenshotpng", path])
+      true
+    rescue Cheetah::ExecutionFailed
+      false
+    end
+
+
+  private
 
     # Determine the virtual machine's configuration file
     #

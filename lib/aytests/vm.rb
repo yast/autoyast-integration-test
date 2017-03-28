@@ -34,5 +34,9 @@ module AYTests
       end
       @driver.save
     end
+
+    def screenshot(path)
+      raise NotImplementedError
+    end
   end
 end
