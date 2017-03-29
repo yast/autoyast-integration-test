@@ -145,11 +145,16 @@ RSpec.describe AYTests::LibvirtVM do
   end
 
   describe "#screenshot" do
-    let(:path) { "/tmp/screenshot.png" }
+    let(:path) { Pathname.new("/tmp/screenshot.png") }
+
+    before do
+      allow(MiniMagick::Tool::Convert).to receive(:new)
+    end
 
     it "uses virsh to create a screenshot of the running system" do
       expect(Cheetah).to receive(:run)
-        .with(["sudo", "virsh", "screenshot", subject.name, "--file", path])
+        .with(["sudo", "virsh", "screenshot", subject.name, "--file", path.sub_ext(".pnm").to_s])
+      expect(MiniMagick::Tool::Convert).to receive(:new)
       subject.screenshot(path)
     end
 

@@ -2,13 +2,14 @@ require "aytests/web_server"
 require "aytests/registration_server"
 require "pathname"
 require "uri"
+require "fileutils"
 require "aytests/vm"
-
+require "aytests/vm_observer"
 
 module AYTests
   # This class implements Veewee hooks
   #
-  # It follows a similar approach to the one proposed in the documentation:
+  # It follows a similar approach to the one proposed in Veewee's documentation:
   # https://github.com/jedi4ever/veewee/blob/bea6837cea33ae2123f3e3ac53c97a203796e4f4/doc/build_hooks.md
   class VeeweeHooks
     # @return [Veewee::Definition] Veewee box definition
@@ -18,8 +19,10 @@ module AYTests
     # @return [Pathname] Document root for the webserver
     # FIXME: rename "webserver_root"
     attr_reader :files_dir
-    # @return [Pathname] Directory where Veewee related files live.
+    # @return [Pathname] Directory where Veewee related files live
     attr_reader :sources_dir
+    # @return [Pathname] Directory to save results (screenshots, logs, etc.)
+    attr_reader :results_dir
     # @return [String] Local IP address (listening address for web and registration servers)
     attr_reader :ip_address
     # @return [String] Virtual machine's MAC address
@@ -36,16 +39,18 @@ module AYTests
     # @param files_dir         [Pathname,String]    Document root for the webserver
     # @param sources_dir       [Pathname,String]    Directory where Veewee related files live
     #                                               (templates for definition, post-install script, etc.)
+    # @param results_dir       [Pathname,String]    Directory to write results (logs, screenshots, etc.)
     # @param ip_address        [String]             Local IP address (listening address for web and registration
     #                                               servers)
     # @param mac_address       [String]             Virtual machine's MAC address
     # @param webserver_port    [Integer,String]     Web server's port
     # @param backup_image_name [String]             Backup virtual machine's image name
-    def initialize(definition:, provider:, files_dir:, sources_dir:, ip_address:, mac_address:, webserver_port:, backup_image_name:)
+    def initialize(definition:, provider:, files_dir:, sources_dir:, results_dir:, ip_address:, mac_address:, webserver_port:, backup_image_name:)
       @definition = definition
-      @provider = provider
-      @files_dir = Pathname(files_dir)
-      @sources_dir = Pathname(sources_dir)
+      @provider = provider.to_sym
+      @files_dir = Pathname.new(files_dir)
+      @sources_dir = Pathname.new(sources_dir)
+      @results_dir = Pathname.new(results_dir)
       @ip_address = ip_address
       @mac_address = mac_address
       @webserver_port = webserver_port
@@ -69,6 +74,13 @@ module AYTests
       vm.update(mac: mac_address, boot_order: [:cdrom, :hd])
     end
 
+    # After up hook
+    #
+    # Start a VM observer which takes care of updating the latest screenshot
+    def after_up
+      start_thread { start_observer }
+    end
+
     # Before upgrade hook
     #
     # Implement the `after_create` hook for the *upgrade scenario*.
@@ -77,7 +89,7 @@ module AYTests
     # * Update the virtual machine's MAC address
     # * Restore the ISO to use. At this point, the ISO used to do the
     #   install was linked. Now we need to use the generated one.
-    def before_upgrade
+    def after_create_on_upgrade
       vm.restore!(backup_image_name)
       vm.update(mac: mac_address, boot_order: [:cdrom, :hd])
 
@@ -87,6 +99,13 @@ module AYTests
       obs_iso = File.join(base_dir, "veewee/iso/obs.iso")
       # Taking obs iso for upgrade
       FileUtils.ln(obs_iso, testing_iso) if File.file?(obs_iso) && !File.file?(testing_iso)
+    end
+
+    # After up hook
+    #
+    # Start a VM observer which takes care of updating the latest screenshot
+    def after_up
+      start_thread { start_observer }
     end
 
     # After postinstall hook
@@ -124,6 +143,14 @@ module AYTests
       ).start
     end
 
+    def start_observer
+      AYTests::VMObserver.new(
+        name:            definition.name,
+        provider:        provider,
+        screenshot_path: results_dir.join("screenshot.png")
+      ).start
+    end
+
     # Start a stores a new thread
     def start_thread(&block)
       @threads << Thread.new(&block)
@@ -138,7 +165,6 @@ module AYTests
     # Virtual machine
     def vm
       return @vm if @vm
-      require "aytests/#{provider}_vm"
       @vm = AYTests::VM.new(definition.name, provider.to_sym)
     end
   end

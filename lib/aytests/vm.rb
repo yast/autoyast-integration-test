@@ -8,7 +8,7 @@ module AYTests
     extend Forwardable
 
     def_delegators :@driver, :mac, :mac=, :boot_order, :boot_order=, :stop,
-      :backup, :restore!, :running?
+      :backup, :restore!, :running?, :screenshot
 
     attr_reader :driver, :name
 
@@ -19,6 +19,7 @@ module AYTests
     def initialize(name, provider)
       driver_class = "#{provider.capitalize}VM"
       @name = name
+      require "aytests/#{provider}_vm"
       @driver = AYTests.const_get(driver_class).new(name)
     end
 
@@ -33,10 +34,6 @@ module AYTests
         send("#{meth}=", value)
       end
       @driver.save
-    end
-
-    def screenshot(path)
-      raise NotImplementedError
     end
   end
 end

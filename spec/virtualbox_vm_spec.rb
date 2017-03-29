@@ -159,7 +159,7 @@ RSpec.describe AYTests::VirtualboxVM do
   end
 
   describe "#screenshot" do
-    let(:path) { "/tmp/screenshot.png" }
+    let(:path) { Pathname.new("/tmp/screenshot.png") }
 
     it "uses VBoxManage to create a screenshot of the running system" do
       expect(Cheetah).to receive(:run)

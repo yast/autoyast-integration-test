@@ -1,19 +1,15 @@
 require "spec_helper"
 require "aytests/vm"
+require "pathname"
 
 RSpec.describe AYTests::VM do
-  class DummyVM
-    def initialize(name); end
-  end
-
-  subject(:vm) { AYTests::VM.new(vm_name, :dummy) }
+  subject(:vm) { AYTests::VM.new(vm_name, :libvirt) }
 
   let(:vm_name) { "autoyast" }
   let(:driver) { double("driver") }
 
   before do
-    allow(AYTests).to receive(:const_get).with("DummyVM").and_return(DummyVM)
-    allow(DummyVM).to receive(:new).with(vm_name).and_return(driver)
+    allow(AYTests::LibvirtVM).to receive(:new).with(vm_name).and_return(driver)
   end
 
   describe ".new" do
@@ -53,6 +49,14 @@ RSpec.describe AYTests::VM do
     it "relies on driver #boot_order= method" do
       expect(driver).to receive(:boot_order=).with([:hd, :cdrom])
       subject.boot_order = [:hd, :cdrom]
+    end
+  end
+
+  describe "#screenshot" do
+    it "relies on driver #screenshot method" do
+      path = Pathname("screenshot.png")
+      expect(driver).to receive(:screenshot).with(path)
+      subject.screenshot(path)
     end
   end
 

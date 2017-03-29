@@ -3,8 +3,9 @@ require "aytests/veewee_hooks"
 hooks = AYTests::VeeweeHooks.new(
   definition:        veewee_definition,
   provider:          ENV["AYTESTS_PROVIDER"].to_sym,
-  files_dir:         ENV["AYTESTS_FILES_DIR"],
-  sources_dir:       ENV["AYTESTS_SOURCES_DIR"],
+  files_dir:         ENV["AYTESTS_FILES_DIR"].to_s,
+  sources_dir:       ENV["AYTESTS_SOURCES_DIR"].to_s,
+  results_dir:       ENV["AYTESTS_RESULTS_DIR"].to_s,
   ip_address:        ENV["AYTESTS_IP_ADDRESS"],
   mac_address:       ENV["AYTESTS_MAC_ADDRESS"],
   webserver_port:    ENV["AYTESTS_WEBSERVER_PORT"].to_i,
@@ -49,7 +50,8 @@ Veewee::Definition.declare({
   :postinstall_timeout => "3600",
   :hooks => {
     :before_create => proc { hooks.before_create },
-    :after_upgrade => proc { hooks.before_upgrade },
-    :after_postinstall => proc { hooks.after_postinstall }
+    :after_create => proc { hooks.after_create_on_upgrade },
+    :after_postinstall => proc { hooks.after_postinstall },
+    :after_up => proc { hooks.after_up }
   }
 })

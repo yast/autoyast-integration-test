@@ -13,7 +13,7 @@ module AYTests
 
     attr_reader :sources_dir, :obs_iso_dir, :autoinst_path, :definition_path,
       :veewee_autoyast_dir, :libvirt_definition_path, :provider, :headless, :work_dir,
-      :files_dir
+      :files_dir, :results_dir
 
     IMAGE_NAME = "autoyast"
     BACKUP_IMAGE_NAME = "autoyast_sav"
@@ -44,9 +44,10 @@ module AYTests
     #                               (:libvirt or :virtualbox)
     # @param [Symbol]   headless    Disable GUI (only relevant for virtualbox
     #                               provider)
-    def initialize(sources_dir: nil, work_dir: nil, files_dir: nil, provider: :libvirt, headless: false)
+    def initialize(sources_dir: nil, work_dir: nil, results_dir: nil, files_dir: nil, provider: :libvirt, headless: false)
       @sources_dir = sources_dir
       @work_dir = work_dir
+      @results_dir = results_dir
       @files_dir = files_dir
       @veewee_autoyast_dir = @work_dir.join("definitions", "autoyast")
       @obs_iso_dir = @work_dir.join("iso")
@@ -371,6 +372,7 @@ module AYTests
     # * AYTESTS_BACKUP_IMAGE_NAME: image name for virtual machine's backup.
     # * AYTESTS_FILES_DIR: files to be served through HTTP.
     # * AYTESTS_SOURCES_DIR: directory where Veewee related files live.
+    # * AYTESTS_RESULTS_DIR: directory to save results (logs, screenshots, etc.)
     # * AYTESTS_IMAGE_NAME: image name for the virtual machine's disk.
     # * AYTESTS_IP_ADDRESS: local IP.
     # * AYTESTS_MAC_ADDRESS: MAC address.
@@ -386,6 +388,7 @@ module AYTests
         "AYTESTS_BACKUP_IMAGE_NAME" => BACKUP_IMAGE_NAME,
         "AYTESTS_FILES_DIR" => files_dir.to_s,
         "AYTESTS_SOURCES_DIR" => sources_dir.to_s,
+        "AYTESTS_RESULTS_DIR" => results_dir.to_s,
         "AYTESTS_IMAGE_NAME" => IMAGE_NAME,
         "AYTESTS_IP_ADDRESS" => local_ip,
         "AYTESTS_MAC_ADDRESS" => MAC_ADDRESS,

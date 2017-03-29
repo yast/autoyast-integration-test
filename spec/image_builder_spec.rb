@@ -5,6 +5,7 @@ require "aytests/iso_repo"
 RSpec.describe AYTests::ImageBuilder do
   let(:work_dir) { TEST_WORK_DIR }
   let(:sources_dir) { Pathname.new(__FILE__).dirname.join("..", "share", "veewee") }
+  let(:results_dir) { TEST_WORK_DIR.join("results") }
   let(:files_dir) { TEST_WORK_DIR.join("files") }
   let(:autoinst_path) { Pathname.new(__FILE__).dirname.join("files", "autoinst.xml") }
   let(:iso_url) { "http://dl.opensuse.org/leap-42.1.iso" }
@@ -13,8 +14,8 @@ RSpec.describe AYTests::ImageBuilder do
   let(:local_ip) { "192.168.122.232" }
 
   let(:default_args) do
-    { sources_dir: sources_dir, work_dir: work_dir, files_dir: files_dir,
-      provider: provider, headless: true }
+    { sources_dir: sources_dir, results_dir: results_dir, work_dir: work_dir,
+      files_dir: files_dir, provider: provider, headless: true }
   end
 
   subject(:builder) { AYTests::ImageBuilder.new(default_args) }
@@ -88,6 +89,7 @@ RSpec.describe AYTests::ImageBuilder do
           "AYTESTS_BACKUP_IMAGE_NAME" => "autoyast_sav",
           "AYTESTS_FILES_DIR" => files_dir.to_s,
           "AYTESTS_SOURCES_DIR" => sources_dir.to_s,
+          "AYTESTS_RESULTS_DIR" => results_dir.to_s,
           "AYTESTS_IMAGE_NAME" => "autoyast",
           "AYTESTS_IP_ADDRESS" => local_ip,
           "AYTESTS_MAC_ADDRESS" => "02:00:00:12:34:56",
@@ -142,6 +144,7 @@ RSpec.describe AYTests::ImageBuilder do
           "AYTESTS_BACKUP_IMAGE_NAME" => "autoyast_sav",
           "AYTESTS_FILES_DIR" => files_dir.to_s,
           "AYTESTS_SOURCES_DIR" => sources_dir.to_s,
+          "AYTESTS_RESULTS_DIR" => results_dir.to_s,
           "AYTESTS_IMAGE_NAME" => "autoyast",
           "AYTESTS_IP_ADDRESS" => local_ip,
           "AYTESTS_MAC_ADDRESS" => "02:00:00:12:34:56",
