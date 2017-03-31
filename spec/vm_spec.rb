@@ -7,8 +7,9 @@ RSpec.describe AYTests::VM do
   subject(:vm) { AYTests::VM.new(vm_name, :libvirt) }
 
   let(:vm_name) { "autoyast" }
-  let(:driver) { double("driver", ip: ip) }
+  let(:driver) { double("driver", mac: mac) }
   let(:ip) { "192.168.122.50" }
+  let(:mac) { "52:54:00:8a:98:c4" }
 
   before do
     allow(AYTests::LibvirtVM).to receive(:new).with(vm_name).and_return(driver)
@@ -133,6 +134,18 @@ RSpec.describe AYTests::VM do
       it "returns false" do
         expect(subject.download(source, target, port: port, user: user, password: password)).to eq(false)
       end
+    end
+  end
+
+  describe "#ip" do
+    before do
+      allow(Cheetah).to receive(:run)
+        .with(["arp", "-n"], stdout: :capture)
+        .and_return(File.read(FIXTURES_PATH.join("arp.txt")))
+    end
+
+    it "returns the IP address" do
+      expect(subject.ip).to eq("192.168.122.94")
     end
   end
 end

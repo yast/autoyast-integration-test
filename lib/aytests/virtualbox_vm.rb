@@ -126,17 +126,6 @@ module AYTests
       false
     end
 
-    # Determine VirtualBox VM IP
-    #
-    # @param  [String] VirtualBox machine name
-    # @return [Hash]   IP address
-    def ip
-      mac_string = `VBoxManage showvminfo #{name} --machinereadable | grep Forwarding`
-      data = mac_string.match(/.+="\w+,tcp,,(\d+),,22"/)
-      port = data[1].to_i
-      { address: SSH_ADDRESS, port: port }
-    end
-
   private
 
     # Determine the virtual machine's configuration file

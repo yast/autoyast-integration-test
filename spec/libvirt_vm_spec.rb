@@ -179,19 +179,4 @@ RSpec.describe AYTests::LibvirtVM do
       end
     end
   end
-
-  describe "#ip" do
-    before do
-      allow(Cheetah).to receive(:run)
-        .with(["sudo", "virsh", "domiflist", NAME], stdout: :capture)
-        .and_return(File.read(FIXTURES_PATH.join("domiflist.txt")))
-      allow(Cheetah).to receive(:run)
-        .with(["arp", "-n"], stdout: :capture)
-        .and_return(File.read(FIXTURES_PATH.join("arp.txt")))
-    end
-
-    it "returns the IP address" do
-      expect(subject.ip).to eq("192.168.122.94")
-    end
-  end
 end

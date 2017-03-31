@@ -107,21 +107,6 @@ module AYTests
       false
     end
 
-    # Determine libvirt domain IP
-    #
-    # @param  [String] libvirt domain name
-    # @return [String] IP address
-    def ip
-      iflist = Cheetah.run(["sudo", "virsh", "domiflist", name], stdout: :capture)
-      device_entry = iflist.lines[2]
-      return nil if device_entry.nil?
-      mac = device_entry.split(" ").last
-      arp = Cheetah.run(["arp", "-n"], stdout: :capture)
-      entry = arp.lines.find { |a| a.include?(mac) }
-      return nil if entry.nil?
-      entry.split(" ")[0]
-    end
-
   private
 
     # Copy a virtual machine into another one

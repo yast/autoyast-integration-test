@@ -2,7 +2,7 @@ require "spec_helper"
 require "aytests/virtualbox_vm"
 
 RSpec.describe AYTests::VirtualboxVM do
-  VIRTUALBOX_DEFINITION = File.join(File.dirname(__FILE__), "files", "autoyast-virtualbox.txt")
+  VIRTUALBOX_DEFINITION = FIXTURES_PATH.join("autoyast-virtualbox.txt")
 
   subject { AYTests::VirtualboxVM.new("autoyast") }
   let(:definition) { File.read(VIRTUALBOX_DEFINITION) }

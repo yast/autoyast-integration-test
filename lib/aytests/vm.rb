@@ -14,7 +14,7 @@ module AYTests
     DEFAULT_SSH_PORT = 22
 
     def_delegators :@driver, :mac, :mac=, :boot_order, :boot_order=, :stop,
-      :backup, :restore!, :running?, :screenshot, :ip
+      :backup, :restore!, :running?, :screenshot
 
     attr_reader :driver, :name
 
@@ -64,11 +64,21 @@ module AYTests
     # @param port     [Integer]         SSH port
     # @return [Boolean] true if the operation was successful; false otherwise
     def download(remote, local, port:, user:, password:)
-      Net::SSH::Simple.scp_get(driver.ip, remote.to_s, local.to_s,
+      Net::SSH::Simple.scp_get(ip, remote.to_s, local.to_s,
         user: user, port: port, password: password, paranoid: false)
       true
     rescue Net::SSH::Simple::Error
       false
+    end
+
+    # Determine virtual machine IP
+    #
+    # @return [String] IP address
+    def ip
+      arp = Cheetah.run(["arp", "-n"], stdout: :capture)
+      entry = arp.lines.find { |a| a.include?(mac) }
+      return nil if entry.nil?
+      entry.split(" ")[0]
     end
   end
 end

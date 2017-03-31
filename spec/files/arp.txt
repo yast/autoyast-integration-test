@@ -1,4 +1,3 @@
 Address                  HWtype  HWaddress           Flags Mask            Iface
-192.168.122.94           ether   52:54:00:4d:3f:40   C                     virbr0
-canaria1.openvpn.suse.d  ether   00:11:6b:67:db:00   C                     em1
-canaria4.openvpn.suse.d  ether   d4:ae:52:bf:5f:96   C                     em1
+192.168.122.94           ether   52:54:00:8a:98:c4   C                     virbr0
+192.168.122.95           ether   d4:ae:52:bf:5f:96   C                     em1
