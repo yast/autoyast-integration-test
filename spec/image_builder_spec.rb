@@ -214,6 +214,7 @@ RSpec.describe AYTests::ImageBuilder do
   describe "#export_from_veewee" do
     before(:each) do
       FileUtils.mkdir_p(TEST_WORK_DIR)
+      allow(File).to receive(:file?).and_return(false)
     end
 
     it "relies on Veewee and returns true if it was successful" do
@@ -224,6 +225,18 @@ RSpec.describe AYTests::ImageBuilder do
     it "relies on Veewee and returns false if it was not successful" do
       expect(builder).to receive(:system).with(/veewee kvm export/).and_return(false)
       expect(builder.export_from_veewee).to eq(false)
+    end
+
+    context "when cloned image exists" do
+      before do
+        allow(File).to receive(:file?).and_return(true)
+      end
+
+      it "sets permissions" do
+        allow(builder).to receive(:system).with(/veewee kvm export/).and_return(true)
+        expect(FileUtils).to receive(:chmod).with(0666, /images/)
+        builder.export_from_veewee
+      end
     end
   end
 
