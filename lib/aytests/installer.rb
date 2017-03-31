@@ -10,6 +10,7 @@ module AYTests
     POLKIT_RULES_SAMPLE = File.join(File.dirname(__FILE__), "..", "..", "share", "files", "99-libvirt.rules")
     VAGRANT_LIBVIRT_VERSION = "0.0.37"
     FOG_VERSION = "1.29"
+    PROGRESSBAR_VERSION = "0.21.0"
 
     # Constructor
     #
@@ -133,7 +134,8 @@ module AYTests
       File.open(File.join(ENV["HOME"], ".profile"), "a") do |f|
         f.puts "export PATH=#{File.join(Gem.user_dir, "bin")}:\$PATH"
       end
-      install_gem("fog-core", version: FOG_VERSION, )
+      install_gem("progressvar", version: PROGRESSBAR_VERSION)
+      install_gem("fog-core", version: FOG_VERSION)
       environment = {"NOKOGIRI_USE_SYSTEM_LIBRARIES" => "1"}
       install_gem("fog", version: FOG_VERSION, environment: environment)
       install_gem("veewee", environment: environment)
