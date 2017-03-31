@@ -102,3 +102,5 @@ RSpec.configure do |config|
     FileUtils.rm_rf(TEST_WORK_DIR)
   end
 end
+
+FIXTURES_PATH = Pathname.new(File.dirname(__FILE__)).join("files")

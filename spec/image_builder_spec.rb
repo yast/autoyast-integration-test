@@ -12,6 +12,8 @@ RSpec.describe AYTests::ImageBuilder do
   let(:path_to_iso) { work_dir.join("iso", "leap-42.1.iso") }
   let(:provider) { :libvirt }
   let(:local_ip) { "192.168.122.232" }
+  let(:vm) { double("vm", name: "autoyast", run: true, download: true) }
+  let(:vm_name) { "autoyast" }
 
   let(:default_args) do
     { sources_dir: sources_dir, results_dir: results_dir, work_dir: work_dir,
@@ -67,6 +69,10 @@ RSpec.describe AYTests::ImageBuilder do
   end
 
   describe "#install" do
+    before do
+      allow(AYTests::VM).to receive(:new).with(vm_name, :libvirt).and_return(vm)
+    end
+
     it "runs each building phase and returns true if build was successful" do
       # Retrieve and link ISO
       expect(AYTests::IsoRepo).to receive(:get).with(iso_url)
@@ -99,6 +105,11 @@ RSpec.describe AYTests::ImageBuilder do
         "veewee kvm build #{AYTests::ImageBuilder::IMAGE_NAME} --force --auto --nogui")
         .and_return(true)
 
+      # Download logs
+      expect(vm).to receive(:run).with(/tar/, any_args)
+      expect(vm).to receive(:download)
+        .with("/tmp/logs.tgz", results_dir.join("installation-y2logs.tgz"), any_args)
+
       #
       # Perform the installation
       #
@@ -120,6 +131,10 @@ RSpec.describe AYTests::ImageBuilder do
   end
 
   describe "#upgrade" do
+    before do
+      allow(AYTests::VM).to receive(:new).with(vm_name, :libvirt).and_return(vm)
+    end
+
     it "runs each building phase and returns true if build was successful" do
       # Retrieve and link ISO
       expect(AYTests::IsoRepo).to receive(:get).with(iso_url)
@@ -155,6 +170,11 @@ RSpec.describe AYTests::ImageBuilder do
         .and_return(true)
 
       allow(builder).to receive(:sleep)
+
+      # Download logs
+      expect(vm).to receive(:run).with(/tar/, any_args)
+      expect(vm).to receive(:download)
+        .with("/tmp/logs.tgz", results_dir.join("upgrade-y2logs.tgz"), any_args)
 
       #
       # Perform the upgrade

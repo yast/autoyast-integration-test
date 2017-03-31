@@ -1,8 +1,6 @@
 require "uri"
 require "socket"
 require "aytests/vm"
-require "aytests/libvirt_vm"
-require "aytests/virtualbox_vm"
 
 module AYTests
   class ImageBuilder
@@ -23,7 +21,6 @@ module AYTests
     SLEEP_TIME_AFTER_SHUTDOWN = 15
     SSH_USER = "vagrant"
     SSH_PASSWORD = "nots3cr3t"
-    SSH_ADDRESS = "127.0.0.1"
     SSH_PORT = "22"
     WEBSERVER_PORT = "8888"
     MAC_ADDRESS = "02:00:00:12:34:56"
@@ -107,7 +104,9 @@ module AYTests
       setup_iso(iso_url)
       setup_autoinst(autoinst)
       setup_definition(:install)
-      build(autoinst)
+      ret = build(autoinst)
+      download_logs(results_dir.join("installation-y2logs.tgz"))
+      ret
     end
 
     # Run the installation using a given profile and an ISO
@@ -141,6 +140,7 @@ module AYTests
       log.info "Waiting #{SLEEP_TIME_AFTER_UPGRADE} seconds for upgrade process to finish"
       sleep SLEEP_TIME_AFTER_UPGRADE
       run_postinstall
+      download_logs(results_dir.join("upgrade-y2logs.tgz"))
       true
     end
 
@@ -213,16 +213,11 @@ module AYTests
     #
     # Veewee won't be able to run post-install script after upgrade.
     def run_postinstall
-      Net::SSH::Simple.sync do
-        log.info "Running post-install script"
-        data = vm_ip(IMAGE_NAME)
-        ssh data[:address], "sudo env #{POSTINSTALL_SCRIPT}",
-          { port: data[:port], user: SSH_USER, password: SSH_PASSWORD,
-            paranoid: false }
-      end
+      log.info "Running post-install script"
+      vm.run("sudo env #{POSTINSTALL_SCRIPT}", ssh_options)
     end
 
-    private
+  private
 
     # Build a Vagrant image using Veewee
     #
@@ -305,7 +300,6 @@ module AYTests
     # backup it and restore in Veewee's +after_create+ hook. Note: doing this in the
     # +before_create+ hook won't work as the machine is destroyed previously.
     def backup_image
-      vm = VM.new(IMAGE_NAME, provider)
       vm.backup(BACKUP_IMAGE_NAME)
     end
 
@@ -325,36 +319,6 @@ module AYTests
       end
     ensure
       Socket.do_not_reverse_lookup = orig
-    end
-
-    def vm_ip(name)
-      case provider
-      when :libvirt
-        libvirt_vm_ip(name)
-      when :virtualbox
-        virtualbox_vm_ip(name)
-      end
-    end
-
-    # Determine libvirt domain IP
-    #
-    # @param  [String] libvirt domain name
-    # @return [Hash]   IP address and port
-    def libvirt_vm_ip(name)
-      mac = `sudo virsh domiflist #{name} | tail -n +3 | tr -s " " | cut -f 5 -d " "`.strip
-      address = `arp | grep -i #{mac} | cut -f1 -d " "`.chomp
-      { address: address, port: SSH_PORT }
-    end
-
-    # Determine VirtualBox VM IP
-    #
-    # @param  [String] VirtualBox machine name
-    # @return [Hash]   IP address and port
-    def virtualbox_vm_ip(name)
-      mac_string = `VBoxManage showvminfo #{name} --machinereadable | grep Forwarding`
-      data = mac_string.match(/.+="\w+,tcp,,(\d+),,22"/)
-      port = data[1].to_i
-      { address: SSH_ADDRESS, port: port }
     end
 
     # Prepare Veewee directory
@@ -461,6 +425,34 @@ module AYTests
         val.nil? ? key : "#{key}=#{val}"
       end
       parts.join(" ")
+    end
+
+    # Download YaST2 logs from the virtual machine
+    #
+    # @param [Pathname] path File to save the logs
+    # @return [Boolean] True if the download was successful; false otherwise.
+    def download_logs(path)
+      log.info "Downloading YaST2 logs"
+      # save_y2logs is not always available (CaaSP or mininal installation)
+      vm.run("sudo /bin/tar -C /var/log -czf /tmp/logs.tgz YaST2", ssh_options)
+      vm.download("/tmp/logs.tgz", path, ssh_options)
+    end
+
+    # Return a representation of the virtual machine
+    #
+    # This class provides methods to run code, download logs, etc.
+    #
+    # @return [AYTests::VM] Virtual machine
+    def vm
+      @vm ||= VM.new(IMAGE_NAME, provider)
+    end
+
+    def ssh_options
+      @ssh_options ||= {
+        user:     SSH_USER,
+        password: SSH_PASSWORD,
+        port:     SSH_PORT
+      }
     end
   end
 end

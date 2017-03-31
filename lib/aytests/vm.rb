@@ -1,4 +1,5 @@
 require "forwardable"
+require "net/ssh/simple"
 
 module AYTests
   # This class allows to query and modify virtual machines attributes.
@@ -7,8 +8,13 @@ module AYTests
   class VM
     extend Forwardable
 
+    # Default user to use when connecting through SSH
+    DEFAULT_SSH_USER = "vagrant".freeze
+    # Default SSH port
+    DEFAULT_SSH_PORT = 22
+
     def_delegators :@driver, :mac, :mac=, :boot_order, :boot_order=, :stop,
-      :backup, :restore!, :running?, :screenshot
+      :backup, :restore!, :running?, :screenshot, :ip
 
     attr_reader :driver, :name
 
@@ -34,6 +40,35 @@ module AYTests
         send("#{meth}=", value)
       end
       @driver.save
+    end
+
+    # Run a command in the virtual machine using SSH
+    #
+    # @param cmd [String] Command
+    # @param user     [String]          SSH username
+    # @param password [String]          SSH user password
+    # @param port     [Integer]         SSH port
+    # @return [Boolean] true if the operation was successful; false otherwise
+    def run(cmd, port:, user:, password:)
+      result = Net::SSH::Simple.ssh(ip, cmd,
+        user: user, port: port, password: password, paranoid: false)
+      result[:exit_code].zero?
+    end
+
+    # Download a file from the virtual machine using SCP
+    #
+    # @param remote   [Pathname,String] Remote file name
+    # @param remote   [Pathname,String] Local file name (where to put the file)
+    # @param user     [String]          SSH username
+    # @param password [String]          SSH user password
+    # @param port     [Integer]         SSH port
+    # @return [Boolean] true if the operation was successful; false otherwise
+    def download(remote, local, port:, user:, password:)
+      Net::SSH::Simple.scp_get(driver.ip, remote.to_s, local.to_s,
+        user: user, port: port, password: password, paranoid: false)
+      true
+    rescue Net::SSH::Simple::Error
+      false
     end
   end
 end

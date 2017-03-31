@@ -1,0 +1,4 @@
+Interface  Type       Source     Model       MAC
+-------------------------------------------------------
+vnet0      network    default    virtio      52:54:00:4d:3f:40
+

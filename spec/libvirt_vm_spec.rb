@@ -2,9 +2,10 @@ require "spec_helper"
 require "aytests/libvirt_vm"
 
 RSpec.describe AYTests::LibvirtVM do
-  LIBVIRT_DEFINITION = File.join(File.dirname(__FILE__), "files", "autoyast-libvirt.xml")
+  LIBVIRT_DEFINITION = FIXTURES_PATH.join("autoyast-libvirt.xml")
+  NAME = "autoyast".freeze
 
-  subject { AYTests::LibvirtVM.new("autoyast") }
+  subject { AYTests::LibvirtVM.new(NAME) }
   let(:definition) { File.read(LIBVIRT_DEFINITION) }
 
   before do
@@ -176,6 +177,21 @@ RSpec.describe AYTests::LibvirtVM do
       it "returns false" do
         expect(subject.screenshot(path)).to eq(false)
       end
+    end
+  end
+
+  describe "#ip" do
+    before do
+      allow(Cheetah).to receive(:run)
+        .with(["sudo", "virsh", "domiflist", NAME], stdout: :capture)
+        .and_return(File.read(FIXTURES_PATH.join("domiflist.txt")))
+      allow(Cheetah).to receive(:run)
+        .with(["arp", "-n"], stdout: :capture)
+        .and_return(File.read(FIXTURES_PATH.join("arp.txt")))
+    end
+
+    it "returns the IP address" do
+      expect(subject.ip).to eq("192.168.122.94")
     end
   end
 end
