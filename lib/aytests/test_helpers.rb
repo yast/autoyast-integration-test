@@ -32,7 +32,6 @@ module AYTests
     # @param [String] script   Script name
     # @param [String] expected Expected value of stdout last line
     def run_test_script(shell, expected = "AUTOYAST OK")
-      #shell =  File.join(File.dirname(__FILE__),"../test", script)
       # Check if the script exists
       expect(File.exists?(shell)).to eq(true), "test script does not exists: #{shell}"
 
@@ -66,26 +65,10 @@ module AYTests
       expect(stdout.split("\n").last).to eq(expected), proc { stderr }
     end
 
-    # Copy YaST2 logs from virtual machine to a given directory
-    #
-    # It relies on AYTests::VagrantRunner#download_logs method.
-    # The logs will be stored in a tar.gz file. To avoid collisions,
-    # the compressed file's name will contain a timestamp.
-    #
-    # @param [AYTests::VagrantRunner] runner Virtual machine runner
-    # @param [String]                 dest   Directory where the logs will be stored
-    #
-    # @see AYTests::VagrantRunner#download_logs
-    def copy_logs(runner, dest = "log")
-      FileUtils.mkdir(dest) unless dest.directory?
-      runner.download_logs(dest)
-    end
-
     # Start a virtual machine
     #
     # @param [AYTests::VagrantRunner] runner Virtual machine runner
     def start_vm(vm)
-      #vm = AYTests::VagrantRunner.new(AYTests.work_dir.join("vagrant"), AYTests.provider)
       vm.cleanup
       vm.start
     end

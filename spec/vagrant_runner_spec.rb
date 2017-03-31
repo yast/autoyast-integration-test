@@ -97,16 +97,4 @@ RSpec.describe AYTests::VagrantRunner do
       end
     end
   end
-
-  describe "#download_logs" do
-    it "download YaST2 logs" do
-      conn = double("conn", close: true)
-      expect(runner).to receive(:with_conn).and_yield(conn)
-      expect(conn).to receive(:ssh)
-        .with(VM_NAME, %r{sudo save_y2logs /tmp/YaST2-.*\.tar\.gz})
-      expect(conn).to receive(:scp_get)
-        .with(VM_NAME, %r{/tmp/YaST2-.*\.tar\.gz}, "log").and_return(success: true)
-      runner.download_logs("log")
-    end
-  end
 end
