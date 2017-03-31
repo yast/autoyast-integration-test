@@ -40,8 +40,10 @@ module AYTests
     # @see #build
     def run
       log.info "Running test #{test_name}"
-      FileUtils.mkdir_p(results_dir) unless results_dir.exist?
-      build unless skip_build
+      unless skip_build
+        setup_results_dir
+        build
+      end
       Dir.chdir(test_file.dirname) do
         system(
           { "AYTESTS_WORK_DIR" => work_dir.to_s, "AYTESTS_PROVIDER" => provider.to_s },
@@ -106,6 +108,14 @@ module AYTests
     # @return [Pathname] Tests path
     def tests_path
       test_file.dirname
+    end
+
+    # Set up the results directory
+    #
+    # Create the results directory and link it as the "latest"
+    def setup_results_dir
+      FileUtils.mkdir_p(results_dir) unless results_dir.exist?
+      FileUtils.ln_sf(results_dir, results_dir.parent.join("latest"))
     end
   end
 end
