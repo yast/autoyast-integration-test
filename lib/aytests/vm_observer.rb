@@ -5,7 +5,7 @@ module AYTests
   #
   # This class updates a screenshot of a virtual machine.
   class VMObserver
-    DEFAULT_INTERVAL = 60
+    DEFAULT_INTERVAL = 30
 
     # @return [String] Virtual machine name
     attr_reader :name
