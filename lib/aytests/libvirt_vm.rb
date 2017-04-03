@@ -29,7 +29,8 @@ module AYTests
     # @example Boot from hard disk first
     #   vm.boot_order #=> [:hd, :cdrom]
     def boot_order
-      @boot_order || REXML::XPath.match(@definition, "//os/boot").map { |d| d.attributes["dev"].to_sym }
+      @boot_order ||
+        REXML::XPath.match(@definition, "//os/boot").map { |d| d.attributes["dev"].to_sym }
     end
 
     # Return the MAC address

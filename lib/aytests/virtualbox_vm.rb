@@ -56,7 +56,8 @@ module AYTests
     # It relies on `VBoxManage` to update the definition.
     def save
       # VBoxManage requires MAC addresses without ":". It reports invalid MAC otherwise
-      Cheetah.run(["VBoxManage", "modifyvm", name, "--macaddress1", mac.delete(":")] + boot_order_to_options)
+      Cheetah.run(["VBoxManage", "modifyvm", name, "--macaddress1", mac.delete(":")] +
+        boot_order_to_options)
       read_definition
     end
 
@@ -158,7 +159,7 @@ module AYTests
     def boot_order_to_options
       order = virtualbox_boot_order
       (1..4).reduce([]) do |options, idx|
-        options += ["--boot#{idx}", order[idx - 1].to_s]
+        options + ["--boot#{idx}", order[idx - 1].to_s]
       end
     end
 
@@ -185,10 +186,9 @@ module AYTests
     def read_definition
       content = Cheetah.run(["VBoxManage", "showvminfo",
                              "--machinereadable", name], stdout: :capture)
-      @definition = content.split("\n").reduce({}) do |definition, line|
+      @definition = content.split("\n").each_with_object({}) do |line, definition|
         key, value = line.split("=")
         definition[unquote(key)] = unquote(value)
-        definition
       end
     end
 

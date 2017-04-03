@@ -3,10 +3,9 @@ require "socket"
 require "aytests/vm"
 
 module AYTests
+  # Build a libvirt-kvm or a VirtualBox image using Veewee
+  # https://github.com/jedi4ever/veewee
   class ImageBuilder
-    # Build a libvirt-kvm or a VirtualBox image using Veewee
-    # https://github.com/jedi4ever/veewee
-
     include AYTests::Helpers
 
     attr_reader :sources_dir, :obs_iso_dir, :autoinst_path, :definition_path,
@@ -41,7 +40,8 @@ module AYTests
     #                               (:libvirt or :virtualbox)
     # @param [Symbol]   headless    Disable GUI (only relevant for virtualbox
     #                               provider)
-    def initialize(sources_dir: nil, work_dir: nil, results_dir: nil, files_dir: nil, provider: :libvirt, headless: false)
+    def initialize(sources_dir: nil, work_dir: nil, results_dir: nil, files_dir: nil,
+      provider: :libvirt, headless: false)
       @sources_dir = sources_dir
       @work_dir = work_dir
       @results_dir = results_dir
@@ -51,7 +51,8 @@ module AYTests
       @autoinst_path = @work_dir.join("definitions", "autoyast", "autoinst.xml")
       @definition_path = @work_dir.join("definitions", "autoyast", "definition.rb")
       # This file will be used by Veewee during upgrade.
-      @libvirt_definition_path = @work_dir.join("definitions", "autoyast", "autoyast_description.xml")
+      @libvirt_definition_path = @work_dir.join("definitions", "autoyast",
+        "autoyast_description.xml")
       @headless = headless
       @provider = provider
     end
@@ -182,12 +183,11 @@ module AYTests
       FileUtils.rm(autoinst_path, force: true)
       FileUtils.rm(definition_path, force: true)
       FileUtils.rm(libvirt_definition_path, force: true)
-      if provider == :libvirt
-        # Due a bug in vagrant-libvirt the images will not cleanuped correctly
-        # in the /var/lib/libvirt directory. This has to be done manually
-        # (including DB update)
-        system "sudo virsh vol-delete #{IMAGE_BOX_NAME} default"
-      end
+      return unless provider == :libvirt
+      # Due a bug in vagrant-libvirt the images will not cleanuped correctly
+      # in the /var/lib/libvirt directory. This has to be done manually
+      # (including DB update)
+      system "sudo virsh vol-delete #{IMAGE_BOX_NAME} default"
     end
 
     # Veewee provider
@@ -378,10 +378,9 @@ module AYTests
       content = File.read(vars_file)
                     .gsub("{{IP}}", local_ip)
                     .gsub("{{PORT}}", WEBSERVER_PORT)
-      content.split("\n").reduce({}) do |hsh, line|
+      content.split("\n").each_with_object({}) do |line, hsh|
         key, value = line.split("=")
         hsh[key] = value
-        hsh
       end
     end
 

@@ -8,7 +8,17 @@ require "aytests/iso_repo"
 require "aytests/vagrant_runner"
 require "aytests/test_runner"
 
+# AYTests main module
+#
+# Apart of being used as the main namespace, it implements some methods to allow
+# aytests configuration/initialization.
 module AYTests
+  # Initialize the system
+  #
+  # The given directory will be used as workspace in order to store downloaded
+  # files (ISOs and packages), build new ISOs, store results, etc.
+  #
+  # @param work_dir [Pathname,String] Workspace directory
   def self.init(work_dir)
     work_dir_path = Pathname.new(work_dir)
     self.work_dir = work_dir_path.absolute? ? work_dir_path : work_dir_path.realdirpath

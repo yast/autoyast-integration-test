@@ -1,7 +1,19 @@
 require "fileutils"
 
 module AYTests
+  # Set up and run scripts in a Vagrant machine
   class VagrantRunner
+    class << self
+      # Set the current runner
+      #
+      # @param runner [AYTests::VagrantRunner] Current runner
+      attr_writer :current
+
+      # Return the current runner
+      #
+      # @return Current runner
+      attr_reader :current
+    end
     VM_NAME = "autoyast_vm".freeze
 
     attr_reader :vagrantfile, :dir, :ssh_config

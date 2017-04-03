@@ -3,6 +3,7 @@ require "json"
 
 module AYTests
   module Servlets
+    # Fake implementation of list_updates call for the registration server.
     class ListUpdates < WEBrick::HTTPServlet::AbstractServlet
       PRODUCT = {
         "id"                => 2101,
@@ -29,6 +30,7 @@ module AYTests
       # Handle get requests
       #
       # @see WEBrick::HTTPServlet::AbstractServlet#do_GET
+      # rubocop:disable Style/MethodName
       def do_GET(_request, response)
         response.status = 200
         response["Content-Type"] = "application/json"

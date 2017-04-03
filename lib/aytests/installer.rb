@@ -7,7 +7,8 @@ module AYTests
 
     GROUPS = ["libvirt", "qemu", "kvm", "vboxusers"].freeze
     POLKIT_RULES_PATH = "/etc/polkit-1/rules.d/99-libvirt.rules".freeze
-    POLKIT_RULES_SAMPLE = File.join(File.dirname(__FILE__), "..", "..", "share", "files", "99-libvirt.rules")
+    POLKIT_RULES_SAMPLE = File.join(File.dirname(__FILE__), "..", "..", "share", "files",
+      "99-libvirt.rules")
     VAGRANT_LIBVIRT_VERSION = "0.0.37".freeze
     FOG_VERSION = "1.29".freeze
     PROGRESSBAR_VERSION = "0.21.0".freeze
@@ -20,7 +21,7 @@ module AYTests
     def initialize(config, user, log = nil)
       @config = config
       @user = user
-      @log = Logger.new(STDOUT)
+      @log = log || Logger.new(STDOUT)
     end
 
     # Run the installation/configuration process

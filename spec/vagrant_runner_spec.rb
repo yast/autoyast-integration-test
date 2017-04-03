@@ -8,6 +8,16 @@ RSpec.describe AYTests::VagrantRunner do
   let(:provider) { :libvirt }
   subject(:runner) { AYTests::VagrantRunner.new(vagrantfile, dir, provider) }
 
+  describe "#current=" do
+    it "sets the current runner" do
+      expect { AYTests::VagrantRunner.current = runner }
+        .to change { AYTests::VagrantRunner.current }
+        .from(nil).to(runner)
+    end
+
+    after { AYTests::VagrantRunner.current = nil }
+  end
+
   describe "#start" do
     before(:each) do
       allow(FileUtils).to receive(:cp).with(vagrantfile, dir).and_call_original

@@ -19,6 +19,9 @@ require "open3"
 require "pathname"
 
 module AYTests
+  # Set of helpers to use on the lib/aytests/spec_helper when running
+  # integration tests. Do not confuse those tests with AYTests unit
+  # tests (under spec/).
   module TestHelpers
     # Run a test script
     #
@@ -38,7 +41,7 @@ module AYTests
       if ENV["AYTESTS_LOCAL"] == "true"
         local_run_test_script(shell, expected)
       else
-        remote_run_test_script($vm, shell, expected)
+        remote_run_test_script(AYTests::VagrantRunner.current, shell, expected)
       end
     end
 

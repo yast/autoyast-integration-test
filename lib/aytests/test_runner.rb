@@ -21,7 +21,8 @@ module AYTests
     # @param [True,False] skip_build   Do not build the virtual machine
     # @param [String|Symbol] provider  Set the vagrant provider (:libvirt or :virtualbox)
     # @param [True,False] headless     Enable headless mode if true
-    def initialize(test_file:, work_dir:, default_iso_path:, skip_build: false, provider: :libvirt, headless: false)
+    def initialize(test_file:, work_dir:, default_iso_path:, skip_build: false, provider: :libvirt,
+      headless: false)
       @test_file        = Pathname.new(test_file).expand_path
       @default_iso_path = default_iso_path
       @skip_build       = skip_build

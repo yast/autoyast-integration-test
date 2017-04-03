@@ -25,19 +25,16 @@ RSpec.configure do |config|
 
   config.before(:all) do
     # Start the previously create vagrant VM - autoyast_vm
-    $vm = AYTests::VagrantRunner.new(
+    AYTests::VagrantRunner.current = AYTests::VagrantRunner.new(
       AYTests.base_dir.join("share", "vagrant", "Vagrantfile"),
       AYTests.work_dir.join("vagrant"),
       ENV["AYTESTS_PROVIDER"]
     )
-    start_vm($vm)
+    start_vm(AYTests::VagrantRunner.current)
   end
 
   config.after(:all) do
-    examples = RSpec.world.filtered_examples.values.flatten
-    # Copy the logs if some test fails.
-    copy_logs($vm, AYTests.work_dir.join("log")) if examples.any?(&:exception)
-    shutdown_vm($vm)
+    shutdown_vm(AYTests::VagrantRunner.current)
   end
 end
 
@@ -48,7 +45,7 @@ RSpec.shared_examples "test_scripts" do |list|
     test, description = line.strip.split("#", 2)
     next if test.nil?
 
-    it (description || test).to_s do
+    it((description || test).to_s) do
       run_test_script(Pathname.pwd.join(test.strip))
     end
   end

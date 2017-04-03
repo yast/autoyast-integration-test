@@ -8,6 +8,9 @@ require "aytests"
 require "aytests/installer"
 
 module AYTests
+  # CLI interface
+  #
+  # It uses Thor to handle command line options
   class CLI < Thor
     TEST_PASSED_ERRCODE = 0
     TEST_DOES_NOT_EXIST_ERRCODE = 1
@@ -40,23 +43,8 @@ module AYTests
         exit TEST_DOES_NOT_EXIST_ERRCODE
       end
 
-      results = {}
-      files.each do |test_file|
-        if File.exist?(test_file)
-          runner = AYTests::TestRunner.new(
-            work_dir:         AYTests.work_dir,
-            test_file:        Pathname.new(test_file),
-            default_iso_path: AYTests.obs_iso_path,
-            skip_build:       options["skip-build"] || false,
-            provider:         options["provider"] || ENV["AYTESTS_PROVIDER"] || :libvirt,
-            headless:         options[:headless] || ENV["AYTESTS_HEADLESS"] == "true"
-          )
-          # When a test fails, a non-zero return code will be returned
-          results[test_file] = runner.run ? :passed : :failed
-        else
-          results[test_file] = :missing
-          AYTests.logger.error "File #{test_file} does not exist"
-        end
+      results = files.each_with_object({}) do |test_file, hsh|
+        hsh[test_file] = test_result(test_file)
       end
       show_results(results)
       status = results.values.all? { |r| r == :passed } ? TEST_PASSED_ERRCODE : TEST_FAILED_ERRCODE
@@ -108,6 +96,30 @@ module AYTests
       results.each do |test, result|
         say_status result, test, TESTS_COLORS[result]
       end
+    end
+
+    # Run a test a return the result
+    #
+    # @param test_file [String] Path to the test to run
+    # @return [:passed,:missing,:failed] :passed if test passed, :missing if
+    #   test_file does not exist and :failed if test failed.
+    def test_result(test_file)
+      return :missing unless File.exist?(test_file)
+      runner = AYTests::TestRunner.new(runner_options(test_file))
+      # When a test fails, a non-zero return code will be returned
+      runner.run ? :passed : :failed
+    end
+
+    # Toptions to pass to the runner
+    def runner_options(test_file)
+      @runner_options ||= {
+        work_dir:         AYTests.work_dir,
+        test_file:        Pathname.new(test_file),
+        default_iso_path: AYTests.obs_iso_path,
+        skip_build:       options["skip-build"] || false,
+        provider:         options["provider"] || ENV["AYTESTS_PROVIDER"] || :libvirt,
+        headless:         options[:headless] || ENV["AYTESTS_HEADLESS"] == "true"
+      }
     end
   end
 end
