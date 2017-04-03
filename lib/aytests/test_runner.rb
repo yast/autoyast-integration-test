@@ -115,7 +115,9 @@ module AYTests
     # Create the results directory and link it as the "latest"
     def setup_results_dir
       FileUtils.mkdir_p(results_dir) unless results_dir.exist?
-      FileUtils.ln_sf(results_dir, results_dir.parent.join("latest"))
+      latest_link = results_dir.parent.join("latest")
+      FileUtils.rm_f(latest_link)
+      FileUtils.ln_sf(results_dir, latest_link)
     end
   end
 end
