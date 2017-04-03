@@ -102,6 +102,16 @@ RSpec.describe AYTests::VM do
         expect(subject.run("unknown", port: port, user: user, password: password)).to eq(false)
       end
     end
+
+    context "when command raises an exception" do
+      before do
+        allow(Net::SSH::Simple).to receive(:ssh).and_raise(Net::SSH::Simple::Error.new("failed"))
+      end
+
+      it "returns false" do
+        expect(subject.run("ls", port: port, user: user, password: password)).to eq(false)
+      end
+    end
   end
 
   describe "#download" do

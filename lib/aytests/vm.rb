@@ -53,6 +53,8 @@ module AYTests
       result = Net::SSH::Simple.ssh(ip, cmd,
         user: user, port: port, password: password, paranoid: false)
       result[:exit_code].zero?
+    rescue Net::SSH::Simple::Error
+      false
     end
 
     # Download a file from the virtual machine using SCP
