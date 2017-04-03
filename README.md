@@ -164,6 +164,21 @@ For example:
 
     $ bundle exec rspec aytests/tftp.rb --skip-build
 
+### Debugging
+
+To help with debugging, AYTests will store an screenshot and, if possible, YaST2
+logs from installation/upgrade under the workspace. Assuming that the default
+settings are used, they'll be saved under `$HOME/aytests-workspace/results`.
+
+Each run will have its data saved in a directory named after the current
+date/time in the form `YYYYMMDDhhmm`.
+
+The screenshot will be refreshed every 30 seconds so, if a timeout occurs,
+it will easy to find out where the process got stucked.
+
+About logs, they're retrieved through SSH so, if installation/upgrade crashed,
+there's a big chance that they're not saved.
+
 ### Headless mode
 
 VirtualBox can run in headless mode if needed. To do that, just use the
