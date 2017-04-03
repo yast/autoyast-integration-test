@@ -22,4 +22,4 @@ testing_iso = File.join(base_dir, "../kiwi/iso/obs.iso")
 
 puts "\n**** Taking the default ISO which is defined in kiwi/definitions/autoyast/definition.rb (:iso_src)  ****"
 
-FileUtils.rm(testing_iso, :force => true)
+FileUtils.rm(testing_iso, force: true)

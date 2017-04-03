@@ -16,8 +16,8 @@ module AYTests
 
     # --prefix=37 sets a directory prefix to avoid conflicts. Check mkdud README.
     MKDUD_CMD = "mkdud -c %<dud_path>s -d %<dud_dist>s -i  %<dud_method>s --prefix=37 " \
-      "--format=tar.gz $(find %<rpms_dir>s -name \"\*\.rpm\") %<dud_dir>s"
-    MKSUSECD_CMD = "sudo mksusecd -c %<output_path>s --initrd=%<dud_path>s %<iso_path>s"
+      "--format=tar.gz $(find %<rpms_dir>s -name \"\*\.rpm\") %<dud_dir>s".freeze
+    MKSUSECD_CMD = "sudo mksusecd -c %<output_path>s --initrd=%<dud_path>s %<iso_path>s".freeze
 
     # Constructor
     #
@@ -102,7 +102,7 @@ module AYTests
     def fetch_obs_packages
       log.info "Fetching all required packages"
       yast_url.each_with_index do |url, index|
-        system "zypper --root #{cache_dir} ar --no-gpgcheck -p #{index+1} #{url} download-packages-#{index}"
+        system "zypper --root #{cache_dir} ar --no-gpgcheck -p #{index + 1} #{url} download-packages-#{index}"
       end
       system "xargs -a #{obs_pkg_list_path} zypper --root #{cache_dir} --pkg-cache-dir=#{cache_dir} download"
 

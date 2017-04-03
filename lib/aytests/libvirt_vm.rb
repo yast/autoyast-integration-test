@@ -11,7 +11,7 @@ module AYTests
     attr_reader :name
     attr_writer :boot_order, :mac
 
-    RUNNING_STATE = "running"
+    RUNNING_STATE = "running".freeze
     SLEEP_TIME_AFTER_SHUTDOWN = 15
 
     # Constructor

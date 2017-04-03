@@ -14,7 +14,7 @@ RSpec.describe AYTests::IsoRepo do
   end
 
   describe ".init" do
-    let(:directory) { double("directory", :directory? => exist?)}
+    let(:directory) { double("directory", directory?: exist?) }
 
     context "when directory exists" do
       let(:exist?) { true }

@@ -9,9 +9,9 @@ RSpec.describe AYTests::LibvirtVM do
   let(:definition) { File.read(LIBVIRT_DEFINITION) }
 
   before do
-    allow(Cheetah).to receive(:run).
-      with(["sudo", "virsh", "dumpxml", "autoyast"], stdout: :capture).
-      and_return(definition)
+    allow(Cheetah).to receive(:run)
+      .with(["sudo", "virsh", "dumpxml", "autoyast"], stdout: :capture)
+      .and_return(definition)
   end
 
   describe "#boot_order=" do

@@ -2,7 +2,7 @@ require "fileutils"
 
 module AYTests
   class VagrantRunner
-    VM_NAME = "autoyast_vm"
+    VM_NAME = "autoyast_vm".freeze
 
     attr_reader :vagrantfile, :dir, :ssh_config
 
@@ -70,7 +70,7 @@ module AYTests
       end
     end
 
-    private
+  private
 
     # Open a SSH connection a execute a block of code in that context
     def with_conn

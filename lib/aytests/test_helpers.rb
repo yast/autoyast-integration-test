@@ -33,7 +33,7 @@ module AYTests
     # @param [String] expected Expected value of stdout last line
     def run_test_script(shell, expected = "AUTOYAST OK")
       # Check if the script exists
-      expect(File.exists?(shell)).to eq(true), "test script does not exists: #{shell}"
+      expect(File.exist?(shell)).to eq(true), "test script does not exists: #{shell}"
 
       if ENV["AYTESTS_LOCAL"] == "true"
         local_run_test_script(shell, expected)

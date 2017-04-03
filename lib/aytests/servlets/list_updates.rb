@@ -5,13 +5,13 @@ module AYTests
   module Servlets
     class ListUpdates < WEBrick::HTTPServlet::AbstractServlet
       PRODUCT = {
-        'id' => 2101,
-        'name' => 'SLES12-SP2-Installer-Updates',
-        'distro_target' => 'sle-12-x86_64',
-        'description' => 'SLES12-SP2-Installer-Updates for sle-12-x86_64',
-        'enabled' => false,
-        'autorefresh' => true,
-        'installer_updates' => true
+        "id"                => 2101,
+        "name"              => "SLES12-SP2-Installer-Updates",
+        "distro_target"     => "sle-12-x86_64",
+        "description"       => "SLES12-SP2-Installer-Updates for sle-12-x86_64",
+        "enabled"           => false,
+        "autorefresh"       => true,
+        "installer_updates" => true
       }.freeze
 
       # @return [URI] Updates URL
@@ -29,9 +29,9 @@ module AYTests
       # Handle get requests
       #
       # @see WEBrick::HTTPServlet::AbstractServlet#do_GET
-      def do_GET(request, response)
+      def do_GET(_request, response)
         response.status = 200
-        response['Content-Type'] = "application/json"
+        response["Content-Type"] = "application/json"
         response.body = JSON.generate(updates)
       end
 

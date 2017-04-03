@@ -12,45 +12,45 @@ hooks = AYTests::VeeweeHooks.new(
   backup_image_name: ENV["AYTESTS_BACKUP_IMAGE_NAME"]
 )
 
-Veewee::Definition.declare({
-  :cpu_count => '2',
-  :memory_size=> '1024',
-  :disk_size => '20280',
-  :disk_format => 'VDI',
-  :hostiocache => 'off',
-  :os_type_id => 'OpenSUSE_64',
-  :iso_file => "testing.iso",
-  :iso_src => "__iso_source_path__",
-  :iso_md5 => "",
-  :iso_download_timeout => "1000",
-  :boot_wait => "10",
-  :boot_cmd_sequence => [
-    '<Esc><Enter>',
-    '     ', # Workaround to avoid timing problems with VirtualBox
-    'linux',
-    ' netdevice=eth0',
-    ' instmode=dvd',
-    ' textmode=1',
-    ' insecure=1',
-    ' netsetup=dhcp',
-    ' SetHostname=0',
+Veewee::Definition.declare(
+  cpu_count:            "2",
+  memory_size:          "1024",
+  disk_size:            "20280",
+  disk_format:          "VDI",
+  hostiocache:          "off",
+  os_type_id:           "OpenSUSE_64",
+  iso_file:             "testing.iso",
+  iso_src:              "__iso_source_path__",
+  iso_md5:              "",
+  iso_download_timeout: "1000",
+  boot_wait:            "10",
+  boot_cmd_sequence:    [
+    "<Esc><Enter>",
+    "     ", # Workaround to avoid timing problems with VirtualBox
+    "linux",
+    " netdevice=eth0",
+    " instmode=dvd",
+    " textmode=1",
+    " insecure=1",
+    " netsetup=dhcp",
+    " SetHostname=0",
     " #{ENV["AYTESTS_LINUXRC"]}",
-    '<Enter>'
-   ],
-  :ssh_login_timeout => "3600",
-  :ssh_user => "vagrant",
-  :ssh_password => "nots3cr3t",
-  :ssh_key => "",
-  :ssh_host_port => "7222",
-  :ssh_guest_port => "22",
-  :sudo_cmd => "echo '%p'|sudo -S sh '%f'",
-  :shutdown_cmd => "shutdown -P now",
-  :postinstall_files => [ "postinstall.sh" ],
-  :postinstall_timeout => "3600",
-  :hooks => {
-    :before_create => proc { hooks.before_create },
-    :after_create  => proc { hooks.after_create },
-    :after_postinstall => proc { hooks.after_postinstall },
-    :after_up => proc { hooks.after_up }
+    "<Enter>"
+  ],
+  ssh_login_timeout:    "3600",
+  ssh_user:             "vagrant",
+  ssh_password:         "nots3cr3t",
+  ssh_key:              "",
+  ssh_host_port:        "7222",
+  ssh_guest_port:       "22",
+  sudo_cmd:             "echo '%p'|sudo -S sh '%f'",
+  shutdown_cmd:         "shutdown -P now",
+  postinstall_files:    ["postinstall.sh"],
+  postinstall_timeout:  "3600",
+  hooks:                {
+    before_create:     proc { hooks.before_create },
+    after_create:      proc { hooks.after_create },
+    after_postinstall: proc { hooks.after_postinstall },
+    after_up:          proc { hooks.after_up }
   }
-})
+)

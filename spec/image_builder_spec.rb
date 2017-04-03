@@ -234,7 +234,7 @@ RSpec.describe AYTests::ImageBuilder do
 
       it "sets permissions" do
         allow(builder).to receive(:system).with(/veewee kvm export/).and_return(true)
-        expect(FileUtils).to receive(:chmod).with(0666, /images/)
+        expect(FileUtils).to receive(:chmod).with(0o666, /images/)
         builder.export_from_veewee
       end
     end

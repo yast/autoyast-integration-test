@@ -17,15 +17,15 @@ http://github.com/yast/aytests-tests.
 end
 
   spec.files        = Dir["bin/*", "lib/**/*.rb", "share/**/*", "spec/**/*",
-                          "doc/*", "config/*", "Rakefile", "README.md", "VERSION"]
+    "doc/*", "config/*", "Rakefile", "README.md", "VERSION"]
 
   spec.require_path = "lib"
   spec.bindir       = "bin"
   spec.executables  = ["aytests"]
 
   # dependencies
-  spec.add_runtime_dependency("rspec", "~> 3.1", '>= 3.1.0')
-  spec.add_runtime_dependency("net-ssh-simple", "~> 1.6", '>= 1.6.11')
+  spec.add_runtime_dependency("rspec", "~> 3.1", ">= 3.1.0")
+  spec.add_runtime_dependency("net-ssh-simple", "~> 1.6", ">= 1.6.11")
   spec.add_runtime_dependency("ruby-libvirt", "~> 0.5", ">= 0.5.2")
   spec.add_runtime_dependency("cheetah", "~> 0.4", ">= 0.4.0")
   spec.add_runtime_dependency("thor", "~> 0.19", ">= 0.19.1")

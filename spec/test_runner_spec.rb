@@ -9,11 +9,11 @@ RSpec.describe AYTests::TestRunner do
 
   subject(:runner) do
     AYTests::TestRunner.new(
-      work_dir: TEST_WORK_DIR,
-      test_file: test_file,
+      work_dir:         TEST_WORK_DIR,
+      test_file:        test_file,
       default_iso_path: DEFAULT_ISO_PATH,
-      skip_build: skip_build,
-      provider: provider
+      skip_build:       skip_build,
+      provider:         provider
     )
   end
 
@@ -30,8 +30,8 @@ RSpec.describe AYTests::TestRunner do
         expect(builder).to receive(:cleanup_environment)
         expect(builder).to receive(:install)
         expect(runner).to receive(:system)
-          .with({"AYTESTS_WORK_DIR" => TEST_WORK_DIR.to_s, "AYTESTS_PROVIDER" => provider.to_s},
-                "rspec #{test_file.basename}").and_return(true)
+          .with({ "AYTESTS_WORK_DIR" => TEST_WORK_DIR.to_s, "AYTESTS_PROVIDER" => provider.to_s },
+            "rspec #{test_file.basename}").and_return(true)
         expect(builder).to receive(:import)
         expect(builder).to receive(:cleanup)
         expect(runner.run).to eq(true)
@@ -43,8 +43,8 @@ RSpec.describe AYTests::TestRunner do
         expect(builder).to receive(:cleanup_environment)
         expect(builder).to receive(:install)
         expect(runner).to receive(:system)
-          .with({"AYTESTS_WORK_DIR" => TEST_WORK_DIR.to_s, "AYTESTS_PROVIDER" => provider.to_s},
-                "rspec #{test_file.basename}").and_return(false)
+          .with({ "AYTESTS_WORK_DIR" => TEST_WORK_DIR.to_s, "AYTESTS_PROVIDER" => provider.to_s },
+            "rspec #{test_file.basename}").and_return(false)
         expect(builder).to receive(:import)
         expect(builder).to receive(:cleanup)
         expect(runner.run).to eq(false)
@@ -59,8 +59,8 @@ RSpec.describe AYTests::TestRunner do
         expect(builder).to receive(:install)
         expect(builder).to receive(:upgrade)
         expect(runner).to receive(:system)
-          .with({"AYTESTS_WORK_DIR" => TEST_WORK_DIR.to_s, "AYTESTS_PROVIDER" => provider.to_s},
-                "rspec #{test_file.basename}").and_return(true)
+          .with({ "AYTESTS_WORK_DIR" => TEST_WORK_DIR.to_s, "AYTESTS_PROVIDER" => provider.to_s },
+            "rspec #{test_file.basename}").and_return(true)
         expect(builder).to receive(:import)
         expect(builder).to receive(:cleanup)
         expect(runner.run).to eq(true)
@@ -74,8 +74,8 @@ RSpec.describe AYTests::TestRunner do
         expect(builder).to_not receive(:cleanup_environment)
         expect(AYTests::ImageBuilder).to_not receive(:new)
         expect(runner).to receive(:system)
-          .with({"AYTESTS_WORK_DIR" => TEST_WORK_DIR.to_s, "AYTESTS_PROVIDER" => provider.to_s},
-                "rspec #{test_file.basename}").and_return(true)
+          .with({ "AYTESTS_WORK_DIR" => TEST_WORK_DIR.to_s, "AYTESTS_PROVIDER" => provider.to_s },
+            "rspec #{test_file.basename}").and_return(true)
         expect(runner.run).to eq(true)
       end
     end

@@ -28,7 +28,8 @@ RSpec.configure do |config|
     $vm = AYTests::VagrantRunner.new(
       AYTests.base_dir.join("share", "vagrant", "Vagrantfile"),
       AYTests.work_dir.join("vagrant"),
-      ENV["AYTESTS_PROVIDER"])
+      ENV["AYTESTS_PROVIDER"]
+    )
     start_vm($vm)
   end
 
@@ -47,7 +48,7 @@ RSpec.shared_examples "test_scripts" do |list|
     test, description = line.strip.split("#", 2)
     next if test.nil?
 
-    it "#{description || test}" do
+    it (description || test).to_s do
       run_test_script(Pathname.pwd.join(test.strip))
     end
   end

@@ -14,10 +14,10 @@ module AYTests
     TEST_FAILED_ERRCODE = 2
 
     TESTS_COLORS = {
-      failed: :red,
+      failed:  :red,
       missing: :yellow,
-      passed: :green
-    }
+      passed:  :green
+    }.freeze
 
     option "work-dir", type: :string
     desc "build_iso NAME", "Build boot image <name>"
@@ -44,12 +44,12 @@ module AYTests
       files.each do |test_file|
         if File.exist?(test_file)
           runner = AYTests::TestRunner.new(
-            work_dir: AYTests.work_dir,
-            test_file: Pathname.new(test_file),
+            work_dir:         AYTests.work_dir,
+            test_file:        Pathname.new(test_file),
             default_iso_path: AYTests.obs_iso_path,
-            skip_build: options["skip-build"] || false,
-            provider: options["provider"] || ENV["AYTESTS_PROVIDER"] || :libvirt,
-            headless: options[:headless] || ENV["AYTESTS_HEADLESS"] == "true"
+            skip_build:       options["skip-build"] || false,
+            provider:         options["provider"] || ENV["AYTESTS_PROVIDER"] || :libvirt,
+            headless:         options[:headless] || ENV["AYTESTS_HEADLESS"] == "true"
           )
           # When a test fails, a non-zero return code will be returned
           results[test_file] = runner.run ? :passed : :failed
@@ -77,7 +77,7 @@ module AYTests
       FileUtils.rm_rf([work_dir.join("cache"), work_dir.join("veewee")])
     end
 
-    private
+  private
 
     # Initialize AYTests
     #
