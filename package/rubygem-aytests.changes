@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon Apr  3 15:24:48 UTC 2017 - igonzalezsosa@suse.com
+
+- AYTests::VM#run does not crash when Net::SSH::Simple raises
+  an exception 
+- 1.0.36
+
+-------------------------------------------------------------------
 Fri Mar 31 15:10:41 UTC 2017 - igonzalezsosa@suse.com
 
 - Take screenshots while the system is being installed
