@@ -74,13 +74,6 @@ module AYTests
       vm.update(mac: mac_address, boot_order: [:cdrom, :hd])
     end
 
-    # After up hook
-    #
-    # Start a VM observer which takes care of updating the latest screenshot
-    def after_up
-      start_thread { start_observer }
-    end
-
     # Before upgrade hook
     #
     # Implement the `after_create` hook for the *upgrade scenario*.
@@ -121,6 +114,8 @@ module AYTests
     #
     # Veewee's built in webserver solution doesn't work reliably with AutoYaST
     # due to some timing issues.
+    #
+    # @see AYTests::WebServer
     def start_webserver
       AYTests::WebServer.new(
         veewee_dir: Pathname.pwd.join("definitions", "autoyast"),
@@ -130,6 +125,8 @@ module AYTests
     end
 
     # Start a fake registration server
+    #
+    # @see AYTests::RegistrationServer
     def start_regserver
       certs_dir = Pathname.new(sources_dir).join("ssl")
       updates_url = URI("http://#{ip_address}:#{webserver_port}" \
@@ -143,6 +140,9 @@ module AYTests
       ).start
     end
 
+    # Start a VM observer
+    #
+    # @see AYTests::VMObserver
     def start_observer
       AYTests::VMObserver.new(
         name:            definition.name,

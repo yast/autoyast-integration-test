@@ -447,6 +447,9 @@ module AYTests
       @vm ||= VM.new(IMAGE_NAME, provider)
     end
 
+    # Return SSH options to connect to the virtual machine
+    #
+    # @return [Hash] SSH options
     def ssh_options
       @ssh_options ||= {
         user:     SSH_USER,
