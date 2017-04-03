@@ -61,20 +61,6 @@ module AYTests
       end
     end
 
-    # Download YaST logs to a given directory
-    #
-    # @param [String,Pathname] dest Directory to copy logs to
-    # @return [Boolean] +true+ if the log was saved; +false+ otherwise
-    def download_logs(dest)
-      with_conn do |conn|
-        tar_path = "/tmp/YaST2-#{Time.now.strftime('%Y%m%d%H%M%S')}.tar.gz"
-        conn.ssh VM_NAME, "sudo save_y2logs #{tar_path}"
-        result = conn.scp_get VM_NAME, tar_path, dest.to_s
-        result[:success]
-      end
-    end
-
-
     # Clean-up the machine and the ssh configuration
     def cleanup
       return false unless dir.directory?

@@ -1,3 +1,17 @@
+require "aytests/veewee_hooks"
+
+hooks = AYTests::VeeweeHooks.new(
+  definition:        veewee_definition,
+  provider:          ENV["AYTESTS_PROVIDER"].to_sym,
+  files_dir:         ENV["AYTESTS_FILES_DIR"].to_s,
+  sources_dir:       ENV["AYTESTS_SOURCES_DIR"].to_s,
+  results_dir:       ENV["AYTESTS_RESULTS_DIR"].to_s,
+  ip_address:        ENV["AYTESTS_IP_ADDRESS"],
+  mac_address:       ENV["AYTESTS_MAC_ADDRESS"],
+  webserver_port:    ENV["AYTESTS_WEBSERVER_PORT"].to_i,
+  backup_image_name: ENV["AYTESTS_BACKUP_IMAGE_NAME"]
+)
+
 Veewee::Definition.declare({
   :cpu_count => '2',
   :memory_size=> '1024',
@@ -35,50 +49,9 @@ Veewee::Definition.declare({
   :postinstall_files => [ "postinstall.sh" ],
   :postinstall_timeout => "3600",
   :hooks => {
-    # Before starting the build we spawn a webrick webserver which serves the
-    # autoyast profile to the installer. veewee's built in webserver solution
-    # doesn't work reliably with autoyast due to some timing issues.
-    :before_create => Proc.new do
-      require "aytests/web_server"
-      require "pathname"
-      require "uri"
-      Thread.new do
-        AYTests::WebServer.new(
-          veewee_dir: Pathname.pwd.join("definitions", "autoyast"),
-          files_dir: ENV["AYTESTS_FILES_DIR"],
-          name: definition.box.name).start
-      end
-
-      Thread.new do
-        certs_dir = Pathname.new(ENV["AYTESTS_SOURCES_DIR"]).join("ssl")
-        updates_url = URI("http://#{ENV["AYTESTS_IP_ADDRESS"]}:#{ENV["AYTESTS_WEBSERVER_PORT"]}" \
-          "/static/repos/sles12")
-
-        AYTests::RegistrationServer.new(
-          ca_crt_path: certs_dir.join("rootCA.pem"),
-          ca_key_path: certs_dir.join("rootCA.key"),
-          address: ENV["AYTESTS_IP_ADDRESS"],
-          updates_url: updates_url
-        ).start
-      end
-    end,
-    :after_create => Proc.new do
-      # Restoring old autoyast image which has to be updated.
-      require "aytests/vm"
-      require "aytests/#{ENV["AYTESTS_PROVIDER"]}_vm"
-      vm = AYTests::VM.new(ENV["AYTESTS_IMAGE_NAME"], ENV["AYTESTS_PROVIDER"].to_sym)
-      vm.restore!(ENV["AYTESTS_BACKUP_IMAGE_NAME"])
-      vm.update(mac: ENV["AYTESTS_MAC_ADDRESS"], boot_order: [:cdrom, :hd])
-
-      # Restoring obs image
-      base_dir = File.dirname(__FILE__)
-      testing_iso = File.join(base_dir, "iso/testing.iso")
-      obs_iso = File.join(base_dir, "veewee/iso/obs.iso")
-      # Taking obs iso for upgrade
-      if File.file?(obs_iso) && !File.file?(testing_iso)
-        FileUtils.ln(obs_iso, testing_iso)
-      end
-    end
-
+    :before_create => proc { hooks.before_create },
+    :after_create => proc { hooks.after_create_on_upgrade },
+    :after_postinstall => proc { hooks.after_postinstall },
+    :after_up => proc { hooks.after_up }
   }
 })

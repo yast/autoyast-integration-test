@@ -2,7 +2,7 @@ require "spec_helper"
 require "aytests/virtualbox_vm"
 
 RSpec.describe AYTests::VirtualboxVM do
-  VIRTUALBOX_DEFINITION = File.join(File.dirname(__FILE__), "files", "autoyast-virtualbox.txt")
+  VIRTUALBOX_DEFINITION = FIXTURES_PATH.join("autoyast-virtualbox.txt")
 
   subject { AYTests::VirtualboxVM.new("autoyast") }
   let(:definition) { File.read(VIRTUALBOX_DEFINITION) }
@@ -154,6 +154,36 @@ RSpec.describe AYTests::VirtualboxVM do
 
       it "returns false" do
         expect(subject).to_not be_running
+      end
+    end
+  end
+
+  describe "#screenshot" do
+    let(:path) { Pathname.new("/tmp/screenshot.png") }
+
+    it "uses VBoxManage to create a screenshot of the running system" do
+      expect(Cheetah).to receive(:run)
+        .with(["VBoxManage", "controlvm", subject.name, "screenshotpng", path])
+      subject.screenshot(path)
+    end
+
+    context "when screenshot was successfully saved" do
+      it "returns true" do
+        allow(Cheetah).to receive(:run)
+          .with(array_including("screenshotpng"))
+        expect(subject.screenshot(path)).to eq(true)
+      end
+    end
+
+    context "when screenshot was not successfully saved" do
+      before do
+        allow(Cheetah).to receive(:run)
+          .with(array_including("screenshotpng"))
+          .and_raise(Cheetah::ExecutionFailed.new(["VBoxManage"], 1, nil, nil))
+      end
+
+      it "returns false" do
+        expect(subject.screenshot(path)).to eq(false)
       end
     end
   end

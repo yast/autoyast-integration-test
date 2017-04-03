@@ -1,6 +1,7 @@
 require "rexml/document"
 require "rexml/xpath"
 require "cheetah"
+require "mini_magick"
 
 module AYTests
   # Implements communication with Libvirt virtual machines.
@@ -94,7 +95,19 @@ module AYTests
       state == RUNNING_STATE
     end
 
-    private
+    # Take a screenshot of the virtual machine
+    #
+    # @param [String,Pathname] File path to save the screenshot
+    def screenshot(path)
+      pnm_path = path.sub_ext(".pnm").to_s
+      Cheetah.run(["sudo", "virsh", "screenshot", name, "--file", pnm_path])
+      MiniMagick::Tool::Convert.new { |c| c << pnm_path << path.to_s }
+      true
+    rescue Cheetah::ExecutionFailed
+      false
+    end
+
+  private
 
     # Copy a virtual machine into another one
     #

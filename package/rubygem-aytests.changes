@@ -1,4 +1,13 @@
 -------------------------------------------------------------------
+Fri Mar 31 15:10:41 UTC 2017 - igonzalezsosa@suse.com
+
+- Take screenshots while the system is being installed
+- Download YaST2 logs after installation/upgrade
+- Fix a Veewee dependency problem installing an specific
+  version of the progressbar gem
+- 1.0.35
+
+-------------------------------------------------------------------
 Thu Feb 16 10:15:30 CET 2017 - schubi@suse.de
 
 - fixed undefined variable

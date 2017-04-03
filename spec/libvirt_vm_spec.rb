@@ -2,9 +2,10 @@ require "spec_helper"
 require "aytests/libvirt_vm"
 
 RSpec.describe AYTests::LibvirtVM do
-  LIBVIRT_DEFINITION = File.join(File.dirname(__FILE__), "files", "autoyast-libvirt.xml")
+  LIBVIRT_DEFINITION = FIXTURES_PATH.join("autoyast-libvirt.xml")
+  NAME = "autoyast".freeze
 
-  subject { AYTests::LibvirtVM.new("autoyast") }
+  subject { AYTests::LibvirtVM.new(NAME) }
   let(:definition) { File.read(LIBVIRT_DEFINITION) }
 
   before do
@@ -140,6 +141,41 @@ RSpec.describe AYTests::LibvirtVM do
 
       it "returns false" do
         expect(subject).to_not be_running
+      end
+    end
+  end
+
+  describe "#screenshot" do
+    let(:path) { Pathname.new("/tmp/screenshot.png") }
+
+    before do
+      allow(MiniMagick::Tool::Convert).to receive(:new)
+    end
+
+    it "uses virsh to create a screenshot of the running system" do
+      expect(Cheetah).to receive(:run)
+        .with(["sudo", "virsh", "screenshot", subject.name, "--file", path.sub_ext(".pnm").to_s])
+      expect(MiniMagick::Tool::Convert).to receive(:new)
+      subject.screenshot(path)
+    end
+
+    context "when screenshot was successfully saved" do
+      it "returns true" do
+        allow(Cheetah).to receive(:run)
+          .with(array_including("screenshot"))
+        expect(subject.screenshot(path)).to eq(true)
+      end
+    end
+
+    context "when screenshot was not successfully saved" do
+      before do
+        allow(Cheetah).to receive(:run)
+          .with(array_including("screenshot"))
+          .and_raise(Cheetah::ExecutionFailed.new(["virsh"], 1, nil, nil))
+      end
+
+      it "returns false" do
+        expect(subject.screenshot(path)).to eq(false)
       end
     end
   end

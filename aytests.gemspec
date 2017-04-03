@@ -29,5 +29,6 @@ end
   spec.add_runtime_dependency("ruby-libvirt", "~> 0.5", ">= 0.5.2")
   spec.add_runtime_dependency("cheetah", "~> 0.4", ">= 0.4.0")
   spec.add_runtime_dependency("thor", "~> 0.19", ">= 0.19.1")
+  spec.add_runtime_dependency("mini_magick", "~> 4.0")
   spec.add_development_dependency("packaging_rake_tasks", "~> 1.0")
 end

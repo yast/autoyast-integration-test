@@ -5,16 +5,19 @@ require "aytests/iso_repo"
 RSpec.describe AYTests::ImageBuilder do
   let(:work_dir) { TEST_WORK_DIR }
   let(:sources_dir) { Pathname.new(__FILE__).dirname.join("..", "share", "veewee") }
+  let(:results_dir) { TEST_WORK_DIR.join("results") }
   let(:files_dir) { TEST_WORK_DIR.join("files") }
   let(:autoinst_path) { Pathname.new(__FILE__).dirname.join("files", "autoinst.xml") }
   let(:iso_url) { "http://dl.opensuse.org/leap-42.1.iso" }
   let(:path_to_iso) { work_dir.join("iso", "leap-42.1.iso") }
   let(:provider) { :libvirt }
   let(:local_ip) { "192.168.122.232" }
+  let(:vm) { double("vm", name: "autoyast", run: true, download: true) }
+  let(:vm_name) { "autoyast" }
 
   let(:default_args) do
-    { sources_dir: sources_dir, work_dir: work_dir, files_dir: files_dir,
-      provider: provider, headless: true }
+    { sources_dir: sources_dir, results_dir: results_dir, work_dir: work_dir,
+      files_dir: files_dir, provider: provider, headless: true }
   end
 
   subject(:builder) { AYTests::ImageBuilder.new(default_args) }
@@ -66,6 +69,10 @@ RSpec.describe AYTests::ImageBuilder do
   end
 
   describe "#install" do
+    before do
+      allow(AYTests::VM).to receive(:new).with(vm_name, :libvirt).and_return(vm)
+    end
+
     it "runs each building phase and returns true if build was successful" do
       # Retrieve and link ISO
       expect(AYTests::IsoRepo).to receive(:get).with(iso_url)
@@ -88,6 +95,7 @@ RSpec.describe AYTests::ImageBuilder do
           "AYTESTS_BACKUP_IMAGE_NAME" => "autoyast_sav",
           "AYTESTS_FILES_DIR" => files_dir.to_s,
           "AYTESTS_SOURCES_DIR" => sources_dir.to_s,
+          "AYTESTS_RESULTS_DIR" => results_dir.to_s,
           "AYTESTS_IMAGE_NAME" => "autoyast",
           "AYTESTS_IP_ADDRESS" => local_ip,
           "AYTESTS_MAC_ADDRESS" => "02:00:00:12:34:56",
@@ -96,6 +104,11 @@ RSpec.describe AYTests::ImageBuilder do
           "AYTESTS_LINUXRC" => "autoyast=http://%IP%:8888/autoinst.xml vnc=1"},
         "veewee kvm build #{AYTests::ImageBuilder::IMAGE_NAME} --force --auto --nogui")
         .and_return(true)
+
+      # Download logs
+      expect(vm).to receive(:run).with(/tar/, any_args)
+      expect(vm).to receive(:download)
+        .with("/tmp/logs.tgz", results_dir.join("installation-y2logs.tgz"), any_args)
 
       #
       # Perform the installation
@@ -118,6 +131,10 @@ RSpec.describe AYTests::ImageBuilder do
   end
 
   describe "#upgrade" do
+    before do
+      allow(AYTests::VM).to receive(:new).with(vm_name, :libvirt).and_return(vm)
+    end
+
     it "runs each building phase and returns true if build was successful" do
       # Retrieve and link ISO
       expect(AYTests::IsoRepo).to receive(:get).with(iso_url)
@@ -142,6 +159,7 @@ RSpec.describe AYTests::ImageBuilder do
           "AYTESTS_BACKUP_IMAGE_NAME" => "autoyast_sav",
           "AYTESTS_FILES_DIR" => files_dir.to_s,
           "AYTESTS_SOURCES_DIR" => sources_dir.to_s,
+          "AYTESTS_RESULTS_DIR" => results_dir.to_s,
           "AYTESTS_IMAGE_NAME" => "autoyast",
           "AYTESTS_IP_ADDRESS" => local_ip,
           "AYTESTS_MAC_ADDRESS" => "02:00:00:12:34:56",
@@ -152,6 +170,11 @@ RSpec.describe AYTests::ImageBuilder do
         .and_return(true)
 
       allow(builder).to receive(:sleep)
+
+      # Download logs
+      expect(vm).to receive(:run).with(/tar/, any_args)
+      expect(vm).to receive(:download)
+        .with("/tmp/logs.tgz", results_dir.join("upgrade-y2logs.tgz"), any_args)
 
       #
       # Perform the upgrade
@@ -191,6 +214,7 @@ RSpec.describe AYTests::ImageBuilder do
   describe "#export_from_veewee" do
     before(:each) do
       FileUtils.mkdir_p(TEST_WORK_DIR)
+      allow(File).to receive(:file?).and_return(false)
     end
 
     it "relies on Veewee and returns true if it was successful" do
@@ -201,6 +225,18 @@ RSpec.describe AYTests::ImageBuilder do
     it "relies on Veewee and returns false if it was not successful" do
       expect(builder).to receive(:system).with(/veewee kvm export/).and_return(false)
       expect(builder.export_from_veewee).to eq(false)
+    end
+
+    context "when cloned image exists" do
+      before do
+        allow(File).to receive(:file?).and_return(true)
+      end
+
+      it "sets permissions" do
+        allow(builder).to receive(:system).with(/veewee kvm export/).and_return(true)
+        expect(FileUtils).to receive(:chmod).with(0666, /images/)
+        builder.export_from_veewee
+      end
     end
   end
 

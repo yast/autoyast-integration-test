@@ -1,3 +1,5 @@
+require "fileutils"
+
 module AYTests
   # This class is responsible for building a virtual machine
   # and running the tests.
@@ -7,7 +9,8 @@ module AYTests
     include AYTests::Helpers
 
     attr_reader :test_name, :files_dir, :test_file, :work_dir,
-      :default_iso_path, :skip_build, :provider, :headless
+      :default_iso_path, :skip_build, :provider, :headless,
+      :results_dir
 
     # Constructor
     #
@@ -27,6 +30,7 @@ module AYTests
       @work_dir         = work_dir
       @provider         = provider.to_sym
       @headless         = headless
+      @results_dir      = work_dir.join("results", Time.now.strftime("%Y%m%d%H%M"))
     end
 
     # Build a virtual machine and run the tests on it
@@ -36,15 +40,19 @@ module AYTests
     # @see #build
     def run
       log.info "Running test #{test_name}"
-      build unless skip_build
+      unless skip_build
+        setup_results_dir
+        build
+      end
       Dir.chdir(test_file.dirname) do
         system(
           { "AYTESTS_WORK_DIR" => work_dir.to_s, "AYTESTS_PROVIDER" => provider.to_s },
-          "rspec #{test_file.basename}")
+          "rspec #{test_file.basename}"
+        )
       end
     end
 
-    private
+  private
 
     # Build a virtual machine to build the tests
     #
@@ -52,10 +60,12 @@ module AYTests
     def build
       builder = AYTests::ImageBuilder.new(
         sources_dir: AYTests.base_dir.join("share", "veewee"),
-        work_dir: work_dir,
-        files_dir: files_dir,
-        provider: provider,
-        headless: headless)
+        work_dir:    work_dir,
+        files_dir:   files_dir,
+        results_dir: results_dir,
+        provider:    provider,
+        headless:    headless
+      )
       builder.cleanup_environment
       builder.install(autoinst(:install), iso_url(:install))
       builder.upgrade(autoinst(:upgrade), iso_url(:upgrade)) if upgrade?
@@ -100,5 +110,14 @@ module AYTests
       test_file.dirname
     end
 
+    # Set up the results directory
+    #
+    # Create the results directory and link it as the "latest"
+    def setup_results_dir
+      FileUtils.mkdir_p(results_dir) unless results_dir.exist?
+      latest_link = results_dir.parent.join("latest")
+      FileUtils.rm_f(latest_link)
+      FileUtils.ln_sf(results_dir, latest_link)
+    end
   end
 end
