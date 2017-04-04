@@ -9,9 +9,9 @@ RSpec.describe AYTests::LibvirtVM do
   let(:definition) { File.read(LIBVIRT_DEFINITION) }
 
   before do
-    allow(Cheetah).to receive(:run).
-      with(["sudo", "virsh", "dumpxml", "autoyast"], stdout: :capture).
-      and_return(definition)
+    allow(Cheetah).to receive(:run)
+      .with(["sudo", "virsh", "dumpxml", "autoyast"], stdout: :capture)
+      .and_return(definition)
   end
 
   describe "#boot_order=" do
@@ -63,7 +63,8 @@ RSpec.describe AYTests::LibvirtVM do
       it "clones the machine" do
         expect(subject).to_not receive(:shutdown)
         expect(Cheetah).to receive(:run)
-          .with(["sudo", "virt-clone", "-o", "autoyast", "-n", "backup-name", "--auto-clone", "--replace"])
+          .with(["sudo", "virt-clone", "-o", "autoyast", "-n", "backup-name", "--auto-clone",
+                 "--replace"])
         subject.backup("backup-name")
       end
     end
@@ -74,7 +75,8 @@ RSpec.describe AYTests::LibvirtVM do
       it "shuts down and clones the machine" do
         expect(subject).to receive(:shutdown)
         expect(Cheetah).to receive(:run)
-          .with(["sudo", "virt-clone", "-o", "autoyast", "-n", "backup-name", "--auto-clone", "--replace"])
+          .with(["sudo", "virt-clone", "-o", "autoyast", "-n", "backup-name", "--auto-clone",
+                 "--replace"])
         subject.backup("backup-name")
       end
     end
@@ -91,7 +93,8 @@ RSpec.describe AYTests::LibvirtVM do
     it "restores the given machine into the current one" do
       expect(old_vm).to receive(:destroy!)
       expect(Cheetah).to receive(:run)
-        .with(["sudo", "virt-clone", "-o", "backup-name", "-n", "autoyast", "--auto-clone", "--replace"])
+        .with(["sudo", "virt-clone", "-o", "backup-name", "-n", "autoyast", "--auto-clone",
+               "--replace"])
       subject.restore!("backup-name")
     end
   end

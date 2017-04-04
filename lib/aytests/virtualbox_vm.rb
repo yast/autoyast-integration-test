@@ -8,13 +8,13 @@ module AYTests
     # By default, Libvirt devices names are used, so this driver needs to map
     # them to VirtualBox terminology.
     DEVICES_MAP = {
-       disk: :hd,
-       dvd: :cdrom,
-       net: :network,
-       fd: :floppy,
-       none: nil
-    }
-    RUNNING_STATE = "running"
+      disk: :hd,
+      dvd:  :cdrom,
+      net:  :network,
+      fd:   :floppy,
+      none: nil
+    }.freeze
+    RUNNING_STATE = "running".freeze
     SLEEP_TIME_AFTER_SHUTDOWN = 15
 
     attr_reader :name
@@ -42,14 +42,13 @@ module AYTests
       @boot_order = devices.compact
     end
 
-
     # Return the MAC address
     #
     # Only 1 network adapter is considered
     #
     # @return [String] MAC address in MAC-48 form (00:00:00:00:00:00)
     def mac
-      @mac || @definition["macaddress1"].unpack("a2"*6).join(":")
+      @mac || @definition["macaddress1"].unpack("a2" * 6).join(":")
     end
 
     # Save changes to the virtual machine
@@ -57,7 +56,8 @@ module AYTests
     # It relies on `VBoxManage` to update the definition.
     def save
       # VBoxManage requires MAC addresses without ":". It reports invalid MAC otherwise
-      Cheetah.run(["VBoxManage", "modifyvm", name, "--macaddress1", mac.delete(":")] + boot_order_to_options)
+      Cheetah.run(["VBoxManage", "modifyvm", name, "--macaddress1", mac.delete(":")] +
+        boot_order_to_options)
       read_definition
     end
 
@@ -111,7 +111,7 @@ module AYTests
     # @return [Boolean] true if it's running; otherwise, it returns false.
     def running?
       vmstate = Cheetah.run(["VBoxManage", "showvminfo", "--machinereadable", name],
-                            ["grep", "VMState"], stdout: :capture)
+        ["grep", "VMState"], stdout: :capture)
       match = /VMState="(\w+)"/.match(vmstate)
       match[1] == RUNNING_STATE
     end
@@ -159,7 +159,7 @@ module AYTests
     def boot_order_to_options
       order = virtualbox_boot_order
       (1..4).reduce([]) do |options, idx|
-        options += ["--boot#{idx}", order[idx-1].to_s]
+        options + ["--boot#{idx}", order[idx - 1].to_s]
       end
     end
 
@@ -186,10 +186,9 @@ module AYTests
     def read_definition
       content = Cheetah.run(["VBoxManage", "showvminfo",
                              "--machinereadable", name], stdout: :capture)
-      @definition = content.split("\n").reduce({}) do |definition, line|
+      @definition = content.split("\n").each_with_object({}) do |line, definition|
         key, value = line.split("=")
         definition[unquote(key)] = unquote(value)
-        definition
       end
     end
 

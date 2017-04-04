@@ -9,8 +9,7 @@ module AYTests
     include AYTests::Helpers
 
     attr_reader :test_name, :files_dir, :test_file, :work_dir,
-      :default_iso_path, :skip_build, :provider, :headless,
-      :results_dir
+      :default_iso_path, :skip_build, :provider, :headless
 
     # Constructor
     #
@@ -21,7 +20,8 @@ module AYTests
     # @param [True,False] skip_build   Do not build the virtual machine
     # @param [String|Symbol] provider  Set the vagrant provider (:libvirt or :virtualbox)
     # @param [True,False] headless     Enable headless mode if true
-    def initialize(test_file:, work_dir:, default_iso_path:, skip_build: false, provider: :libvirt, headless: false)
+    def initialize(test_file:, work_dir:, default_iso_path:, skip_build: false, provider: :libvirt,
+      headless: false)
       @test_file        = Pathname.new(test_file).expand_path
       @default_iso_path = default_iso_path
       @skip_build       = skip_build
@@ -30,7 +30,6 @@ module AYTests
       @work_dir         = work_dir
       @provider         = provider.to_sym
       @headless         = headless
-      @results_dir      = work_dir.join("results", Time.now.strftime("%Y%m%d%H%M"))
     end
 
     # Build a virtual machine and run the tests on it
@@ -50,6 +49,18 @@ module AYTests
           "rspec #{test_file.basename}"
         )
       end
+    end
+
+    # Return results directory
+    #
+    # The results directory includes a timestamp and a suffix
+    #
+    # @return [Pathname] Results directory path name
+    def results_dir
+      return @results_dir if @results_dir
+      suffix = test_file.basename.sub_ext("")
+      dirname = "#{Time.now.strftime("%Y%m%d%H%M")}-#{suffix}"
+      @results_dir = work_dir.join("results", dirname)
     end
 
   private

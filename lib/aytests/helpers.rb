@@ -3,7 +3,7 @@ module AYTests
   module Helpers
     # Return the logger object for AYTests
     #
-  # @return [Logger] Logger object.
+    # @return [Logger] Logger object.
     def log
       AYTests.logger
     end

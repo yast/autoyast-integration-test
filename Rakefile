@@ -22,7 +22,7 @@ require_relative "lib/aytests/tasks/compat.rb"
 Rake::Task[:tarball].clear
 # build the gem package
 desc "Build gem package, save RPM sources to package subdirectory"
-task :"tarball" do
+task :tarball do
   version = File.read("VERSION").chomp
   Dir["package/*.tar.bz2"].each do |f|
     rm f
@@ -73,6 +73,6 @@ end
 
 Yast::Tasks.configuration do |conf|
   conf.package_name = "rubygem-aytests"
-  #lets ignore license check for now
+  # lets ignore license check for now
   conf.skip_license_check << /.*/
 end

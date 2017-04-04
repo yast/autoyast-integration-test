@@ -14,7 +14,8 @@ RSpec.describe AYTests::MediaBuilder do
     AYTests::MediaBuilder.new(
       base_dir: base_dir, work_dir: work_dir, yast_url: yast_url,
       iso_url: iso_url, version: version, dud_dist: dud_dist,
-      dud_method: dud_method)
+      dud_method: dud_method
+    )
   end
 
   describe "#build" do
@@ -36,7 +37,6 @@ RSpec.describe AYTests::MediaBuilder do
       expect(subject.cache_dir).to eq(Pathname.new("#{work_dir}/cache"))
     end
   end
-
 
   describe "#local_packages_dir" do
     it "returns local_packages_dir + 'rpms/VERSION'" do

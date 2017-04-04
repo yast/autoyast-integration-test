@@ -128,21 +128,25 @@ RSpec.describe AYTests::VM do
 
     it "downloads the file from the virtual machine" do
       expect(Net::SSH::Simple).to receive(:scp_get)
-        .with(subject.ip, source.to_s, target.to_s, port: port, user: user, password: password, paranoid: false)
+        .with(subject.ip, source.to_s, target.to_s, port: port, user: user, password: password,
+        paranoid: false)
       subject.download(source, target, port: port, user: user, password: password)
     end
 
     it "returns true" do
-      expect(subject.download(source, target, port: port, user: user, password: password)).to eq(true)
+      expect(subject.download(source, target, port: port, user: user, password: password))
+        .to eq(true)
     end
 
     context "when command fails" do
       before do
-        allow(Net::SSH::Simple).to receive(:scp_get).and_raise(Net::SSH::Simple::Error.new("failed"))
+        allow(Net::SSH::Simple).to receive(:scp_get)
+          .and_raise(Net::SSH::Simple::Error.new("failed"))
       end
 
       it "returns false" do
-        expect(subject.download(source, target, port: port, user: user, password: password)).to eq(false)
+        expect(subject.download(source, target, port: port, user: user, password: password))
+          .to eq(false)
       end
     end
   end

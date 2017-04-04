@@ -91,19 +91,21 @@ RSpec.describe AYTests::ImageBuilder do
 
       # Build
       expect(builder).to receive(:system)
-        .with({
-          "AYTESTS_BACKUP_IMAGE_NAME" => "autoyast_sav",
-          "AYTESTS_FILES_DIR" => files_dir.to_s,
-          "AYTESTS_SOURCES_DIR" => sources_dir.to_s,
-          "AYTESTS_RESULTS_DIR" => results_dir.to_s,
-          "AYTESTS_IMAGE_NAME" => "autoyast",
-          "AYTESTS_IP_ADDRESS" => local_ip,
-          "AYTESTS_MAC_ADDRESS" => "02:00:00:12:34:56",
-          "AYTESTS_PROVIDER" => provider.to_s,
-          "AYTESTS_WEBSERVER_PORT" => "8888",
-          "AYTESTS_LINUXRC" => "autoyast=http://%IP%:8888/autoinst.xml vnc=1"},
-        "veewee kvm build #{AYTests::ImageBuilder::IMAGE_NAME} --force --auto --nogui")
-        .and_return(true)
+        .with(
+          {
+            "AYTESTS_BACKUP_IMAGE_NAME" => "autoyast_sav",
+            "AYTESTS_FILES_DIR"         => files_dir.to_s,
+            "AYTESTS_SOURCES_DIR"       => sources_dir.to_s,
+            "AYTESTS_RESULTS_DIR"       => results_dir.to_s,
+            "AYTESTS_IMAGE_NAME"        => "autoyast",
+            "AYTESTS_IP_ADDRESS"        => local_ip,
+            "AYTESTS_MAC_ADDRESS"       => "02:00:00:12:34:56",
+            "AYTESTS_PROVIDER"          => provider.to_s,
+            "AYTESTS_WEBSERVER_PORT"    => "8888",
+            "AYTESTS_LINUXRC"           => "autoyast=http://%IP%:8888/autoinst.xml vnc=1"
+          },
+          "veewee kvm build #{AYTests::ImageBuilder::IMAGE_NAME} --force --auto --nogui"
+        ).and_return(true)
 
       # Download logs
       expect(vm).to receive(:run).with(/tar/, any_args)
@@ -155,19 +157,21 @@ RSpec.describe AYTests::ImageBuilder do
 
       # Build
       expect(builder).to receive(:system)
-        .with({
-          "AYTESTS_BACKUP_IMAGE_NAME" => "autoyast_sav",
-          "AYTESTS_FILES_DIR" => files_dir.to_s,
-          "AYTESTS_SOURCES_DIR" => sources_dir.to_s,
-          "AYTESTS_RESULTS_DIR" => results_dir.to_s,
-          "AYTESTS_IMAGE_NAME" => "autoyast",
-          "AYTESTS_IP_ADDRESS" => local_ip,
-          "AYTESTS_MAC_ADDRESS" => "02:00:00:12:34:56",
-          "AYTESTS_PROVIDER" => provider.to_s,
-          "AYTESTS_WEBSERVER_PORT" => "8888",
-          "AYTESTS_LINUXRC" => "autoyast=http://%IP%:8888/autoinst.xml vnc=1"},
-        "veewee kvm build #{AYTests::ImageBuilder::IMAGE_NAME} --force --auto --nogui")
-        .and_return(true)
+        .with(
+          {
+            "AYTESTS_BACKUP_IMAGE_NAME" => "autoyast_sav",
+            "AYTESTS_FILES_DIR"         => files_dir.to_s,
+            "AYTESTS_SOURCES_DIR"       => sources_dir.to_s,
+            "AYTESTS_RESULTS_DIR"       => results_dir.to_s,
+            "AYTESTS_IMAGE_NAME"        => "autoyast",
+            "AYTESTS_IP_ADDRESS"        => local_ip,
+            "AYTESTS_MAC_ADDRESS"       => "02:00:00:12:34:56",
+            "AYTESTS_PROVIDER"          => provider.to_s,
+            "AYTESTS_WEBSERVER_PORT"    => "8888",
+            "AYTESTS_LINUXRC"           => "autoyast=http://%IP%:8888/autoinst.xml vnc=1"
+          },
+          "veewee kvm build #{AYTests::ImageBuilder::IMAGE_NAME} --force --auto --nogui"
+        ).and_return(true)
 
       allow(builder).to receive(:sleep)
 
@@ -234,7 +238,7 @@ RSpec.describe AYTests::ImageBuilder do
 
       it "sets permissions" do
         allow(builder).to receive(:system).with(/veewee kvm export/).and_return(true)
-        expect(FileUtils).to receive(:chmod).with(0666, /images/)
+        expect(FileUtils).to receive(:chmod).with(0o666, /images/)
         builder.export_from_veewee
       end
     end

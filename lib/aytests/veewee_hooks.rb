@@ -35,17 +35,21 @@ module AYTests
     # Constructor
     #
     # @param definition        [Veewee::Definition] Veewee box definition
-    # @param provider          [Symbol]             Provider to be used by Vagrant (:libvirt or :virtualbox)
+    # @param provider          [Symbol]             Provider to be used by Vagrant
+    #                                               (:libvirt or :virtualbox)
     # @param files_dir         [Pathname,String]    Document root for the webserver
     # @param sources_dir       [Pathname,String]    Directory where Veewee related files live
-    #                                               (templates for definition, post-install script, etc.)
-    # @param results_dir       [Pathname,String]    Directory to write results (logs, screenshots, etc.)
-    # @param ip_address        [String]             Local IP address (listening address for web and registration
-    #                                               servers)
+    #                                               (templates for definition, post-install script,
+    #                                               etc.)
+    # @param results_dir       [Pathname,String]    Directory to write results (logs, screenshots,
+    #                                               etc.)
+    # @param ip_address        [String]             Local IP address (listening address for web
+    #                                               and registration servers)
     # @param mac_address       [String]             Virtual machine's MAC address
     # @param webserver_port    [Integer,String]     Web server's port
     # @param backup_image_name [String]             Backup virtual machine's image name
-    def initialize(definition:, provider:, files_dir:, sources_dir:, results_dir:, ip_address:, mac_address:, webserver_port:, backup_image_name:)
+    def initialize(definition:, provider:, files_dir:, sources_dir:, results_dir:, ip_address:,
+      mac_address:, webserver_port:, backup_image_name:)
       @definition = definition
       @provider = provider.to_sym
       @files_dir = Pathname.new(files_dir)
@@ -119,8 +123,7 @@ module AYTests
     def start_webserver
       AYTests::WebServer.new(
         veewee_dir: Pathname.pwd.join("definitions", "autoyast"),
-        files_dir:  files_dir,
-        name:       definition.box.name
+        files_dir:  files_dir
       ).start
     end
 

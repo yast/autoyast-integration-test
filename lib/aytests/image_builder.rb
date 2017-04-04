@@ -3,32 +3,31 @@ require "socket"
 require "aytests/vm"
 
 module AYTests
+  # Build a libvirt-kvm or a VirtualBox image using Veewee
+  # https://github.com/jedi4ever/veewee
   class ImageBuilder
-    # Build a libvirt-kvm or a VirtualBox image using Veewee
-    # https://github.com/jedi4ever/veewee
-
     include AYTests::Helpers
 
     attr_reader :sources_dir, :obs_iso_dir, :autoinst_path, :definition_path,
       :veewee_autoyast_dir, :libvirt_definition_path, :provider, :headless, :work_dir,
       :files_dir, :results_dir
 
-    IMAGE_NAME = "autoyast"
-    BACKUP_IMAGE_NAME = "autoyast_sav"
-    ISO_FILE_NAME = "testing.iso"
-    IMAGE_BOX_NAME = "autoyast_vagrant_box_image_0.img"
+    IMAGE_NAME = "autoyast".freeze
+    BACKUP_IMAGE_NAME = "autoyast_sav".freeze
+    ISO_FILE_NAME = "testing.iso".freeze
+    IMAGE_BOX_NAME = "autoyast_vagrant_box_image_0.img".freeze
     SLEEP_TIME_AFTER_UPGRADE = 150
     SLEEP_TIME_AFTER_SHUTDOWN = 15
-    SSH_USER = "vagrant"
-    SSH_PASSWORD = "nots3cr3t"
-    SSH_PORT = "22"
-    WEBSERVER_PORT = "8888"
-    MAC_ADDRESS = "02:00:00:12:34:56"
-    POSTINSTALL_SCRIPT="/home/vagrant/postinstall.sh"
+    SSH_USER = "vagrant".freeze
+    SSH_PASSWORD = "nots3cr3t".freeze
+    SSH_PORT = "22".freeze
+    WEBSERVER_PORT = "8888".freeze
+    MAC_ADDRESS = "02:00:00:12:34:56".freeze
+    POSTINSTALL_SCRIPT = "/home/vagrant/postinstall.sh".freeze
     DEFAULT_LINUXRC_ARGS = {
       "autoyast" => "http://%IP%:{{PORT}}/autoinst.xml"
-    }
-    CLONE_IMAGE_PATH = "/var/lib/libvirt/images/#{IMAGE_NAME}-1.qcow2"
+    }.freeze
+    CLONE_IMAGE_PATH = "/var/lib/libvirt/images/#{IMAGE_NAME}-1.qcow2".freeze
 
     # Constructor
     #
@@ -41,7 +40,8 @@ module AYTests
     #                               (:libvirt or :virtualbox)
     # @param [Symbol]   headless    Disable GUI (only relevant for virtualbox
     #                               provider)
-    def initialize(sources_dir: nil, work_dir: nil, results_dir: nil, files_dir: nil, provider: :libvirt, headless: false)
+    def initialize(sources_dir: nil, work_dir: nil, results_dir: nil, files_dir: nil,
+      provider: :libvirt, headless: false)
       @sources_dir = sources_dir
       @work_dir = work_dir
       @results_dir = results_dir
@@ -51,7 +51,8 @@ module AYTests
       @autoinst_path = @work_dir.join("definitions", "autoyast", "autoinst.xml")
       @definition_path = @work_dir.join("definitions", "autoyast", "definition.rb")
       # This file will be used by Veewee during upgrade.
-      @libvirt_definition_path = @work_dir.join("definitions", "autoyast", "autoyast_description.xml")
+      @libvirt_definition_path = @work_dir.join("definitions", "autoyast",
+        "autoyast_description.xml")
       @headless = headless
       @provider = provider
     end
@@ -67,20 +68,18 @@ module AYTests
         vol_lines = Cheetah.run(["sudo", "virsh", "vol-list", pool], stdout: :capture).lines.drop(2)
         vol_lines.each do |v_string|
           name, pathname = v_string.split.compact
-          if pathname
-            regexp = Regexp.new("^#{IMAGE_NAME}-\\d+.qcow2")
-            if !File.exist?(pathname) || name.match(regexp)
-              # Either the file does not exists anymore or there are cloned instances
-              # which have not been removed correctly by previous run.
-              log.info "CLEANUP: Removing unneeded file #{pathname} in pool #{pool}"
-              begin
-                Cheetah.run(["sudo", "virsh", "vol-delete", pathname])
-              rescue Cheetah::ExecutionFailed => e
-                log.error e.message
-                log.error e.stderr
-                log.error "FAILED; please check manually"
-              end
-            end
+          next unless pathname
+          regexp = Regexp.new("^#{IMAGE_NAME}-\\d+.qcow2")
+          next unless !File.exist?(pathname) || name.match(regexp)
+          # Either the file does not exists anymore or there are cloned instances
+          # which have not been removed correctly by previous run.
+          log.info "CLEANUP: Removing unneeded file #{pathname} in pool #{pool}"
+          begin
+            Cheetah.run(["sudo", "virsh", "vol-delete", pathname])
+          rescue Cheetah::ExecutionFailed => e
+            log.error e.message
+            log.error e.stderr
+            log.error "FAILED; please check manually"
           end
         end
       end
@@ -171,7 +170,7 @@ module AYTests
         # --> Access has to be set manually.
         if File.file? CLONE_IMAGE_PATH
           log.info "Giving write permissions to #{CLONE_IMAGE_PATH}"
-          FileUtils.chmod( 0666, CLONE_IMAGE_PATH)
+          FileUtils.chmod(0o666, CLONE_IMAGE_PATH)
         end
         system "veewee #{veewee_provider} export #{IMAGE_NAME} --force"
       end
@@ -184,12 +183,11 @@ module AYTests
       FileUtils.rm(autoinst_path, force: true)
       FileUtils.rm(definition_path, force: true)
       FileUtils.rm(libvirt_definition_path, force: true)
-      if provider == :libvirt
-        # Due a bug in vagrant-libvirt the images will not cleanuped correctly
-        # in the /var/lib/libvirt directory. This has to be done manually
-        # (including DB update)
-        system "sudo virsh vol-delete #{IMAGE_BOX_NAME} default"
-      end
+      return unless provider == :libvirt
+      # Due a bug in vagrant-libvirt the images will not cleanuped correctly
+      # in the /var/lib/libvirt directory. This has to be done manually
+      # (including DB update)
+      system "sudo virsh vol-delete #{IMAGE_BOX_NAME} default"
     end
 
     # Veewee provider
@@ -311,10 +309,11 @@ module AYTests
     def local_ip
       return @local_ip if @local_ip
       # turn off reverse DNS resolution temporarily
-      orig, Socket.do_not_reverse_lookup = Socket.do_not_reverse_lookup, true
+      orig = Socket.do_not_reverse_lookup
+      Socket.do_not_reverse_lookup = true
 
       UDPSocket.open do |s|
-        s.connect '64.233.187.99', 1 # google
+        s.connect "64.233.187.99", 1 # google
         @local_ip = s.addr.last
       end
     ensure
@@ -350,14 +349,14 @@ module AYTests
     def build_environment(autoinst)
       environment = {
         "AYTESTS_BACKUP_IMAGE_NAME" => BACKUP_IMAGE_NAME,
-        "AYTESTS_FILES_DIR" => files_dir.to_s,
-        "AYTESTS_SOURCES_DIR" => sources_dir.to_s,
-        "AYTESTS_RESULTS_DIR" => results_dir.to_s,
-        "AYTESTS_IMAGE_NAME" => IMAGE_NAME,
-        "AYTESTS_IP_ADDRESS" => local_ip,
-        "AYTESTS_MAC_ADDRESS" => MAC_ADDRESS,
-        "AYTESTS_PROVIDER" => provider.to_s,
-        "AYTESTS_WEBSERVER_PORT" => WEBSERVER_PORT
+        "AYTESTS_FILES_DIR"         => files_dir.to_s,
+        "AYTESTS_SOURCES_DIR"       => sources_dir.to_s,
+        "AYTESTS_RESULTS_DIR"       => results_dir.to_s,
+        "AYTESTS_IMAGE_NAME"        => IMAGE_NAME,
+        "AYTESTS_IP_ADDRESS"        => local_ip,
+        "AYTESTS_MAC_ADDRESS"       => MAC_ADDRESS,
+        "AYTESTS_PROVIDER"          => provider.to_s,
+        "AYTESTS_WEBSERVER_PORT"    => WEBSERVER_PORT
       }
       environment["AYTESTS_LINUXRC"] = linuxrc_options(autoinst.sub_ext(".linuxrc"))
       environment
@@ -376,13 +375,12 @@ module AYTests
     # @see #local_ip
     def autoinst_vars(vars_file)
       return {} unless vars_file.exist?
-      content = File.read(vars_file).
-        gsub("{{IP}}", local_ip).
-        gsub("{{PORT}}", WEBSERVER_PORT)
-      content.split("\n").reduce({}) do |hsh, line|
+      content = File.read(vars_file)
+                    .gsub("{{IP}}", local_ip)
+                    .gsub("{{PORT}}", WEBSERVER_PORT)
+      content.split("\n").each_with_object({}) do |line, hsh|
         key, value = line.split("=")
         hsh[key] = value
-        hsh
       end
     end
 

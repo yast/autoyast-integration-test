@@ -4,19 +4,19 @@ def run_aytests(cmd)
   $stderr.puts "rake interface is deprecated. Please, use aytests script "\
                "directly. The following command will be run:\n\n#{cmd}\n"
   libdir = File.join(Dir.pwd, "lib")
-  system({"RUBYLIB" => libdir}, "./bin/aytests #{cmd}")
+  system({ "RUBYLIB" => libdir }, "./bin/aytests #{cmd}")
 end
 
 #
 # Compatibility layer
 #
 desc "Running autoyast integration tests"
-task :test, :name do |name, args|
+task :test, :name do |_name, args|
   run_aytests("test #{args[:name]} --work-dir #{AYTESTS_COMPAT_WORK_DIR}")
 end
 
 desc "Building boot image <name>"
-task :build_iso, :name do |name, args|
+task :build_iso, :name do |_name, args|
   run_aytests("build_iso #{args[:name]} --work-dir #{AYTESTS_COMPAT_WORK_DIR}")
 end
 

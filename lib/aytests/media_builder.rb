@@ -16,8 +16,8 @@ module AYTests
 
     # --prefix=37 sets a directory prefix to avoid conflicts. Check mkdud README.
     MKDUD_CMD = "mkdud -c %<dud_path>s -d %<dud_dist>s -i  %<dud_method>s --prefix=37 " \
-      "--format=tar.gz $(find %<rpms_dir>s -name \"\*\.rpm\") %<dud_dir>s"
-    MKSUSECD_CMD = "sudo mksusecd -c %<output_path>s --initrd=%<dud_path>s %<iso_path>s"
+      "--format=tar.gz $(find %<rpms_dir>s -name \"\*\.rpm\") %<dud_dir>s".freeze
+    MKSUSECD_CMD = "sudo mksusecd -c %<output_path>s --initrd=%<dud_path>s %<iso_path>s".freeze
 
     # Constructor
     #
@@ -32,7 +32,8 @@ module AYTests
     # @param [Array<Hash>] extra_repos Extra repositories and packages to add to the
     #   ISO. The information for each repository consists in a Hash with +:server+
     #   and a +:packages+ keys.
-    def initialize(yast_url:, iso_url:, version:, dud_dist:, dud_method: nil, base_dir: nil, work_dir: nil, extra_repos: [])
+    def initialize(yast_url:, iso_url:, version:, dud_dist:, dud_method: nil, base_dir: nil,
+      work_dir: nil, extra_repos: [])
       # Directories
       @base_dir           = base_dir || AYTests.base_dir
       @work_dir           = work_dir || AYTests.work_dir
@@ -102,16 +103,20 @@ module AYTests
     def fetch_obs_packages
       log.info "Fetching all required packages"
       yast_url.each_with_index do |url, index|
-        system "zypper --root #{cache_dir} ar --no-gpgcheck -p #{index+1} #{url} download-packages-#{index}"
+        system "zypper --root #{cache_dir} ar --no-gpgcheck -p #{index + 1} #{url} " \
+          "download-packages-#{index}"
       end
-      system "xargs -a #{obs_pkg_list_path} zypper --root #{cache_dir} --pkg-cache-dir=#{cache_dir} download"
+      system "xargs -a #{obs_pkg_list_path} zypper --root #{cache_dir} " \
+        "--pkg-cache-dir=#{cache_dir} download"
 
       yast_url.size.times { |i| system "zypper --root #{cache_dir} rr download-packages-#{i}" }
 
       log.info "Fetching packages from extra repositories"
       @extra_repos.each do |repo|
-        system "zypper --root #{cache_dir} ar --no-gpgcheck #{repo[:server]} download-extra-packages"
-        system "zypper --root #{cache_dir} --pkg-cache-dir=#{cache_dir} download #{repo[:packages].join(" ")}"
+        system "zypper --root #{cache_dir} ar --no-gpgcheck #{repo[:server]} " \
+          "download-extra-packages"
+        system "zypper --root #{cache_dir} --pkg-cache-dir=#{cache_dir} " \
+          "download #{repo[:packages].join(" ")}"
         system "zypper --root #{cache_dir} rr download-extra-packages"
       end
     end

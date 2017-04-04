@@ -5,12 +5,13 @@ module AYTests
   class Installer
     attr_reader :config, :user, :log
 
-    GROUPS = ["libvirt", "qemu", "kvm", "vboxusers"]
-    POLKIT_RULES_PATH = "/etc/polkit-1/rules.d/99-libvirt.rules"
-    POLKIT_RULES_SAMPLE = File.join(File.dirname(__FILE__), "..", "..", "share", "files", "99-libvirt.rules")
-    VAGRANT_LIBVIRT_VERSION = "0.0.37"
-    FOG_VERSION = "1.29"
-    PROGRESSBAR_VERSION = "0.21.0"
+    GROUPS = ["libvirt", "qemu", "kvm", "vboxusers"].freeze
+    POLKIT_RULES_PATH = "/etc/polkit-1/rules.d/99-libvirt.rules".freeze
+    POLKIT_RULES_SAMPLE = File.join(File.dirname(__FILE__), "..", "..", "share", "files",
+      "99-libvirt.rules")
+    VAGRANT_LIBVIRT_VERSION = "0.0.37".freeze
+    FOG_VERSION = "1.29".freeze
+    PROGRESSBAR_VERSION = "0.21.0".freeze
 
     # Constructor
     #
@@ -20,7 +21,7 @@ module AYTests
     def initialize(config, user, log = nil)
       @config = config
       @user = user
-      @log = Logger.new(STDOUT)
+      @log = log || Logger.new(STDOUT)
     end
 
     # Run the installation/configuration process
@@ -136,7 +137,7 @@ module AYTests
       end
       install_gem("progressvar", version: PROGRESSBAR_VERSION)
       install_gem("fog-core", version: FOG_VERSION)
-      environment = {"NOKOGIRI_USE_SYSTEM_LIBRARIES" => "1"}
+      environment = { "NOKOGIRI_USE_SYSTEM_LIBRARIES" => "1" }
       install_gem("fog", version: FOG_VERSION, environment: environment)
       install_gem("veewee", environment: environment)
     end
@@ -175,13 +176,13 @@ module AYTests
       log.info "Allowing libvirt access for normal users"
 
       adapt_config_file "/etc/libvirt/libvirtd.conf",
-        :unix_sock_group    => "libvirt",
-        :unix_sock_ro_perms => "0777",
-        :unix_sock_rw_perms => "0770",
-        :auth_unix_rw       => "none",
+        unix_sock_group:    "libvirt",
+        unix_sock_ro_perms: "0777",
+        unix_sock_rw_perms: "0770",
+        auth_unix_rw:       "none",
         # By default, libvirt logs to syslog. We'd like to have the logs
         # separated.
-        :log_outputs        => "1:file:/var/log/libvirt/libvirt.log"
+        log_outputs:        "1:file:/var/log/libvirt/libvirt.log"
     end
 
     # Allow QEMU/KVM access to main user
@@ -191,8 +192,8 @@ module AYTests
       log.info "Allowing qemu-kvm access for user #{user}"
 
       adapt_config_file "/etc/libvirt/qemu.conf",
-        :user  => user,
-        :group => "qemu"
+        user:  user,
+        group: "qemu"
     end
 
     # Make arp available to Veewee
@@ -231,7 +232,7 @@ module AYTests
       Cheetah.run %w(sudo systemctl reload-or-restart libvirtd)
     end
 
-    private
+  private
 
     # Install a package using Zypper
     #
@@ -278,7 +279,7 @@ module AYTests
     #
     # Adapted from Pennyworth.
     def base_system
-      Cheetah.run(["lsb_release", "--release"], :stdout => :capture).split[1]
+      Cheetah.run(["lsb_release", "--release"], stdout: :capture).split[1]
     end
 
     # Check whether libvirt Vagrant plugin is installed or not
@@ -359,7 +360,7 @@ module AYTests
         "--printf",
         "%a",
         file,
-        :stdout => :capture
+        stdout: :capture
       )
       Cheetah.run "sudo", "mv", temp_file, file
       Cheetah.run "sudo", "chmod", permissions, file
