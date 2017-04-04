@@ -80,4 +80,13 @@ RSpec.describe AYTests::TestRunner do
       end
     end
   end
+
+  describe "#results_dir" do
+    let(:time) { Time.new(2017, 4, 1, 8, 0) }
+
+    it "returns results directory which includes a timestamp and the test file name" do
+      allow(Time).to receive(:now).and_return(time)
+      expect(runner.results_dir).to eq(TEST_WORK_DIR.join("results", "201704010800-sles12"))
+    end
+  end
 end
