@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Apr  4 06:52:42 UTC 2017 - igonzalezsosa@suse.com
+
+- Add the test filename as suffix to the results directory name
+- 1.0.37
+
+-------------------------------------------------------------------
 Mon Apr  3 15:24:48 UTC 2017 - igonzalezsosa@suse.com
 
 - AYTests::VM#run does not crash when Net::SSH::Simple raises
