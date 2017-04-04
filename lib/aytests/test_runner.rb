@@ -54,6 +54,8 @@ module AYTests
     # Return results directory
     #
     # The results directory includes a timestamp and a suffix
+    #
+    # @return [Pathname] Results directory path name
     def results_dir
       return @results_dir if @results_dir
       suffix = test_file.basename.sub_ext("")
