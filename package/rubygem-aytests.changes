@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Apr 13 16:05:48 CEST 2017 - schubi@suse.de
+
+- Configuration for SLES12-SP3.
+- 1.0.38
+
+-------------------------------------------------------------------
 Tue Apr  4 12:18:10 UTC 2017 - igonzalezsosa@suse.com
 
 - Add the test filename as suffix to the results directory name

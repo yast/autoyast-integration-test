@@ -25,6 +25,12 @@ sle12_common: &sle12_common
     - :server: "http://download.suse.de/ibs/SUSE:/SLE-12-SP2:/Update/standard/"
       :packages: ["hwinfo"]
 
+:sles12-sp3:
+  <<: *sle12_common
+  :yast_url: "http://download.suse.de/ibs/Devel:/YaST:/Head/sle12_sp3/"
+# This ISO is used by OpenQA too
+  :iso_url: "http://download.suse.de/ibs/SUSE:/SLE-12-SP3:/GA:/Staging:/A/images/iso/Test-Server-DVD-x86_64-Build*-Media.iso"
+
 :caasp1.0:
   :dud_dist: "caasp1.0"
   :dud_method: "instsys"
