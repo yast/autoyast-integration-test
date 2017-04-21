@@ -27,9 +27,22 @@ Alternatively, you can just use VirtualBox (no hardware virtualization support
 is needed).
 
 If you prefer, you can install the framework in a QEMU/KVM machine. For that
-scenario to work you must enable _nested virtualization_. For example, if
-you're using libvirt, you can achieve that setting `cpu mode` to `host-model`
-or `host-passthrough`. You can find more information in the [official
+scenario to work you must enable _nested virtualization_ and also expose
+virtualization extensions. 
+
+You can check if the parameter for nested virtualization is enabled with:
+
+    $ cat /sys/module/kvm_intel/parameters/nested #(Intel based machines)
+    $ cat /sys/module/kvm_amd/parameters/nested #(AMD based machines)
+
+And to enable, just add this options to the modules and then reload them or
+restart:
+
+    $ sudo sh -c "echo 'options kvm-intel nested=1' >> /etc/modprobe/kvm-intel.conf"
+    $ sudo sh -c "echo 'options kvm-amd nested=1' >> /etc/modprobe/kvm-amd.conf"
+
+And if you're using libvirt, you can expose 'virtualization extensions' setting `cpu mode`
+to `host-model` or `host-passthrough`. You can find more information in the [official
 documentation](https://libvirt.org/formatdomain.html#elementsCPU).
 
 ## Installation
@@ -40,26 +53,26 @@ documentation](https://libvirt.org/formatdomain.html#elementsCPU).
      This will grant access to execute every command for user <username> as root without
      asking for password (unsecure):
 
-        echo '<username> ALL=NOPASSWD: ALL' >> /etc/sudoers
+         echo '<username> ALL=NOPASSWD: ALL' >> /etc/sudoers
 
   2. Add [YaST:Head](http://download.opensuse.org/repositories/YaST:/Head/openSUSE_42.1/YaST:Head.repo)
      and [devel:languages:ruby:extensions](https://build.opensuse.org/project/show/devel:languages:ruby:extensions)
      repositories. For example, if you're running openSUSE Leap 42.1:
 
-        $ sudo zypper ar -f -r http://download.opensuse.org/repositories/YaST:/Head/openSUSE_42.1/YaST:Head.repo
-        $ sudo zypper ar -f -r http://download.opensuse.org/repositories/devel:/languages:/ruby:/extensions/openSUSE_Leap_42.1/devel:languages:ruby:extensions.repo
+         $ sudo zypper ar -f -r http://download.opensuse.org/repositories/YaST:/Head/openSUSE_42.1/YaST:Head.repo
+         $ sudo zypper ar -f -r http://download.opensuse.org/repositories/devel:/languages:/ruby:/extensions/openSUSE_Leap_42.1/devel:languages:ruby:extensions.repo
 
   3. Install package ruby2.1-rubygem-aytests (or ruby2.2-rubygem-aytests) and
      clone tests repository (tests are also available in the package
      aytests-tests):
 
-        $ zypper in ruby2.1-rubygem-aytests
-        $ git clone https://github.com/yast/aytests-tests
+         $ zypper in ruby2.1-rubygem-aytests
+         $ git clone https://github.com/yast/aytests-tests
 
   4. The task `setup` will do a lot of work for you. After that, you should logout
      and login again (as the user will be added to some groups):
 
-        $ aytests setup
+         $ aytests setup
 
   5. If the host is running a firewall, you must permit connections from
      libvirt default network to host’s port 8888. For example, if you’re
@@ -68,7 +81,7 @@ documentation](https://libvirt.org/formatdomain.html#elementsCPU).
      add a custom rule to /etc/sysconfig/SuSEfirewall2 allowing incoming
      connections from 192.168.122.0/24 to TCP port 8888, e.g.:
 
-        FW_SERVICES_ACCEPT_EXT="192.168.122.0/24,tcp,8888"
+         FW_SERVICES_ACCEPT_EXT="192.168.122.0/24,tcp,8888"
 
      After that, you must reboot your system to be sure everything works
      properly (libvirt iptables rules, ip forwarding, etc.).
