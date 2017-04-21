@@ -35,8 +35,7 @@ You can check if the parameter for nested virtualization is enabled with:
     $ cat /sys/module/kvm_intel/parameters/nested #(Intel based machines)
     $ cat /sys/module/kvm_amd/parameters/nested #(AMD based machines)
 
-And to enable, just add this options to the modules and then reload them or
-restart:
+To enable, just add this options to the modules and then reload them or restart your machine:
 
     $ sudo sh -c "echo 'options kvm-intel nested=1' >> /etc/modprobe/kvm-intel.conf"
     $ sudo sh -c "echo 'options kvm-amd nested=1' >> /etc/modprobe/kvm-amd.conf"
@@ -57,16 +56,16 @@ documentation](https://libvirt.org/formatdomain.html#elementsCPU).
 
   2. Add [YaST:Head](http://download.opensuse.org/repositories/YaST:/Head/openSUSE_42.1/YaST:Head.repo)
      and [devel:languages:ruby:extensions](https://build.opensuse.org/project/show/devel:languages:ruby:extensions)
-     repositories. For example, if you're running openSUSE Leap 42.1:
+     repositories. For example, if you're running openSUSE Leap 42.2:
 
-         $ sudo zypper ar -f -r http://download.opensuse.org/repositories/YaST:/Head/openSUSE_42.1/YaST:Head.repo
-         $ sudo zypper ar -f -r http://download.opensuse.org/repositories/devel:/languages:/ruby:/extensions/openSUSE_Leap_42.1/devel:languages:ruby:extensions.repo
+         $ sudo zypper ar -f -r http://download.opensuse.org/repositories/YaST:/Head/openSUSE_Leap_42.2/YaST:Head.repo
+         $ sudo zypper ar -f -r http://download.opensuse.org/repositories/devel:/languages:/ruby:/extensions/openSUSE_Leap_42.2/devel:languages:ruby:extensions.repo
 
   3. Install package ruby2.1-rubygem-aytests (or ruby2.2-rubygem-aytests) and
      clone tests repository (tests are also available in the package
      aytests-tests):
 
-         $ zypper in ruby2.1-rubygem-aytests
+         $ sudo zypper in ruby2.1-rubygem-aytests git
          $ git clone https://github.com/yast/aytests-tests
 
   4. The task `setup` will do a lot of work for you. After that, you should logout
