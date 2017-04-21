@@ -135,7 +135,7 @@ module AYTests
       File.open(File.join(ENV["HOME"], ".profile"), "a") do |f|
         f.puts "export PATH=#{File.join(Gem.user_dir, "bin")}:\$PATH"
       end
-      install_gem("progressvar", version: PROGRESSBAR_VERSION)
+      install_gem("progressbar", version: PROGRESSBAR_VERSION)
       install_gem("fog-core", version: FOG_VERSION)
       environment = { "NOKOGIRI_USE_SYSTEM_LIBRARIES" => "1" }
       install_gem("fog", version: FOG_VERSION, environment: environment)
