@@ -108,6 +108,7 @@ RSpec.describe AYTests::ImageBuilder do
         ).and_return(true)
 
       # Download logs
+      expect(vm).to receive(:upload)
       expect(vm).to receive(:run).with(/tar/, any_args)
       expect(vm).to receive(:download)
         .with("/tmp/logs.tgz", results_dir.join("installation-y2logs.tgz"), any_args)

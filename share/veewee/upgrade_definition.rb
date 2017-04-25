@@ -46,8 +46,7 @@ Veewee::Definition.declare(
   ssh_guest_port:       "22",
   sudo_cmd:             "echo '%p'|sudo -S sh '%f'",
   shutdown_cmd:         "shutdown -P now",
-  postinstall_files:    ["postinstall.sh"],
-  postinstall_timeout:  "3600",
+  postinstall_files:    [],
   hooks:                {
     before_create:     proc { hooks.before_create },
     after_create:      proc { hooks.after_create_on_upgrade },

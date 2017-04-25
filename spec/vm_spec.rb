@@ -10,6 +10,9 @@ RSpec.describe AYTests::VM do
   let(:driver) { double("driver", mac: mac) }
   let(:ip) { "192.168.122.50" }
   let(:mac) { "52:54:00:8a:98:c4" }
+  let(:user) { "vagrant" }
+  let(:port) { 22 }
+  let(:password) { "123456" }
 
   before do
     allow(AYTests::LibvirtVM).to receive(:new).with(vm_name).and_return(driver)
@@ -75,9 +78,6 @@ RSpec.describe AYTests::VM do
   end
 
   describe "#run" do
-    let(:user) { "vagrant" }
-    let(:port) { 22 }
-    let(:password) { "123456" }
     let(:result) { { exit_code: 0 } }
 
     before do
@@ -115,11 +115,8 @@ RSpec.describe AYTests::VM do
   end
 
   describe "#download" do
-    let(:user) { "vagrant" }
-    let(:port) { 22 }
-    let(:password) { "123456" }
-    let(:source) { Pathname.new("/tmp/y2logs.tgz") }
-    let(:target) { Pathname.new("y2logs.tgz") }
+    let(:local) { Pathname.new("y2logs.tgz") }
+    let(:remote) { Pathname.new("/tmp/y2logs.tgz") }
 
     before do
       allow(subject).to receive(:ip).and_return(ip)
@@ -128,24 +125,58 @@ RSpec.describe AYTests::VM do
 
     it "downloads the file from the virtual machine" do
       expect(Net::SSH::Simple).to receive(:scp_get)
-        .with(subject.ip, source.to_s, target.to_s, port: port, user: user, password: password,
+        .with(subject.ip, remote.to_s, local.to_s, port: port, user: user, password: password,
         paranoid: false)
-      subject.download(source, target, port: port, user: user, password: password)
+      subject.download(remote, local, port: port, user: user, password: password)
     end
 
     it "returns true" do
-      expect(subject.download(source, target, port: port, user: user, password: password))
+      expect(subject.download(remote, local, port: port, user: user, password: password))
         .to eq(true)
     end
 
-    context "when command fails" do
+    context "when the file cannot be downloaded" do
       before do
         allow(Net::SSH::Simple).to receive(:scp_get)
           .and_raise(Net::SSH::Simple::Error.new("failed"))
       end
 
       it "returns false" do
-        expect(subject.download(source, target, port: port, user: user, password: password))
+        expect(subject.download(remote, local, port: port, user: user, password: password))
+          .to eq(false)
+      end
+    end
+  end
+
+  describe "#upload" do
+    let(:local) { Pathname.new("y2logs.tgz") }
+    let(:remote) { Pathname.new("/tmp/y2logs.tgz") }
+
+    before do
+      allow(subject).to receive(:ip).and_return(ip)
+      allow(Net::SSH::Simple).to receive(:scp_put)
+    end
+
+    it "uploads the file from the virtual machine" do
+      expect(Net::SSH::Simple).to receive(:scp_put)
+        .with(subject.ip, local.to_s, remote.to_s, port: port, user: user, password: password,
+        paranoid: false)
+      subject.upload(local, remote, port: port, user: user, password: password)
+    end
+
+    it "returns true" do
+      expect(subject.upload(local, remote, port: port, user: user, password: password))
+        .to eq(true)
+    end
+
+    context "when the file cannot be uploaded" do
+      before do
+        allow(Net::SSH::Simple).to receive(:scp_put)
+          .and_raise(Net::SSH::Simple::Error.new("failed"))
+      end
+
+      it "returns false" do
+        expect(subject.upload(local, remote, port: port, user: user, password: password))
           .to eq(false)
       end
     end

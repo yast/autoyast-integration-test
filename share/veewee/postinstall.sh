@@ -10,11 +10,10 @@ echo 'solver.onlyRequires = true' >> /etc/zypp/zypp.conf
 # remove zypper package locks
 rm -f /etc/zypp/locks
 
-# install vagrant key
-mkdir -pm 700 /home/vagrant/.ssh
-curl -Lo /home/vagrant/.ssh/authorized_keys 'https://raw.github.com/mitchellh/vagrant/master/keys/vagrant.pub'
-chmod 0600 /home/vagrant/.ssh/authorized_keys
-chown -R vagrant: /home/vagrant/.ssh
+# install root user key
+mkdir -pm 700 /root/.ssh
+curl -Lo /root/.ssh/authorized_keys 'https://raw.github.com/mitchellh/vagrant/master/keys/vagrant.pub'
+chmod 0600 /root/.ssh/authorized_keys
 
 # update sudoers
 echo -e "\nupdate sudoers ..."
