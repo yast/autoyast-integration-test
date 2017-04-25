@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Tue Apr 25 14:50:21 UTC 2017 - igonzalezsosa@suse.com
+
+- Fixed CaaSP integration as / and /home/vagrant are not writable
+- The post-installation script is now ran by aytests itself
+  instead of Veewee
+- 1.0.40
+
+-------------------------------------------------------------------
 Fri Apr 21 14:10:52 WEST 2017 - knut.anderssen@suse.com
 
 - Fixed typo in progressbar gem installation
