@@ -18,12 +18,12 @@ module AYTests
     IMAGE_BOX_NAME = "autoyast_vagrant_box_image_0.img".freeze
     SLEEP_TIME_AFTER_UPGRADE = 150
     SLEEP_TIME_AFTER_SHUTDOWN = 15
-    SSH_USER = "vagrant".freeze
+    SSH_USER = "root".freeze
     SSH_PASSWORD = "nots3cr3t".freeze
     SSH_PORT = "22".freeze
     WEBSERVER_PORT = "8888".freeze
     MAC_ADDRESS = "02:00:00:12:34:56".freeze
-    POSTINSTALL_SCRIPT = "/home/vagrant/postinstall.sh".freeze
+    POSTINSTALL_SCRIPT = "/root/postinstall.sh".freeze
     DEFAULT_LINUXRC_ARGS = {
       "autoyast" => "http://%IP%:{{PORT}}/autoinst.xml"
     }.freeze
@@ -104,6 +104,7 @@ module AYTests
       setup_autoinst(autoinst)
       setup_definition(:install)
       ret = build(autoinst)
+      run_postinstall
       download_logs(results_dir.join("installation-y2logs.tgz"))
       ret
     end
@@ -211,8 +212,10 @@ module AYTests
     #
     # Veewee won't be able to run post-install script after upgrade.
     def run_postinstall
-      log.info "Running post-install script"
-      vm.run("sudo env #{POSTINSTALL_SCRIPT}", ssh_options)
+      log.info "Uploading and running post-install script"
+      postinstall_path = sources_dir.join("postinstall.sh")
+      vm.upload(postinstall_path, POSTINSTALL_SCRIPT, ssh_options)
+      vm.run("env sh #{POSTINSTALL_SCRIPT}", ssh_options)
     end
 
   private

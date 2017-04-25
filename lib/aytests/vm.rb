@@ -16,17 +16,18 @@ module AYTests
     def_delegators :@driver, :mac, :mac=, :boot_order, :boot_order=, :stop,
       :backup, :restore!, :running?, :screenshot
 
-    attr_reader :driver, :name
+    attr_reader :driver, :name, :log
 
     # Constructor
     #
     # @param [String]        name     Virtual machine name
     # @param [String,Symbol] provider Virtual machine provider
-    def initialize(name, provider)
+    def initialize(name, provider, log = nil)
       driver_class = "#{provider.capitalize}VM"
       @name = name
       require "aytests/#{provider}_vm"
       @driver = AYTests.const_get(driver_class).new(name)
+      @log = log || Logger.new(STDOUT)
     end
 
     # Update virtual machine attributes and saves the new definition
@@ -53,14 +54,15 @@ module AYTests
       result = Net::SSH::Simple.ssh(ip, cmd,
         user: user, port: port, password: password, paranoid: false)
       result[:exit_code].zero?
-    rescue Net::SSH::Simple::Error
+    rescue Net::SSH::Simple::Error => e
+      log.info "Running '#{cmd}' failed: #{e.inspect}"
       false
     end
 
     # Download a file from the virtual machine using SCP
     #
-    # @param remote   [Pathname,String] Remote file name
-    # @param remote   [Pathname,String] Local file name (where to put the file)
+    # @param remote   [Pathname,String] Remote file name (where to get the file)
+    # @param local    [Pathname,String] Local file name (where to put the file)
     # @param user     [String]          SSH username
     # @param password [String]          SSH user password
     # @param port     [Integer]         SSH port
@@ -69,7 +71,25 @@ module AYTests
       Net::SSH::Simple.scp_get(ip, remote.to_s, local.to_s,
         user: user, port: port, password: password, paranoid: false)
       true
-    rescue Net::SSH::Simple::Error
+    rescue Net::SSH::Simple::Error => e
+      log.info "Downloading '#{remote}' failed: #{e.inspect}"
+      false
+    end
+
+    # Upload a file to the virtual machine using SCP
+    #
+    # @param local    [Pathname,String] Local file name (where to put the file)
+    # @param remote   [Pathname,String] Remote file name (where to put the file)
+    # @param user     [String]          SSH username
+    # @param password [String]          SSH user password
+    # @param port     [Integer]         SSH port
+    # @return [Boolean] true if the operation was successful; false otherwise
+    def upload(local, remote, port:, user:, password:)
+      Net::SSH::Simple.scp_put(ip, local.to_s, remote.to_s,
+        user: user, port: port, password: password, paranoid: false)
+      true
+    rescue Net::SSH::Simple::Error => e
+      log.info "Uploading '#{local}' failed: #{e.inspect}"
       false
     end
 
