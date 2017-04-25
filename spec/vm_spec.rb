@@ -135,7 +135,7 @@ RSpec.describe AYTests::VM do
         .to eq(true)
     end
 
-    context "when command fails" do
+    context "when the file cannot be downloaded" do
       before do
         allow(Net::SSH::Simple).to receive(:scp_get)
           .and_raise(Net::SSH::Simple::Error.new("failed"))
@@ -169,7 +169,7 @@ RSpec.describe AYTests::VM do
         .to eq(true)
     end
 
-    context "when command fails" do
+    context "when the file cannot be uploaded" do
       before do
         allow(Net::SSH::Simple).to receive(:scp_put)
           .and_raise(Net::SSH::Simple::Error.new("failed"))
