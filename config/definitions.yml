@@ -39,3 +39,8 @@ sle12_common: &sle12_common
     - "http://download.suse.de/ibs/Devel:/YaST:/CASP:/1.0/CASP_1.0/"
     - "http://download.suse.de/ibs/Devel:/YaST:/SLE-12-SP2/SLE_12_SP2/"
   :iso_url: "http://dist.suse.de/ibs/SUSE:/SLE-12-SP2:/Update:/Products:/CASP10/images/iso/SUSE-CaaS-Platform-1.0-DVD-x86_64-Build*-Media1.iso"
+
+:storage-ng:
+  :dud_dist: "tw"
+  :yast_url: "http://download.opensuse.org/repositories/YaST:/storage-ng/openSUSE_Tumbleweed/"
+  :iso_url: "http://download.opensuse.org/repositories/YaST:/storage-ng/images/iso/StorageNG-Test-Build*-Media.iso"
