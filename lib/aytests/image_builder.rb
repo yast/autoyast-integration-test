@@ -18,9 +18,9 @@ module AYTests
     IMAGE_BOX_NAME = "autoyast_vagrant_box_image_0.img".freeze
     SLEEP_TIME_AFTER_UPGRADE = 150
     SLEEP_TIME_AFTER_SHUTDOWN = 15
-    SSH_USER = "root".freeze
-    SSH_PASSWORD = "nots3cr3t".freeze
-    SSH_PORT = "22".freeze
+    SSH_USER = "root"
+    SSH_PASSWORD = "nots3cr3t"
+    SSH_PORT = "22"
     WEBSERVER_PORT = "8888".freeze
     MAC_ADDRESS = "02:00:00:12:34:56".freeze
     POSTINSTALL_SCRIPT = "/root/postinstall.sh".freeze
@@ -65,6 +65,8 @@ module AYTests
       pool_lines = Cheetah.run(["sudo", "virsh", "pool-list"], stdout: :capture).lines.drop(2)
       pools = pool_lines.collect { |l| l.split.first }.compact
       pools.each do |pool|
+        # try a refresh at first.
+        Cheetah.run(["sudo", "virsh", "pool-refresh", pool], stdout: :capture)
         vol_lines = Cheetah.run(["sudo", "virsh", "vol-list", pool], stdout: :capture).lines.drop(2)
         vol_lines.each do |v_string|
           name, pathname = v_string.split.compact
@@ -274,7 +276,8 @@ module AYTests
         content.gsub!("/dev/vd", "/dev/sd") if provider == :virtualbox
         File.open(autoinst_path, "w") { |f| f.puts content }
       else
-        log.info "No profile found. No problem, it should be available at /static"
+        log.warn "#{autoinst} not found"
+        log.warn "Taking the previous one from the last run."
       end
     end
 

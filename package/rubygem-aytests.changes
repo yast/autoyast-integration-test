@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue May  9 15:22:44 CEST 2017 - schubi@suse.de
+
+- Added environment for storage-ng.
+- 1.0.41
+
+-------------------------------------------------------------------
 Tue Apr 25 14:50:21 UTC 2017 - igonzalezsosa@suse.com
 
 - Fixed CaaSP integration as / and /home/vagrant are not writable

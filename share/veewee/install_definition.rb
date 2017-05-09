@@ -15,7 +15,7 @@ hooks = AYTests::VeeweeHooks.new(
 Veewee::Definition.declare(
   cpu_count:            "2",
   memory_size:          "1024",
-  disk_size:            "20280",
+  disk_size:            "25600",
   disk_format:          "VDI",
   hostiocache:          "off",
   os_type_id:           "OpenSUSE_64",
@@ -28,7 +28,6 @@ Veewee::Definition.declare(
     "<Esc><Enter>",
     "     ", # Workaround to avoid timing problems with VirtualBox
     "linux",
-    " netdevice=eth0",
     " instmode=dvd",
     " textmode=1",
     " insecure=1",

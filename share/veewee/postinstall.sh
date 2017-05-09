@@ -40,6 +40,9 @@ if [[ ! -f /etc/sysconfig/network/ifcfg-eth0 ]]; then
   STARTMODE='auto'
 EOF
 fi
+# Switching back from ens* to eth* interfaces
+mkdir -p /etc/systemd/network/
+ln -s /dev/null /etc/systemd/network/99-default.link
 
 # Make sure that everything's written to disk, otherwise we sometimes get
 # empty files in the image
