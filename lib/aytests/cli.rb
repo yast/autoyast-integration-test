@@ -112,7 +112,7 @@ module AYTests
 
     # Toptions to pass to the runner
     def runner_options(test_file)
-      @runner_options ||= {
+      {
         work_dir:         AYTests.work_dir,
         test_file:        Pathname.new(test_file),
         default_iso_path: AYTests.obs_iso_path,
