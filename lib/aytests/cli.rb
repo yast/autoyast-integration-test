@@ -110,7 +110,7 @@ module AYTests
       runner.run ? :passed : :failed
     end
 
-    # Toptions to pass to the runner
+    # options to pass to the runner
     def runner_options(test_file)
       {
         work_dir:         AYTests.work_dir,
