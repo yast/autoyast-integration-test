@@ -43,7 +43,7 @@ RSpec.shared_examples "test_scripts" do |list|
 
   File.readlines(list_path).each do |line|
     test, description = line.strip.split("#", 2)
-    next if test.nil?
+    next if line.strip.start_with? "#" || test.nil? || test.empty?
 
     it((description || test).to_s) do
       run_test_script(Pathname.pwd.join(test.strip))
