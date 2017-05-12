@@ -91,9 +91,8 @@ module AYTests
       vm.update(mac: mac_address, boot_order: [:cdrom, :hd])
 
       # Restoring obs image
-      base_dir = File.dirname(__FILE__)
-      testing_iso = File.join(base_dir, "iso/testing.iso")
-      obs_iso = File.join(base_dir, "veewee/iso/obs.iso")
+      testing_iso = Pathname.pwd.join( "iso/testing.iso")
+      obs_iso = Pathname.pwd.join( "veewee/iso/obs.iso")
       # Taking obs iso for upgrade
       FileUtils.ln(obs_iso, testing_iso) if File.file?(obs_iso) && !File.file?(testing_iso)
     end

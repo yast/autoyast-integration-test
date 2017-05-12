@@ -35,6 +35,7 @@ Veewee::Definition.declare(
     " netsetup=dhcp",
     " SetHostname=0",
     " #{ENV["AYTESTS_LINUXRC"]}",
+    " netdevice= ", # Only needed for SLES11 installation. So removing this entry again.
     "<Enter>"
   ],
   ssh_login_timeout:    "3600",
