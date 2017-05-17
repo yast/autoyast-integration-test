@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Wed May 17 16:28:26 CEST 2017 - schubi@suse.de
+
+- "virsh pool-refresh": It could inactive and returns an
+   error. Going on because each entry will be check explicitly.
+- 1.0.44
+
+-------------------------------------------------------------------
 Fri May 12 15:20:29 CEST 2017 - schubi@suse.de
 
 - Fixes build for SLES12-SP2.
