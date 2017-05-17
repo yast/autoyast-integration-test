@@ -66,7 +66,11 @@ module AYTests
       pools = pool_lines.collect { |l| l.split.first }.compact
       pools.each do |pool|
         # try a refresh at first.
-        Cheetah.run(["sudo", "virsh", "pool-refresh", pool], stdout: :capture)
+        begin
+          Cheetah.run(["sudo", "virsh", "pool-refresh", pool], stdout: :capture)
+        rescue Cheetah::ExecutionFailed => e
+          log.error "#{e.message} ; #{e.stderr}"
+        end
         vol_lines = Cheetah.run(["sudo", "virsh", "vol-list", pool], stdout: :capture).lines.drop(2)
         vol_lines.each do |v_string|
           name, pathname = v_string.split.compact
