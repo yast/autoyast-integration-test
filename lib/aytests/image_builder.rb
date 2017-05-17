@@ -67,7 +67,7 @@ module AYTests
       pools.each do |pool|
         # try a refresh at first.
         begin
-          Cheetah.run(["sudo", "virsh", "pool-refresh", pool], stdout: :capture)
+          Cheetah.run(["sudo", "virsh", "pool-refresh", pool])
         rescue Cheetah::ExecutionFailed => e
           log.error "#{e.message} ; #{e.stderr}"
         end
