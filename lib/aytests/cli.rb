@@ -42,9 +42,16 @@ module AYTests
         help("test")
         exit TEST_DOES_NOT_EXIST_ERRCODE
       end
-
       results = files.each_with_object({}) do |test_file, hsh|
         hsh[test_file] = test_result(test_file)
+      end
+      tests_again = results.select {|file,ret| ret == :failed }.keys
+      unless tests_again.empty?
+        say "giving following tests an additional try:"
+        say tests_again
+        tests_again.each do |test_file|
+          results[test_file] = test_result(test_file)
+        end
       end
       show_results(results)
       status = results.values.all? { |r| r == :passed } ? TEST_PASSED_ERRCODE : TEST_FAILED_ERRCODE

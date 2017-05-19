@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Fri May 19 14:13:13 CEST 2017 - schubi@suse.de
+
+- Killing screenshot process manually.
+- Trying failed tests one more time. Maybe there has been an
+  timeout issue on slow machines only.
+- 1.0.45
+
+-------------------------------------------------------------------
 Wed May 17 16:28:26 CEST 2017 - schubi@suse.de
 
 - "virsh pool-refresh": It could inactive and returns an

@@ -103,6 +103,10 @@ module AYTests
       pnm_path = path.sub_ext(".pnm").to_s
       Cheetah.run(["sudo", "virsh", "screenshot", name, "--file", pnm_path])
       MiniMagick::Tool::Convert.new { |c| c << pnm_path << path.to_s }
+      # Although the call has returned correclty there is still a snapshot
+      # process running. Maybe there is a virsh problem here.
+      # So trying to kill it explicit.
+      Cheetah.run(["sudo", "pkill", "-f", "virsh screenshot"], allowed_exitstatus: 1)
       true
     rescue Cheetah::ExecutionFailed
       false
