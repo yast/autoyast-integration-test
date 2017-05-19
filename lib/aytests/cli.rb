@@ -45,7 +45,6 @@ module AYTests
       results = files.each_with_object({}) do |test_file, hsh|
         hsh[test_file] = test_result(test_file)
       end
-      show_results(results)
       tests_again = results.select {|file,ret| ret == :failed }.keys
       unless tests_again.empty?
         say "giving following tests an additional try:"
@@ -54,7 +53,7 @@ module AYTests
           results[test_file] = test_result(test_file)
         end
       end
-      show_results(results) unless tests_again.empty?
+      show_results(results)
       status = results.values.all? { |r| r == :passed } ? TEST_PASSED_ERRCODE : TEST_FAILED_ERRCODE
       exit(status)
     end
