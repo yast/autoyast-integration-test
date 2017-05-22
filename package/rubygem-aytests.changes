@@ -1,4 +1,13 @@
 -------------------------------------------------------------------
+Mon May 22 14:34:09 CEST 2017 - schubi@suse.de
+
+- Do not rerun a test if it is the only one. It is more comfortable
+  if only one test will be run.
+- Do not rerun a test if the build has been skipped by the flag
+  --skip-build.
+- 1.0.46
+
+-------------------------------------------------------------------
 Fri May 19 14:13:13 CEST 2017 - schubi@suse.de
 
 - Killing screenshot process manually.

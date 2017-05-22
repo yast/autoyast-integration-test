@@ -46,7 +46,9 @@ module AYTests
         hsh[test_file] = test_result(test_file)
       end
       tests_again = results.select {|file,ret| ret == :failed }.keys
-      unless tests_again.empty?
+      if files.size > 1 && !tests_again.empty? && !options["skip-build"]
+        # Trying only again if there are more than one test to check
+        # and the build will not be skipped.
         say "giving following tests an additional try:"
         say tests_again
         tests_again.each do |test_file|
