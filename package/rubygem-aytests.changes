@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Jun  2 11:34:51 CEST 2017 - schubi@suse.de
+
+- Added support for SLES15.
+- 1.0.47
+
+-------------------------------------------------------------------
 Mon May 22 14:34:09 CEST 2017 - schubi@suse.de
 
 - Do not rerun a test if it is the only one. It is more comfortable
