@@ -55,7 +55,7 @@ module AYTests
     #
     # @param [String] kind of the device e.g. "network"
     # @param [String] params of the given divice
-    def add_device( kind, params)
+    def add_device(kind, params)
       Cheetah.run(["sudo", "virt-xml", name, "--add-device", "--#{kind}", params])
     end
 

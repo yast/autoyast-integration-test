@@ -50,7 +50,7 @@ module AYTests
       log.info "Adding additional devices: #{devices}"
       devices.each do |kind, entries|
         entries.each do |entry|
-          @driver.add_device( kind, entry )
+          @driver.add_device(kind, entry)
         end
       end
     end

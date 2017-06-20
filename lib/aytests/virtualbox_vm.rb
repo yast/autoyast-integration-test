@@ -65,7 +65,7 @@ module AYTests
     #
     # @param [String] kind of the device e.g. "network" (just for information)
     # @param [String] params of the given divice
-    def add_device( kind, params)
+    def add_device(kind, params)
       Cheetah.run(["VBoxManage", "modifyvm", name] + params.split)
     end
 
