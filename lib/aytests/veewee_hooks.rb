@@ -1,3 +1,4 @@
+require "yaml"
 require "aytests/web_server"
 require "aytests/registration_server"
 require "pathname"
@@ -31,6 +32,9 @@ module AYTests
     attr_reader :webserver_port
     # @return [String] Backup virtual machine's image name
     attr_reader :backup_image_name
+    # @return [String] Definition file of additional hardware which should be added to
+    # generated image.
+    attr_reader :add_devices_file
 
     # Constructor
     #
@@ -48,8 +52,9 @@ module AYTests
     # @param mac_address       [String]             Virtual machine's MAC address
     # @param webserver_port    [Integer,String]     Web server's port
     # @param backup_image_name [String]             Backup virtual machine's image name
+    # @param add_devices_file  [String]             Additional hardware desciption file
     def initialize(definition:, provider:, files_dir:, sources_dir:, results_dir:, ip_address:,
-      mac_address:, webserver_port:, backup_image_name:)
+      mac_address:, webserver_port:, backup_image_name:, add_devices_file:)
       @definition = definition
       @provider = provider.to_sym
       @files_dir = Pathname.new(files_dir)
@@ -59,6 +64,7 @@ module AYTests
       @mac_address = mac_address
       @webserver_port = webserver_port
       @backup_image_name = backup_image_name
+      @add_devices_file = add_devices_file
       @vm = nil
       @threads = []
     end
@@ -74,8 +80,13 @@ module AYTests
     # After create hook
     #
     # Update virtual machine's MAC address and boot order
+    # Add additional devices if needed.
     def after_create
       vm.update(mac: mac_address, boot_order: [:cdrom, :hd])
+      if add_devices_file && !add_devices_file.empty?
+        add_devices = YAML.load_file(add_devices_file).fetch(provider.to_sym)
+        vm.add_devices(add_devices) if add_devices
+      end
     end
 
     # Before upgrade hook

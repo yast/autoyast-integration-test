@@ -9,7 +9,8 @@ hooks = AYTests::VeeweeHooks.new(
   ip_address:        ENV["AYTESTS_IP_ADDRESS"],
   mac_address:       ENV["AYTESTS_MAC_ADDRESS"],
   webserver_port:    ENV["AYTESTS_WEBSERVER_PORT"].to_i,
-  backup_image_name: ENV["AYTESTS_BACKUP_IMAGE_NAME"]
+  backup_image_name: ENV["AYTESTS_BACKUP_IMAGE_NAME"],
+  add_devices_file:  ENV["AYTESTS_ADD_DEVICES_FILE"]
 )
 
 Veewee::Definition.declare(

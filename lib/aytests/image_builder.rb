@@ -353,6 +353,8 @@ module AYTests
     # * AYTESTS_PROVIDER: virtual machine's provider (virtualbox or libvirt).
     # * AYTESTS_LINUXRC: additional parameters for Linuxrc. They're taken
     #   from a file called after the profile but with `.linuxrc` extension.
+    # * AYTESTS_ADD_DEVICES_FILE: Definition file of additional hardware which
+    #   should be added to generated image.
     #
     # @param  [Pathname] autoinst Path to AutoYaST profile
     # @return [Hash] Variables to be used as environment for Veewee
@@ -369,6 +371,8 @@ module AYTests
         "AYTESTS_WEBSERVER_PORT"    => WEBSERVER_PORT
       }
       environment["AYTESTS_LINUXRC"] = linuxrc_options(autoinst.sub_ext(".linuxrc"))
+      add_devices_file = autoinst.sub_ext('.add-devices')
+      environment["AYTESTS_ADD_DEVICES_FILE"] = add_devices_file.to_s if add_devices_file.file?
       environment
     end
 

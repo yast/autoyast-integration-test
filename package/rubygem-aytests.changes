@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Tue Jun 20 10:28:52 CEST 2017 - schubi@suse.de
+
+- Adding additional devices to the test image.
+  (e.g. network device)
+- 1.0.49
+
+-------------------------------------------------------------------
 Fri Jun  2 14:26:45 CEST 2017 - schubi@suse.de
 
 - Added libncurses6 to sles15
