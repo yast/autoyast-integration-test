@@ -61,6 +61,14 @@ module AYTests
       read_definition
     end
 
+    # Adding/Updating devices of the virtual machine
+    #
+    # @param [String] kind of the device e.g. "network" (just for information)
+    # @param [String] params of the given divice
+    def add_device( kind, params)
+      Cheetah.run(["VBoxManage", "modifyvm", name] + params.split)
+    end
+
     # Backup the virtual machine
     #
     # If the machine is running, it will be switched off before creating the

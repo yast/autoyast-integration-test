@@ -43,6 +43,18 @@ module AYTests
       @driver.save
     end
 
+    # Add additional devices to the virtial machine.
+    #
+    # @param [Hash] devices Device description
+    def add_devices(devices)
+      log.info "Adding additional devices: #{devices}"
+      devices.each do |kind, entries|
+        entries.each do |entry|
+          @driver.add_device( kind, entry )
+        end
+      end
+    end
+
     # Run a command in the virtual machine using SSH
     #
     # @param cmd [String] Command

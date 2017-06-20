@@ -51,6 +51,14 @@ module AYTests
       read_definition
     end
 
+    # Adding one device to the virtual machine
+    #
+    # @param [String] kind of the device e.g. "network"
+    # @param [String] params of the given divice
+    def add_device( kind, params)
+      Cheetah.run(["sudo", "virt-xml", name, "--add-device", "--#{kind}", params])
+    end
+
     # Backup the virtual machine
     #
     # If the machine is running, it will be switched off before creating the
