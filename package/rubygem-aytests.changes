@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Jul 17 16:56:19 CEST 2017 - schubi@suse.de
+
+- Removed SLES12-SP1 tree from SLES12-SP3
+- 1.0.51
+
+-------------------------------------------------------------------
 Mon Jul 17 13:36:19 CEST 2017 - schubi@suse.de
 
 - SLES12-SP3 test: Switiching YAST repository to

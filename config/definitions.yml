@@ -26,7 +26,7 @@ sle12_common: &sle12_common
       :packages: ["hwinfo"]
 
 :sles12-sp3:
-  <<: *sle12_common
+  :dud_dist: "sle12"
   :yast_url: "http://download.suse.de/ibs/Devel:/YaST:/SLE-12-SP3/SLE_12_SP3_Update/"
 # This ISO is used by OpenQA too
   :iso_url: "http://download.suse.de/ibs/SUSE:/SLE-12-SP3:/GA:/Staging:/A/images/iso/Test-Server-DVD-x86_64-Build*-Media.iso"
