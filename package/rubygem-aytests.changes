@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon Jul 17 13:36:19 CEST 2017 - schubi@suse.de
+
+- SLES12-SP3 test: Switiching YAST repository to
+  SLE-12-SP3/SLE_12_SP3_Update
+- 1.0.50
+
+-------------------------------------------------------------------
 Tue Jun 20 10:28:52 CEST 2017 - schubi@suse.de
 
 - Adding additional devices to the test image.
