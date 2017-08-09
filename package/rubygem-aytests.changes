@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Wed Aug  9 15:27:49 UTC 2017 - knut.anderssen@suse.com
+
+- bsc#1053034
+  - Disable predictable network interface names by default
+- 1.0.52
+
+-------------------------------------------------------------------
 Mon Jul 17 16:56:19 CEST 2017 - schubi@suse.de
 
 - Removed SLES12-SP1 tree from SLES12-SP3

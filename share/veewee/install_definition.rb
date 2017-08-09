@@ -34,6 +34,10 @@ Veewee::Definition.declare(
     " insecure=1",
     " netsetup=dhcp",
     " SetHostname=0",
+    # Disable predictable network interface names until we have a better
+    # solution (bsc#1053034)
+    " biosdevname=0",
+    " net.ifnames=0",
     " #{ENV["AYTESTS_LINUXRC"]}",
     "<Enter>"
   ],
