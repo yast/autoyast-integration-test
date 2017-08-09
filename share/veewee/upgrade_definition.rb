@@ -34,6 +34,9 @@ Veewee::Definition.declare(
     " autoupgrade=1",
     " netsetup=dhcp",
     " SetHostname=0",
+    # Disable predictable network interface names until we have a workaround
+    " biosdevname=0",
+    " net.ifnames=0",
     " #{ENV["AYTESTS_LINUXRC"]}",
     " netdevice= ", # Only needed for SLES11 installation. So removing this entry again.
     "<Enter>"
