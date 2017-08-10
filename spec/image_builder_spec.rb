@@ -24,7 +24,8 @@ RSpec.describe AYTests::ImageBuilder do
 
   describe ".new" do
     context "when no provider is given" do
-      let(:default_args) { { sources_dir: sources_dir, work_dir: work_dir } }
+      let(:default_args) { { sources_dir: sources_dir, work_dir: work_dir,
+        files_dir: files_dir } }
 
       it "selects :libvirt" do
         expect(builder.provider).to eq(:libvirt)
@@ -32,7 +33,8 @@ RSpec.describe AYTests::ImageBuilder do
     end
 
     context "when a provider is given" do
-      let(:default_args) { { sources_dir: sources_dir, work_dir: work_dir, provider: :virtualbox } }
+      let(:default_args) { { sources_dir: sources_dir, work_dir: work_dir,
+        files_dir: files_dir, provider: :virtualbox } }
 
       it "selects the given provider" do
         expect(builder.provider).to eq(:virtualbox)
@@ -248,7 +250,7 @@ RSpec.describe AYTests::ImageBuilder do
   describe "#cleanup" do
     context "when provider is :libvirt" do
       it "removes copied AutoYaST profile, Veewee definition and vm storage" do
-        expect(FileUtils).to receive(:rm).with(builder.autoinst_path, force: true)
+        expect(FileUtils).to receive(:rm_r).with(builder.autoinst_path, force: true)
         expect(FileUtils).to receive(:rm).with(builder.definition_path, force: true)
         expect(FileUtils).to receive(:rm).with(builder.libvirt_definition_path, force: true)
         expect(builder).to receive(:system)
@@ -262,7 +264,7 @@ RSpec.describe AYTests::ImageBuilder do
       let(:provider) { :virtualbox }
 
       it "removes copied AutoYaST profile, Veewee definition" do
-        expect(FileUtils).to receive(:rm).with(builder.autoinst_path, force: true)
+        expect(FileUtils).to receive(:rm_r).with(builder.autoinst_path, force: true)
         expect(FileUtils).to receive(:rm).with(builder.definition_path, force: true)
         expect(FileUtils).to receive(:rm).with(builder.libvirt_definition_path, force: true)
         expect(builder).to_not receive(:system)

@@ -10,7 +10,7 @@ module AYTests
 
     attr_reader :sources_dir, :obs_iso_dir, :autoinst_path, :definition_path,
       :veewee_autoyast_dir, :libvirt_definition_path, :provider, :headless, :work_dir,
-      :files_dir, :results_dir
+      :files_dir, :results_dir, :aytests_dir
 
     IMAGE_NAME = "autoyast".freeze
     BACKUP_IMAGE_NAME = "autoyast_sav".freeze
@@ -25,9 +25,10 @@ module AYTests
     MAC_ADDRESS = "02:00:00:12:34:56".freeze
     POSTINSTALL_SCRIPT = "/root/postinstall.sh".freeze
     DEFAULT_LINUXRC_ARGS = {
-      "autoyast" => "http://%IP%:{{PORT}}/autoinst.xml"
+      "autoyast" => "http://%IP%:{{PORT}}/"
     }.freeze
     CLONE_IMAGE_PATH = "/var/lib/libvirt/images/#{IMAGE_NAME}-1.qcow2".freeze
+    AUTOINST_XML = "autoinst.xml"
 
     # Constructor
     #
@@ -36,9 +37,12 @@ module AYTests
     #                               post-install script, etc.)
     # @param [Pathname] work_dir    Set the work directory. By default it
     #                               uses AYTests.work_dir
+    # @param [Pathname] results_dir Directory to save results
+    #                               (logs, screenshots, etc.)
+    # @param [Pathname] files_dir   Files to be served through HTTP.
     # @param [Symbol]   provider    Provider to be used by Vagrant
     #                               (:libvirt or :virtualbox)
-    # @param [Symbol]   headless    Disable GUI (only relevant for virtualbox
+    # @param [Boolean]  headless    Disable GUI (only relevant for virtualbox
     #                               provider)
     def initialize(sources_dir: nil, work_dir: nil, results_dir: nil, files_dir: nil,
       provider: :libvirt, headless: false)
@@ -48,13 +52,14 @@ module AYTests
       @files_dir = files_dir
       @veewee_autoyast_dir = @work_dir.join("definitions", "autoyast")
       @obs_iso_dir = @work_dir.join("iso")
-      @autoinst_path = @work_dir.join("definitions", "autoyast", "autoinst.xml")
+      @autoinst_path = @work_dir.join("definitions", "autoyast", AUTOINST_XML)
       @definition_path = @work_dir.join("definitions", "autoyast", "definition.rb")
       # This file will be used by Veewee during upgrade.
       @libvirt_definition_path = @work_dir.join("definitions", "autoyast",
         "autoyast_description.xml")
       @headless = headless
       @provider = provider
+      @aytests_dir = files_dir.dirname
     end
 
     # Due an aborted run there could be old stuff which should be
@@ -187,7 +192,7 @@ module AYTests
     #
     # Removes AutoYaST profile, Veewee definition and link to installation ISO
     def cleanup
-      FileUtils.rm(autoinst_path, force: true)
+      FileUtils.rm_r(autoinst_path, force: true)
       FileUtils.rm(definition_path, force: true)
       FileUtils.rm(libvirt_definition_path, force: true)
       return unless provider == :libvirt
@@ -268,17 +273,54 @@ module AYTests
       FileUtils.cp(source_definition, definition_path)
     end
 
+    # Set up one AutoYaST configuration file
+    #
+    # It copies the AutoYaST configuration file to the workspace which
+    # can be used by Veewee.
+    # All variables in the AY configuration files will be exchanged by values
+    # defined in <test_name>.var file.
+    #
+    # @param [Pathname] source path of source file
+    # @param [Pathname] dest   path of destination
+    def setup_autoinst_file(source, dest)
+      dir = dest.dirname
+      dir.mkpath unless dir.directory?
+      content = File.read(source)
+      autoinst_vars(source.sub_ext(".vars")).each { |k, v| content.gsub!("{{#{k}}}", v) }
+      content.gsub!("/dev/vd", "/dev/sd") if provider == :virtualbox
+      File.open(dest, "w") { |f| f.puts content }
+    end
+
+    # Set up one AutoYaST configuration directory where e.g. classes and rules
+    # have been defined.
+    #
+    # It copies the AutoYaST configuration directory to the workspace which
+    # can be used by Veewee.
+    #
+    # @param [Pathname] source_dir path of source directory
+    def setup_autoinst_dir(source_dir)
+      source_dir.children.each do |filename|
+        if File.directory?(filename)
+          setup_autoinst_dir(filename)
+        else
+          setup_autoinst_file(filename,
+            veewee_autoyast_dir.join(filename.dirname.relative_path_from(aytests_dir), filename.basename))
+        end
+      end
+    end
+
     # Set up AutoYaST profile
     #
-    # It copies the AutoYaST profile so Veewee can use it.
+    # It copies the AutoYaST profile(s) so Veewee can use it.
     #
     # @param [String|Pathname] autoinst AutoYaST profile path.
     def setup_autoinst(autoinst)
       if autoinst.file?
-        content = File.read(autoinst)
-        autoinst_vars(autoinst.sub_ext(".vars")).each { |k, v| content.gsub!("{{#{k}}}", v) }
-        content.gsub!("/dev/vd", "/dev/sd") if provider == :virtualbox
-        File.open(autoinst_path, "w") { |f| f.puts content }
+        setup_autoinst_file(autoinst, @autoinst_path)
+      elsif autoinst.directory?
+        setup_autoinst_dir(autoinst)
+        # is the directory name now
+        @autoinst_path = @work_dir.join("definitions", "autoyast", autoinst.basename)
       else
         log.warn "#{autoinst} not found"
         log.warn "Taking the previous one from the last run."
@@ -290,8 +332,6 @@ module AYTests
     # It will use a temporal file that won't be deleted (as it will
     # be needed by Veewee's upgrade definition).
     #
-    # @params [Pathname,String] definition Path to the libvirt domain definition
-    #   for the KVM image.
     def change_boot_order
       return unless provider == :libvirt
       system "sudo virsh destroy #{IMAGE_NAME}" # shutdown
@@ -408,6 +448,13 @@ module AYTests
     # @return [String]   Linuxrc options to be used during installation
     def linuxrc_options(linuxrc_file)
       options = DEFAULT_LINUXRC_ARGS.merge(custom_linuxrc_options(linuxrc_file))
+      if autoinst_path.file?
+        # default AY configuration file
+        options["autoyast"] += AUTOINST_XML
+      else
+        # directory in which classes/rules are defined
+        options["autoyast"] += autoinst_path.basename.to_s + "/"
+      end
       options_string = linuxrc_options_to_s(options)
       options_string.gsub(/{{\w+}}/, "{{PORT}}" => WEBSERVER_PORT)
     end

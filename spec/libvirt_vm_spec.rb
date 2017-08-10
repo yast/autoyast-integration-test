@@ -158,6 +158,8 @@ RSpec.describe AYTests::LibvirtVM do
     it "uses virsh to create a screenshot of the running system" do
       expect(Cheetah).to receive(:run)
         .with(["sudo", "virsh", "screenshot", subject.name, "--file", path.sub_ext(".pnm").to_s])
+      expect(Cheetah).to receive(:run)
+        .with(["sudo", "pkill", "-f", "virsh screenshot"], {:allowed_exitstatus=>1})
       expect(MiniMagick::Tool::Convert).to receive(:new)
       subject.screenshot(path)
     end
@@ -166,6 +168,8 @@ RSpec.describe AYTests::LibvirtVM do
       it "returns true" do
         allow(Cheetah).to receive(:run)
           .with(array_including("screenshot"))
+        expect(Cheetah).to receive(:run)
+          .with(["sudo", "pkill", "-f", "virsh screenshot"], {:allowed_exitstatus=>1})
         expect(subject.screenshot(path)).to eq(true)
       end
     end
