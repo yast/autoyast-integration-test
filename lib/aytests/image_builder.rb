@@ -28,7 +28,7 @@ module AYTests
       "autoyast" => "http://%IP%:{{PORT}}/"
     }.freeze
     CLONE_IMAGE_PATH = "/var/lib/libvirt/images/#{IMAGE_NAME}-1.qcow2".freeze
-    AUTOINST_XML = "autoinst.xml"
+    AUTOINST_XML = "autoinst.xml".freeze
 
     # Constructor
     #
