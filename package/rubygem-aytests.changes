@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Aug 11 08:56:46 UTC 2017 - knut.anderssen@suse.com
+
+- Added a woraround to avoid modifications of the SSH_PASSWORD in
+  case of a Net::SSH::Simple exceptions.
+- 1.0.53
+
+-------------------------------------------------------------------
 Wed Aug  9 15:27:49 UTC 2017 - knut.anderssen@suse.com
 
 - bsc#1053034
