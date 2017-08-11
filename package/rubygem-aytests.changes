@@ -2,7 +2,7 @@
 Fri Aug 11 08:56:46 UTC 2017 - knut.anderssen@suse.com
 
 - Added a woraround to avoid modifications of the SSH_PASSWORD in
-  case of a Net::SSH::Simple exceptions.
+  case of a Net::SSH::Simple exception.
 - 1.0.53
 
 -------------------------------------------------------------------
