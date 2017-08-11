@@ -18,9 +18,9 @@ module AYTests
     IMAGE_BOX_NAME = "autoyast_vagrant_box_image_0.img".freeze
     SLEEP_TIME_AFTER_UPGRADE = 150
     SLEEP_TIME_AFTER_SHUTDOWN = 15
-    SSH_USER = "root"
-    SSH_PASSWORD = "nots3cr3t"
-    SSH_PORT = "22"
+    SSH_USER = "root".freeze
+    SSH_PASSWORD = "nots3cr3t".freeze
+    SSH_PORT = "22".freeze
     WEBSERVER_PORT = "8888".freeze
     MAC_ADDRESS = "02:00:00:12:34:56".freeze
     POSTINSTALL_SCRIPT = "/root/postinstall.sh".freeze
@@ -510,9 +510,11 @@ module AYTests
     #
     # @return [Hash] SSH options
     def ssh_options
-      @ssh_options ||= {
+      {
         user:     SSH_USER,
-        password: SSH_PASSWORD,
+        # Net::SSH::Simple modifies it in case of an exception, workaround to
+        # avoid unexpected constant modifications
+        password: SSH_PASSWORD.dup,
         port:     SSH_PORT
       }
     end
