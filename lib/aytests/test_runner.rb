@@ -90,7 +90,10 @@ module AYTests
     # @return [String]      AutoYaST profile path for the given stage
     def autoinst(stage = :install)
       autoinst = tests_path.join("#{test_name}.#{stage}_xml")
-      autoinst.file? ? autoinst : tests_path.join("#{test_name}.xml")
+      return autoinst if autoinst.file?
+      autoinst = tests_path.join(test_name)
+      return autoinst if autoinst.directory?
+      tests_path.join("#{test_name}.xml")
     end
 
     # Determine ISO url to be used
