@@ -1,7 +1,7 @@
 #
 # spec file for package rubygem-aytests
 #
-# Copyright (c) 2015 SUSE LINUX GmbH, Nuernberg, Germany.
+# Copyright (c) 2017 SUSE LINUX GmbH, Nuernberg, Germany.
 #
 # All modifications and additions to the file contributed by third parties
 # remain the property of their copyright owners, unless otherwise agreed
@@ -15,15 +15,16 @@
 # Please submit bugfixes or comments via http://bugs.opensuse.org/
 #
 
+
 Name:           rubygem-aytests
-Version:        1.0.52
+Version:        1.0.53
 Release:        0
 %define mod_name aytests
 %define mod_full_name %{mod_name}-%{version}
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
-BuildRequires:  ruby-macros >= 5
-BuildRequires:  %{ruby}
 BuildRequires:  %{rubygem gem2rpm}
+BuildRequires:  %{ruby}
+BuildRequires:  ruby-macros >= 5
 Url:            http://github.org/yast/autoyast-integration-test
 Source:         http://rubygems.org/gems/%{mod_full_name}.gem
 Summary:        AutoYaST integration tests framework
@@ -31,8 +32,8 @@ License:        GPL-3.0
 Group:          Development/Languages/Ruby
 
 # These dependencies are included in the package/gem2rpm.yml file.
-Requires:       mksusecd
 Requires:       mkdud
+Requires:       mksusecd
 Requires:       virt-install
 
 %description
