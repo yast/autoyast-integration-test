@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Aug 23 15:26:10 CEST 2017 - schubi@suse.de
+
+- Adapted to SLES15
+- 1.0.55
+
+-------------------------------------------------------------------
 Thu Aug 11 10:56:39 CEST 2017 - schubi@suse.de
 
 - Allowing tests with classes and rules.
