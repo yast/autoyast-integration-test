@@ -1,9 +1,8 @@
 autoyast2
 autoyast2-installation
-hwinfo
 libsnapper4
-libstorage7
-libstorage-ruby
+libstorage-ng1
+libstorage-ng-ruby
 libyui8
 libyui-ncurses8
 libyui-ncurses-pkg8
@@ -85,7 +84,7 @@ yast2-slp
 yast2-snapper
 yast2-sound
 yast2-squid
-yast2-storage
+yast2-storage-ng
 yast2-transfer
 yast2-tune
 yast2-update
