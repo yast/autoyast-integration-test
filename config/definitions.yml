@@ -52,3 +52,11 @@ sle12_common: &sle12_common
   :extra_repos:
     - :server: "http://download.suse.de/ibs/SUSE:/SLE-15:/GA/standard/"
       :packages: ["lsof", "perl-Config-IniFiles", "libcamgm100", "SuSEfirewall2", "vsftpd" ]
+
+:leanos15:
+  :dud_dist: "sle15"
+  :yast_url: "http://download.suse.de/ibs/Devel:/YaST:/Head/SUSE_SLE-15_GA/"
+  :iso_url: "http://download.suse.de/ibs/SUSE:/SLE-15:/GA/images/iso/SLE-15-Leanos-DVD-x86_64-Build*-Media1.iso"
+  :extra_repos:
+    - :server: "http://download.suse.de/ibs/SUSE:/SLE-15:/GA/standard/"
+      :packages: ["lsof", "perl-Config-IniFiles", "libcamgm100", "SuSEfirewall2", "vsftpd" ]
