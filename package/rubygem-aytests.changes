@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Oct  3 08:56:14 UTC 2017 - mfilka@suse.com
+
+- added LeanOS definition
+- 1.0.57 
+
+-------------------------------------------------------------------
 Thu Aug 31 14:38:53 CEST 2017 - schubi@suse.de
 
 - Fixes for SLES15: workaround for missing licence file; package
