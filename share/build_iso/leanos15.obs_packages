@@ -3,6 +3,7 @@ autoyast2-installation
 libsnapper4
 libstorage-ng1
 libstorage-ng-ruby
+libstorage-ng-lang
 libyui8
 libyui-ncurses8
 libyui-ncurses-pkg8
