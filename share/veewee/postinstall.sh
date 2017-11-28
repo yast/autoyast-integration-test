@@ -12,8 +12,11 @@ rm -f /etc/zypp/locks
 
 # install root user key
 mkdir -pm 700 /root/.ssh
-curl -Lo /root/.ssh/authorized_keys 'https://raw.github.com/mitchellh/vagrant/master/keys/vagrant.pub'
-chmod 0600 /root/.ssh/authorized_keys
+curl -Lo /root/.ssh/authorized_keys2 'https://raw.github.com/mitchellh/vagrant/master/keys/vagrant.pub'
+chmod 0600 /root/.ssh/authorized_keys2
+
+# Comment AuthorizedKeysFile to use defaults allowing also authorized_keys2
+sed -i '/AuthorizedKeysFile/s/^#*/#/' /etc/ssh/sshd_config
 
 # update sudoers
 echo -e "\nupdate sudoers ..."
