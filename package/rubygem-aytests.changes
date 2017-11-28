@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Tue Nov 28 21:15:24 UTC 2017 - knut.anderssen@suse.com
+
+- Use .ssh/authorized_keys2 instead of .ssh/authorized_keys in 
+  postinshtall.sh script (bsc#1066342)
+- 1.0.59
+
+-------------------------------------------------------------------
 Wed Oct 11 13:18:58 CEST 2017 - schubi@suse.de
 
 - Replaced sles15 by leanos15.
