@@ -11,10 +11,8 @@ echo 'solver.onlyRequires = true' >> /etc/zypp/zypp.conf
 rm -f /etc/zypp/locks
 
 # Moved the root ssh authorized keys file if exist for being tested
-if [[ ! -f /root/.ssh/authorized_keys.aytests ]]; then
-  if [[ -f /root/.ssh/authorized_keys ]]; then
-    mv /root/.ssh/authorized_keys /root/.ssh/authorized_keys.aytests
-  fi
+if [[ ! -f /root/.ssh/authorized_keys.aytests ]] && [[ -f /root/.ssh/authorized_keys ]]; then
+  mv /root/.ssh/authorized_keys /root/.ssh/authorized_keys.aytests
 fi
 
 # install root user key
