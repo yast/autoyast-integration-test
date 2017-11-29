@@ -10,13 +10,17 @@ echo 'solver.onlyRequires = true' >> /etc/zypp/zypp.conf
 # remove zypper package locks
 rm -f /etc/zypp/locks
 
+# Moved the root ssh authorized keys file if exist for being tested
+if [[ ! -f /root/.ssh/authorized_keys.aytests ]]; then
+  if [[ -f /root/.ssh/authorized_keys ]]; then
+    mv /root/.ssh/authorized_keys /root/.ssh/authorized_keys.aytests
+  fi
+fi
+
 # install root user key
 mkdir -pm 700 /root/.ssh
-curl -Lo /root/.ssh/authorized_keys2 'https://raw.github.com/mitchellh/vagrant/master/keys/vagrant.pub'
-chmod 0600 /root/.ssh/authorized_keys2
-
-# Comment AuthorizedKeysFile to use defaults allowing also authorized_keys2
-sed -i '/AuthorizedKeysFile/s/^#*/#/' /etc/ssh/sshd_config
+curl -Lo /root/.ssh/authorized_keys 'https://raw.github.com/mitchellh/vagrant/master/keys/vagrant.pub'
+chmod 0600 /root/.ssh/authorized_keys
 
 # update sudoers
 echo -e "\nupdate sudoers ..."
