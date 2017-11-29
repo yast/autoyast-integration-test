@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Tue Nov 28 21:15:24 UTC 2017 - knut.anderssen@suse.com
+
+- Move installed root ssh authorized_keys to authorized_keys.aytest
+  in postinstall.sh script for being tested (bsc#1066342).
+- 1.0.59
+
+-------------------------------------------------------------------
 Wed Oct 11 13:18:58 CEST 2017 - schubi@suse.de
 
 - Replaced sles15 by leanos15.

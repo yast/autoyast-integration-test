@@ -10,6 +10,11 @@ echo 'solver.onlyRequires = true' >> /etc/zypp/zypp.conf
 # remove zypper package locks
 rm -f /etc/zypp/locks
 
+# Moved the root ssh authorized keys file if exist for being tested
+if [[ ! -f /root/.ssh/authorized_keys.aytests ]] && [[ -f /root/.ssh/authorized_keys ]]; then
+  mv /root/.ssh/authorized_keys /root/.ssh/authorized_keys.aytests
+fi
+
 # install root user key
 mkdir -pm 700 /root/.ssh
 curl -Lo /root/.ssh/authorized_keys 'https://raw.github.com/mitchellh/vagrant/master/keys/vagrant.pub'
