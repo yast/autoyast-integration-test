@@ -4,6 +4,12 @@ sle12_common: &sle12_common
     - :server: "http://download.suse.de/ibs/SUSE:/SLE-12-SP1:/GA/standard/"
       :packages: ["grub2-2.02~beta2", "grub2-i386-pc-2.02~beta2", "libzypp", "libsolv-tools", "zypper"]
 
+leanos15_common: &leanos15_common
+  :dud_dist: "sle15"
+  :extra_repos:
+    - :server: "http://download.suse.de/ibs/Devel:/zypp:/SLE15/SLE_15/"
+      :packages: ["libzypp", "libsolv-tools", "zypper"]
+
 :sles12:
   <<: *sle12_common
   :yast_url: "http://download.suse.de/ibs/Devel:/YaST:/Head/SLE-12-SP1/"
@@ -41,7 +47,7 @@ sle12_common: &sle12_common
   :iso_url: "http://dist.suse.de/ibs/SUSE:/SLE-12-SP2:/Update:/Products:/CASP10/images/iso/SUSE-CaaS-Platform-1.0-DVD-x86_64-Build*-Media1.iso"
 
 :leanos15:
-  :dud_dist: "sle15"
+  <<: *leanos15_common
   :yast_url: "http://download.suse.de/ibs/Devel:/YaST:/Head/SUSE_SLE-15_GA/"
   :iso_url: "http://dist.nue.suse.com/ibs/SUSE:/SLE-15:/GA:/TEST/images/iso/SLE-15-Installer-DVD-x86_64-Build*-Media1.iso"
 
