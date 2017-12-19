@@ -15,7 +15,7 @@ hooks = AYTests::VeeweeHooks.new(
 
 Veewee::Definition.declare(
   cpu_count:            "2",
-  memory_size:          "1024",
+  memory_size:          "1536",
   disk_size:            "25600",
   disk_format:          "VDI",
   hostiocache:          "off",
