@@ -244,7 +244,8 @@ module AYTests
         "--non-interactive",
         "install",
         "--auto-agree-with-licenses",
-        "--name"
+        "--name",
+        "--no-gpgcheck"
       ]
       candidates = Array(packages)
       to_install = candidates.select do |name|
