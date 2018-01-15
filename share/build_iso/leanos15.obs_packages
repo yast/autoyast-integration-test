@@ -19,7 +19,6 @@ yast2-audit-laf
 yast2-auth-client
 yast2-boot-server
 yast2-buildtools
-yast2-ca-management
 yast2-cio
 yast2-cluster
 yast2-configuration-management
