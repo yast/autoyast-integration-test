@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Feb  5 15:40:26 CET 2018 - schubi@suse.de
+
+- Added ruby2.5-rubygem-simpleidn to leanos15
+- 1.0.64
+
+-------------------------------------------------------------------
 Mon Jan 15 10:17:49 CET 2018 - schubi@suse.de
 
 - Added libjson-c3 for leanos inst-sys.
