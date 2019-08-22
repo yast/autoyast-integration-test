@@ -17,12 +17,12 @@
 
 
 Name:           rubygem-aytests
-Version:        1.0.64
+Version:        1.0.65
 Release:        0
 %define mod_name aytests
 %define mod_full_name %{mod_name}-%{version}
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
-BuildRequires:  %{rubygem gem2rpm}
+BuildRequires:  rubygem(%{rb_default_ruby_abi}:gem2rpm)
 BuildRequires:  %{ruby}
 BuildRequires:  ruby-macros >= 5
 Url:            http://github.org/yast/autoyast-integration-test
