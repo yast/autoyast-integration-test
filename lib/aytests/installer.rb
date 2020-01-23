@@ -105,8 +105,8 @@ module AYTests
     # Adapted from Pennyworth.
     def reload_udev_rules
       log.info "Reloading udev rules"
-      Cheetah.run "sudo", "/sbin/udevadm", "control", "--reload-rules"
-      Cheetah.run "sudo", "/sbin/udevadm", "trigger"
+      Cheetah.run "sudo", "/usr/bin/udevadm", "control", "--reload-rules"
+      Cheetah.run "sudo", "/usr/bin/udevadm", "trigger"
     end
 
     # Install libvirt Vagrant plugin
