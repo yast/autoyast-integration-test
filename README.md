@@ -271,12 +271,3 @@ After installation of the RPM please run:
     # systemctl start virtlogd.socket
 
 in order to initialize the socket communication.
-
-
-## Jenkins
-
-These AutoYaST integration tests are running on a SUSE Jenkins node:
-
-* https://ci.suse.de/view/YaST/job/yast-aytests-run-SLE12/
-* https://ci.suse.de/view/YaST/job/yast-aytests-run-CASP/
-* https://ci.suse.de/view/YaST/job/yast-aytests-run-storage-ng/
