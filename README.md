@@ -1,5 +1,7 @@
 # AutoYaST Integration Tests
 
+**DEPRECATION NOTICE: this tool has been deprecated and it is not maintained anymore.**
+
 Test framework for running AutoYaST integration tests by using Veewee and
 Vagrant.
 
